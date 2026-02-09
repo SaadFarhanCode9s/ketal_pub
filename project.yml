@@ -64,7 +64,9 @@ include:
 - path: AccessibilityTests/SupportingFiles/target.yml
 packages:
   MatrixRustSDK:
-    path: ../matrix-rust-sdk
+    url: https://github.com/element-hq/matrix-rust-components-swift
+    exactVersion: 26.01.27
+    # path: ../matrix-rust-sdk
   Compound:
     path: compound-ios
   AnalyticsEvents:

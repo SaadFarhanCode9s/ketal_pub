@@ -1,6 +1,0 @@
-echo "--- SYSTEM CHECK ---"
-sw_vers -productVersion | xargs echo "macOS Version:"
-xcodebuild -version | head -n 1
-swift --version | head -n 1
-xcodegen version | xargs echo "XcodeGen:"
-echo "--------------------"

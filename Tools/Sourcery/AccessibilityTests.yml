@@ -1,0 +1,7 @@
+sources:
+  include:
+    - ../../ketal
+templates:
+  - AccessibilityTests.stencil
+output:
+  ../../AccessibilityTests/Sources/GeneratedAccessibilityTests.swift

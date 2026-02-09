@@ -1,0 +1,19 @@
+project: ketal.xcodeproj
+schemes:
+- ketal
+- UnitTests
+- PreviewTests
+- UITests
+- IntegrationTests
+targets:
+- ketal
+- NSE
+- ShareExtension
+- UnitTests
+- PreviewTests
+- UITests
+- IntegrationTests
+report_exclude:
+  - ketal/Sources/Mocks/Generated/GeneratedMocks.swift
+  - ketal/Sources/Mocks/Generated/SDKGeneratedMocks.swift
+retain_swift_ui_previews: true

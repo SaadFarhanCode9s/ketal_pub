@@ -1,0 +1,130 @@
+name: NSE
+
+schemes:
+  NSE:
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+    build:
+      targets:
+        NSE:
+        - running
+        - testing
+        - profiling
+        - analyzing
+        - archiving
+    profile:
+      config: Release
+    run:
+      askForAppToLaunch: true
+      config: Debug
+      debugEnabled: false
+      disableMainThreadChecker: false
+      launchAutomaticallySubstyle: 2
+    test:
+      config: Debug
+      disableMainThreadChecker: false
+
+targets:
+  NSE:
+    type: app-extension
+    platform: iOS
+
+    dependencies:
+      - package: MatrixRustSDK
+      - package: KeychainAccess
+      - package: Kingfisher
+      - package: Collections
+      - package: Compound
+      - package: DeviceKit
+      - package: LRUCache
+      - package: Version
+      - package: SwiftSoup
+
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: $(PRODUCT_DISPLAY_NAME)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        appGroupIdentifier: $(APP_GROUP_IDENTIFIER)
+        baseBundleIdentifier: $(BASE_BUNDLE_IDENTIFIER)
+        keychainAccessGroupIdentifier: $(KEYCHAIN_ACCESS_GROUP_IDENTIFIER)
+        productionAppName: $(PRODUCTION_APP_NAME)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.usernotifications.service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).NotificationServiceExtension
+
+    entitlements:
+      path: NSE.entitlements
+      properties:
+        com.apple.developer.usernotifications.filtering: true
+        com.apple.security.application-groups:
+        - $(APP_GROUP_IDENTIFIER)
+        keychain-access-groups:
+        - $(KEYCHAIN_ACCESS_GROUP_IDENTIFIER)
+
+    settings:
+      base:
+        PRODUCT_NAME: NSE
+        PRODUCT_DISPLAY_NAME: $(APP_DISPLAY_NAME)
+        PRODUCT_BUNDLE_IDENTIFIER: ${BASE_BUNDLE_IDENTIFIER}.nse
+        MARKETING_VERSION: $(MARKETING_VERSION)
+        CURRENT_PROJECT_VERSION: $(CURRENT_PROJECT_VERSION)
+        DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+        SWIFT_OBJC_INTERFACE_HEADER_NAME: GeneratedInterface-Swift.h
+        OTHER_SWIFT_FLAGS:
+        - "-DIS_NSE"
+        
+    sources:
+    - path: ../Sources
+    - path: ../SupportingFiles
+    - path: ../../ketal/Sources/AppHooks/AppHooks.swift
+    - path: ../../ketal/Sources/AppHooks/Hooks/TracingHook.swift
+    - path: ../../ketal/Sources/AppHooks/Hooks/ClientBuilderHook.swift
+    - path: ../../ketal/Sources/AppHooks/Hooks/RemoteSettingsHook.swift
+    - path: ../../Secrets/Secrets.swift
+    - path: ../../ketal/Sources/Application/Settings
+    - path: ../../ketal/Sources/Application/TargetConfiguration.swift
+    - path: ../../ketal/Sources/Generated/Assets.swift
+    - path: ../../ketal/Sources/Generated/Strings.swift
+    - path: ../../ketal/Sources/Other/Avatars.swift
+    - path: ../../ketal/Sources/Other/CurrentValuePublisher.swift
+    - path: ../../ketal/Sources/Other/ExpiringTaskRunner.swift
+    - path: ../../ketal/Sources/Other/Extensions/AttributedString.swift
+    - path: ../../ketal/Sources/Other/Extensions/Bundle.swift
+    - path: ../../ketal/Sources/Other/Extensions/ClientBuilder.swift
+    - path: ../../ketal/Sources/Other/Extensions/Date.swift
+    - path: ../../ketal/Sources/Other/Extensions/Dictionary.swift
+    - path: ../../ketal/Sources/Other/Extensions/FileManager.swift
+    - path: ../../ketal/Sources/Other/Extensions/ImageCache.swift
+    - path: ../../ketal/Sources/Other/Extensions/LayoutDirection.swift
+    - path: ../../ketal/Sources/Other/Extensions/NSRegularExpresion.swift
+    - path: ../../ketal/Sources/Other/Extensions/ProcessInfo.swift
+    - path: ../../ketal/Sources/Other/Extensions/String.swift
+    - path: ../../ketal/Sources/Other/Extensions/Task.swift
+    - path: ../../ketal/Sources/Other/Extensions/UNNotificationContent.swift
+    - path: ../../ketal/Sources/Other/Extensions/URL.swift
+    - path: ../../ketal/Sources/Other/Extensions/UTType.swift
+    - path: ../../ketal/Sources/Other/Extensions/CharacterSet.swift
+    - path: ../../ketal/Sources/Other/HTMLParsing
+    - path: ../../ketal/Sources/Other/InfoPlistReader.swift
+    - path: ../../ketal/Sources/Other/Logging
+    - path: ../../ketal/Sources/Other/MatrixEntityRegex.swift
+    - path: ../../ketal/Sources/Other/NetworkMonitor
+    - path: ../../ketal/Sources/Other/Pills/PillUtilities.swift
+    - path: ../../ketal/Sources/Other/Pills/PlainMentionBuilder.swift
+    - path: ../../ketal/Sources/Other/SDKListener.swift
+    - path: ../../ketal/Sources/Other/SwiftUI/Views/PlaceholderAvatarImage.swift
+    - path: ../../ketal/Sources/Other/TestablePreview/TestablePreview.swift
+    - path: ../../ketal/Sources/Other/UserAgentBuilder.swift
+    - path: ../../ketal/Sources/Services/ElementCall/ElementCallServiceConstants.swift
+    - path: ../../ketal/Sources/Services/Keychain/KeychainController.swift
+    - path: ../../ketal/Sources/Services/Keychain/KeychainControllerProtocol.swift
+    - path: ../../ketal/Sources/Services/Media/Provider
+    - path: ../../ketal/Sources/Services/Notification/NotificationConstants.swift
+    - path: ../../ketal/Sources/Services/Room/RoomSummary/RoomMessageEventStringBuilder.swift
+    - path: ../../ketal/Sources/Services/UserSession/RestorationToken.swift
+    - path: ../../ketal/Sources/Services/UserSession/SessionDirectories.swift
+    - path: ../../ketal/Sources/UITests/UITestsScreenIdentifier.swift

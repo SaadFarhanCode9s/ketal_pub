@@ -1,0 +1,59 @@
+name: IntegrationTests
+
+schemes:
+  IntegrationTests:
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+    build:
+      targets:
+        IntegrationTests: all
+    profile:
+      config: Release
+    run:
+      config: Debug
+      disableMainThreadChecker: false
+    test:
+      config: Debug
+      disableMainThreadChecker: false
+      gatherCoverageData: true
+      coverageTargets:
+        - ketal
+      testPlans:
+        - path: IntegrationTests.xctestplan
+          defaultPlan: true
+
+targets:
+  IntegrationTests:
+    type: bundle.ui-testing
+    platform: iOS
+
+    dependencies:
+    - target: ketal
+    - package: MatrixRustSDK
+    - package: DeviceKit
+    - package: KeychainAccess
+    - package: Kingfisher
+    - package: SwiftState
+    - package: GZIP
+    - package: Sentry
+    - package: Collections
+
+    info:
+      path: ../SupportingFiles/Info.plist
+
+    settings:
+      base:
+        PRODUCT_NAME: IntegrationTests
+        PRODUCT_BUNDLE_IDENTIFIER: ${BASE_BUNDLE_IDENTIFIER}.integration.tests
+      debug:
+      release:
+
+    sources:
+    - path: ../Sources
+    - path: ../SupportingFiles
+    - path: ../../ketal/Sources/Other/AccessibilityIdentifiers.swift
+    - path: ../../ketal/Sources/Other/Extensions/NSRegularExpresion.swift
+    - path: ../../ketal/Sources/Other/Extensions/XCUIElement.swift
+    - path: ../../ketal/Sources/Services/Analytics/Signposter.swift

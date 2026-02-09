@@ -1,0 +1,7 @@
+sources:
+  include:
+    - ../../ketal
+templates:
+  - PreviewTests.stencil
+output:
+  ../../PreviewTests/Sources/GeneratedPreviewTests.swift

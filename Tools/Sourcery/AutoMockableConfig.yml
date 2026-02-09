@@ -1,0 +1,10 @@
+sources:
+  include:
+    - ../../ketal
+    - ../../NSE
+  exclude:
+    - ../../ketal/Sources/Mocks/SDK
+templates:
+  - AutoMockable.stencil
+output:
+  ../../ketal/Sources/Mocks/Generated/GeneratedMocks.swift

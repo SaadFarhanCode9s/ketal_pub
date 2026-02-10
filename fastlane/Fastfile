@@ -352,7 +352,7 @@ lane :deploy_testflight do
 
   # 2. Sync Code Signing (ReadOnly)
   # Ensure you used the 'match' action to generate these repo url and password
-  # match(type: "appstore", readonly: true, git_url: ENV["MATCH_GIT_URL"])
+  match(type: "appstore", readonly: true, git_url: ENV["MATCH_GIT_URL"])
 
   # 3. Build App
   build_app(

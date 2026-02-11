@@ -274,10 +274,11 @@ validate_configuration() {
     fi
     
     # Check app.yml
-    if grep -q 'APP_DISPLAY_NAME: "ketal"' app.yml; then
+    if grep -q "APP_DISPLAY_NAME: ketal" app.yml; then
         print_success "app.yml: APP_DISPLAY_NAME is 'ketal'"
     else
         print_error "app.yml: APP_DISPLAY_NAME is NOT 'ketal'"
+        print_info "Found: $(grep "APP_DISPLAY_NAME" app.yml)"
         errors=$((errors + 1))
     fi
     

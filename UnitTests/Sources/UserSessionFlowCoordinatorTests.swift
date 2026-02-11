@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import ketal
 import XCTest
 
 @MainActor
@@ -250,7 +250,7 @@ class UserSessionFlowCoordinatorTests: XCTestCase {
     private var retractReachabilityIndicatorCallsCount: Int {
         userIndicatorController
             .retractIndicatorWithIdReceivedInvocations
-            .filter { $0 == "io.element.elementx.reachability.notification" }
+            .filter { $0 == "io.ketal.reachability.notification" }
             .count
     }
 }

@@ -26,13 +26,13 @@ class AudioRecorder: AudioRecorderProtocol {
     private var audioFile: AVAudioFile?
     private var audioConverter: AVAudioConverter?
     private var internalState = InternalAudioRecorderState.stopped
-
+    
     private var cancellables = Set<AnyCancellable>()
     private let actionsSubject: PassthroughSubject<AudioRecorderAction, Never> = .init()
     var actions: AnyPublisher<AudioRecorderAction, Never> {
         actionsSubject.eraseToAnyPublisher()
     }
-
+    
     private var recordingFormat: AVAudioFormat!
     private let maximumRecordingTime: TimeInterval = 1800 // 30 minutes
     private let silenceThreshold: Float = -50.0
@@ -43,14 +43,14 @@ class AudioRecorder: AudioRecorderProtocol {
     var isRecording: Bool {
         audioEngine?.isRunning ?? false
     }
-
+    
     private let dispatchQueue = DispatchQueue(label: "io.ketal.audio_recorder", qos: .userInitiated)
     private var stopped = false
-
+    
     init(audioSession: AudioSessionProtocol = AVAudioSession.sharedInstance()) {
         self.audioSession = audioSession
     }
-
+    
     deinit {
         if isRecording {
             // Cleanup
@@ -58,7 +58,7 @@ class AudioRecorder: AudioRecorderProtocol {
             deleteRecordingFile()
         }
     }
-
+    
     func record(audioFileURL: URL) async {
         stopped = false
         guard await requestRecordPermission() else {
@@ -73,7 +73,7 @@ class AudioRecorder: AudioRecorderProtocol {
             setInternalState(.error(error))
         }
     }
-
+    
     func stopRecording() async {
         await withCheckedContinuation { continuation in
             stopRecording {
@@ -81,12 +81,12 @@ class AudioRecorder: AudioRecorderProtocol {
             }
         }
     }
-
+    
     func cancelRecording() async {
         await stopRecording()
         await deleteRecording()
     }
-
+    
     func deleteRecording() async {
         await withCheckedContinuation { continuation in
             deleteRecording {
@@ -94,13 +94,13 @@ class AudioRecorder: AudioRecorderProtocol {
             }
         }
     }
-
+        
     func averagePower() -> Float {
         meterLevel
     }
-
+    
     // MARK: - Private
-
+    
     private func requestRecordPermission() async -> Bool {
         await withCheckedContinuation { continuation in
             audioSession.requestRecordPermission { granted in
@@ -108,22 +108,22 @@ class AudioRecorder: AudioRecorderProtocol {
             }
         }
     }
-
+    
     private func setupAudioSession() throws {
         MXLog.info("setup audio session")
-
+        
         try audioSession.setAllowHapticsAndSystemSoundsDuringRecording(true)
-        try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth])
+        try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetoothHFP])
         try audioSession.setActive(true)
         addObservers()
     }
-
+    
     private func releaseAudioSession() {
         MXLog.info("releasing audio session")
         try? audioSession.setActive(false, options: .notifyOthersOnDeactivation)
         removeObservers()
     }
-
+    
     private func startRecording(audioFileURL: URL) async -> Result<Void, AudioRecorderError> {
         await withCheckedContinuation { continuation in
             startRecording(audioFileURL: audioFileURL) { result in
@@ -131,7 +131,7 @@ class AudioRecorder: AudioRecorderProtocol {
             }
         }
     }
-
+    
     private func createAudioFile(at recordingURL: URL) throws -> AVAudioFile {
         let settings = [AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
                         AVSampleRateKey: Int(recordingFormat.sampleRate),
@@ -142,14 +142,14 @@ class AudioRecorder: AudioRecorderProtocol {
         try? FileManager.default.removeItem(at: recordingURL)
         return try AVAudioFile(forWriting: recordingURL, settings: settings)
     }
-
+    
     private func startRecording(audioFileURL: URL, completion: @escaping (Result<Void, AudioRecorderError>) -> Void) {
         dispatchQueue.async { [weak self] in
             guard let self, !self.stopped else {
                 completion(.failure(.recordingCancelled))
                 return
             }
-
+            
             do {
                 try setupAudioSession()
             } catch {
@@ -157,7 +157,7 @@ class AudioRecorder: AudioRecorderProtocol {
                 completion(.failure(.audioSessionFailure))
                 return
             }
-
+            
             // Initialize a new audio engine
             let audioEngine = AVAudioEngine()
             self.audioEngine = audioEngine
@@ -165,14 +165,14 @@ class AudioRecorder: AudioRecorderProtocol {
             let inputNode = audioEngine.inputNode
             let inputFormat = inputNode.outputFormat(forBus: 0)
             let hardwareSampleRate = audioEngine.inputNode.outputFormat(forBus: 0).sampleRate
-
+            
             // Define a recording audio format. Force the sample rate to 48000 to ensure OGGEncoder won't crash
             guard let recordingFormat = AVAudioFormat(standardFormatWithSampleRate: 48000, channels: 1) else {
                 completion(.failure(.unsupportedAudioFormat))
                 return
             }
             self.recordingFormat = recordingFormat
-
+            
             // Make sure we have 1 channel at the end by using a mixer.
             // The sample rate must match the hardware sample rate.
             let mixerFormat = AVAudioFormat(standardFormatWithSampleRate: hardwareSampleRate, channels: 1)
@@ -180,7 +180,7 @@ class AudioRecorder: AudioRecorderProtocol {
             self.mixer = mixer
             audioEngine.attach(mixer)
             audioEngine.connect(audioEngine.inputNode, to: mixer, format: inputFormat)
-
+            
             // Reset the recording duration
             currentTime = 0
             // Create an audio file
@@ -195,7 +195,7 @@ class AudioRecorder: AudioRecorderProtocol {
                 releaseAudioSession()
                 return
             }
-
+            
             // Set up an audio converter if the hardware sample rate doesn't match the recording format.
             // Note: Not all Apple devices have the same default sample rate.
             if recordingFormat.sampleRate != hardwareSampleRate {
@@ -219,7 +219,7 @@ class AudioRecorder: AudioRecorderProtocol {
             }
         }
     }
-
+    
     private func stopRecording(completion: @escaping () -> Void) {
         dispatchQueue.async { [weak self] in
             defer {
@@ -232,7 +232,7 @@ class AudioRecorder: AudioRecorderProtocol {
             setInternalState(.stopped)
         }
     }
-
+    
     private func cleanupAudioEngine() {
         MXLog.info("cleaning up the audio engine")
         if let audioEngine {
@@ -246,7 +246,7 @@ class AudioRecorder: AudioRecorderProtocol {
         audioEngine = nil
         releaseAudioSession()
     }
-
+    
     private func deleteRecording(completion: @escaping () -> Void) {
         dispatchQueue.async { [weak self] in
             defer {
@@ -258,7 +258,7 @@ class AudioRecorder: AudioRecorderProtocol {
             currentTime = 0
         }
     }
-
+    
     private func deleteRecordingFile() {
         guard let audioFileURL else { return }
         do {
@@ -268,14 +268,14 @@ class AudioRecorder: AudioRecorderProtocol {
             MXLog.error("failed to delete recording file. \(error)")
         }
     }
-
+    
     // MARK: Audio Processing
-
+    
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
         guard let audioFile else {
             return
         }
-
+        
         var inputBuffer = buffer
         if let audioConverter {
             // Create an AVAudioPCMBuffer instance for the converted buffer
@@ -285,13 +285,13 @@ class AudioRecorder: AudioRecorderProtocol {
                 MXLog.error("failed to initialize an output buffer")
                 return
             }
-
+            
             // Convert the buffer
             let inputBlock: AVAudioConverterInputBlock = { _, outStatus in
                 outStatus.pointee = AVAudioConverterInputStatus.haveData
                 return buffer
             }
-
+            
             var conversionError: NSError?
             audioConverter.convert(to: convertedBuffer, error: &conversionError, withInputFrom: inputBlock)
             if let conversionError {
@@ -300,17 +300,17 @@ class AudioRecorder: AudioRecorderProtocol {
             }
             inputBuffer = convertedBuffer
         }
-
+        
         // Write the buffer into the audio file
         do {
             try audioFile.write(from: inputBuffer)
 
             // Compute the sample value for the waveform
             updateMeterLevel(inputBuffer)
-
+            
             // Update the recording duration only if we succeed to write the buffer
             currentTime += Double(inputBuffer.frameLength) / inputBuffer.format.sampleRate
-
+            
             // Limit the recording time
             if currentTime >= maximumRecordingTime {
                 MXLog.info("Maximum recording time reach (\(maximumRecordingTime))")
@@ -320,9 +320,9 @@ class AudioRecorder: AudioRecorderProtocol {
             MXLog.error("failed to write sample. \(error)")
         }
     }
-
+    
     // MARK: Observers
-
+    
     private func addObservers() {
         removeObservers()
         // Stop recording uppon UIApplication.didEnterBackgroundNotification notification
@@ -333,14 +333,14 @@ class AudioRecorder: AudioRecorderProtocol {
                 Task { await self.stopRecording() }
             }
             .store(in: &cancellables)
-
+        
         NotificationCenter.default.publisher(for: Notification.Name.AVAudioEngineConfigurationChange)
             .sink { [weak self] _ in
                 guard let self else { return }
                 self.handleConfigurationChange()
             }
             .store(in: &cancellables)
-
+        
         NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification)
             .sink { [weak self] notification in
                 guard let self else { return }
@@ -348,18 +348,18 @@ class AudioRecorder: AudioRecorderProtocol {
             }
             .store(in: &cancellables)
     }
-
+    
     private func removeObservers() {
         cancellables.removeAll()
     }
-
+    
     func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
             return
         }
-
+        
         switch type {
         case .began:
             MXLog.info("Interruption started: \(notification)")
@@ -369,7 +369,7 @@ class AudioRecorder: AudioRecorderProtocol {
 
             guard let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
             let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-
+                        
             if options.contains(.shouldResume) {
                 do {
                     try audioEngine?.start()
@@ -382,12 +382,12 @@ class AudioRecorder: AudioRecorderProtocol {
                 MXLog.warning("AudioSession was interrupted: \(notification)")
                 setInternalState(.error(.interrupted))
             }
-
+            
         @unknown default:
             break
         }
     }
-
+    
     func handleConfigurationChange() {
         guard let audioEngine else { return }
         MXLog.warning("Configuration changed: \(audioEngine.inputNode.inputFormat(forBus: 0))")
@@ -395,15 +395,15 @@ class AudioRecorder: AudioRecorderProtocol {
             Task { await stopRecording() }
         }
     }
-
+    
     // MARK: Internal State
-
+    
     private func setInternalState(_ state: InternalAudioRecorderState) {
         dispatchQueue.async { [weak self] in
             guard let self else { return }
             MXLog.debug("internal state: \(internalState) -> \(state)")
             internalState = state
-
+            
             switch internalState {
             case .recording:
                 actionsSubject.send(.didStartRecording)
@@ -418,16 +418,16 @@ class AudioRecorder: AudioRecorderProtocol {
             }
         }
     }
-
+    
     // MARK: Audio Metering
-
+    
     private func scaledPower(power: Float) -> Float {
         guard power.isFinite else {
             return 0.0
         }
-
+        
         let minDb: Float = silenceThreshold
-
+        
         if power < minDb {
             return 0.0
         } else if power >= 1.0 {
@@ -436,20 +436,20 @@ class AudioRecorder: AudioRecorderProtocol {
             return (abs(minDb) - abs(power)) / abs(minDb)
         }
     }
-
+    
     private func updateMeterLevel(_ buffer: AVAudioPCMBuffer) {
         // Get an array of pointer to each sample's data
         guard let channelData = buffer.floatChannelData else {
             return
         }
-
+        
         // Compute RMS
         var rms: Float = .nan
         vDSP_rmsqv(channelData.pointee, buffer.stride, &rms, vDSP_Length(buffer.frameLength))
-
+        
         // Convert to decibels
         let avgPower = 20 * log10(rms)
-
+        
         meterLevel = scaledPower(power: avgPower)
     }
 }

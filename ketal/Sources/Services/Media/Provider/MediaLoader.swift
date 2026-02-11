@@ -33,21 +33,21 @@ actor MediaLoader: MediaLoaderProtocol {
     init(client: ClientProtocol) {
         self.client = client
     }
-
+    
     func loadMediaContentForSource(_ source: MediaSourceProxy) async throws -> Data {
         try await enqueueLoadMediaRequest(forSource: source) { [weak client] in
             guard let client else { throw MediaLoaderError.missingClient }
             return try await client.getMediaContent(mediaSource: source.underlyingSource)
         }
     }
-
+    
     func loadMediaThumbnailForSource(_ source: MediaSourceProxy, width: UInt, height: UInt) async throws -> Data {
         try await enqueueLoadMediaRequest(forSource: source) { [weak client] in
             guard let client else { throw MediaLoaderError.missingClient }
             return try await client.getMediaThumbnail(mediaSource: source.underlyingSource, width: UInt64(width), height: UInt64(height))
         }
     }
-
+    
     func loadMediaFileForSource(_ source: MediaSourceProxy, filename: String?) async throws -> MediaFileHandleProxy {
         guard let client else { throw MediaLoaderError.missingClient }
         let result = try await client.getMediaFile(mediaSource: source.underlyingSource,
@@ -55,33 +55,33 @@ actor MediaLoader: MediaLoaderProtocol {
                                                    mimeType: source.mimeType ?? "application/octet-stream",
                                                    useCache: true,
                                                    tempDir: nil)
-
+        
         return MediaFileHandleProxy(handle: result)
     }
-
+    
     // MARK: - Private
-
+    
     private func enqueueLoadMediaRequest(forSource source: MediaSourceProxy, operation: @escaping () async throws -> Data) async throws -> Data {
         if let ongoingRequest = ongoingRequests[source] {
             return try await withCheckedThrowingContinuation { continuation in
                 ongoingRequest.continuations.append(continuation)
             }
         }
-
+        
         let ongoingRequest = MediaRequest()
         ongoingRequests[source] = ongoingRequest
-
+        
         defer {
             ongoingRequests[source] = nil
         }
-
+        
         do {
             let result = try await operation()
-
+            
             ongoingRequest.continuations.forEach { $0.resume(returning: result) }
-
+            
             return result
-
+            
         } catch {
             ongoingRequest.continuations.forEach { $0.resume(throwing: error) }
             throw error

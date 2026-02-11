@@ -23,8 +23,8 @@ protocol UserSessionProtocol {
     var clientProxy: ClientProxyProtocol { get }
     var mediaProvider: MediaProviderProtocol { get }
     var voiceMessageMediaManager: VoiceMessageMediaManagerProtocol { get }
-
+    
     var sessionSecurityStatePublisher: CurrentValuePublisher<SessionSecurityState, Never> { get }
-
+    
     var callbacks: PassthroughSubject<UserSessionCallback, Never> { get }
 }

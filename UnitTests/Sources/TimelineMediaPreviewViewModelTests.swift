@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import ketal
 import MatrixRustSDK
 import QuickLook
 import SwiftUI

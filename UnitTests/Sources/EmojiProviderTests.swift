@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ElementX
+@testable import ketal
 import XCTest
 
 @MainActor
@@ -88,8 +88,8 @@ final class EmojiProviderTests: XCTestCase {
 }
 
 private class EmojiLoaderMock: EmojiLoaderProtocol {
-    var categories = [ElementX.EmojiCategory]()
-    func load() async -> [ElementX.EmojiCategory] {
+    var categories = [ketal.EmojiCategory]()
+    func load() async -> [ketal.EmojiCategory] {
         categories
     }
 }

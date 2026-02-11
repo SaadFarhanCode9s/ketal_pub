@@ -13,7 +13,7 @@ final class ComposerDraftService: ComposerDraftServiceProtocol {
     private let threadRootEventID: String?
     private let timelineItemfactory: RoomTimelineItemFactoryProtocol
     private var volatileDraft: ComposerDraftProxy?
-
+    
     init(roomProxy: JoinedRoomProxyProtocol,
          timelineItemfactory: RoomTimelineItemFactoryProtocol,
          threadRootEventID: String?) {
@@ -21,7 +21,7 @@ final class ComposerDraftService: ComposerDraftServiceProtocol {
         self.threadRootEventID = threadRootEventID
         self.timelineItemfactory = timelineItemfactory
     }
-
+    
     func saveDraft(_ draft: ComposerDraftProxy) async -> Result<Void, ComposerDraftServiceError> {
         switch await roomProxy.saveDraft(draft.toRust, threadRootEventID: threadRootEventID) {
         case .success:
@@ -32,7 +32,7 @@ final class ComposerDraftService: ComposerDraftServiceProtocol {
             return .failure(.failedToSaveDraft)
         }
     }
-
+    
     func loadDraft() async -> Result<ComposerDraftProxy?, ComposerDraftServiceError> {
         switch await roomProxy.loadDraft(threadRootEventID: threadRootEventID) {
         case .success(let draft):
@@ -45,7 +45,7 @@ final class ComposerDraftService: ComposerDraftServiceProtocol {
             return .failure(.failedToLoadDraft)
         }
     }
-
+    
     func getReply(eventID: String) async -> Result<TimelineItemReply, ComposerDraftServiceError> {
         switch await roomProxy.timeline.getLoadedReplyDetails(eventID: eventID) {
         case .success(let replyDetails):
@@ -55,7 +55,7 @@ final class ComposerDraftService: ComposerDraftServiceProtocol {
             return .failure(.failedToLoadReply)
         }
     }
-
+    
     func clearDraft() async -> Result<Void, ComposerDraftServiceError> {
         switch await roomProxy.clearDraft(threadRootEventID: threadRootEventID) {
         case .success:
@@ -66,15 +66,15 @@ final class ComposerDraftService: ComposerDraftServiceProtocol {
             return .failure(.failedToClearDraft)
         }
     }
-
+    
     func saveVolatileDraft(_ draft: ComposerDraftProxy) {
         volatileDraft = draft
     }
-
+    
     func loadVolatileDraft() -> ComposerDraftProxy? {
         volatileDraft
     }
-
+    
     func clearVolatileDraft() {
         volatileDraft = nil
     }

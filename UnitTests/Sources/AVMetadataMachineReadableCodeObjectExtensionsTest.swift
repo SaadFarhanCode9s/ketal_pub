@@ -7,7 +7,7 @@
 //
 
 import AVKit
-@testable import ElementX
+@testable import ketal
 import XCTest
 
 final class AVMetadataMachineReadableCodeObjectExtensionsTest: XCTestCase {

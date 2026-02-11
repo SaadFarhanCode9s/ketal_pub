@@ -12,7 +12,7 @@ import MatrixRustSDK
 protocol RoomPowerLevelsProxyProtocol {
     var values: RoomPowerLevelsValues { get }
     var userPowerLevels: [String: Int64] { get }
-
+        
     func canOwnUser(sendMessage messageType: MessageLikeEventType) -> Bool
     func canOwnUser(sendStateEvent event: StateEventType) -> Bool
     func canOwnUserInvite() -> Bool
@@ -24,7 +24,7 @@ protocol RoomPowerLevelsProxyProtocol {
     func canOwnUserPinOrUnpin() -> Bool
     func canOwnUserJoinCall() -> Bool
     func canOwnUserEditRolesAndPermissions() -> Bool
-
+    
     func canUser(userID: String, sendMessage messageType: MessageLikeEventType) -> Result<Bool, RoomProxyError>
     func canUser(userID: String, sendStateEvent event: StateEventType) -> Result<Bool, RoomProxyError>
     func canUserInvite(userID: String) -> Result<Bool, RoomProxyError>
@@ -44,7 +44,7 @@ extension RoomPowerLevelsProxyProtocol {
     func canOwnUserEditBaseInfo() -> Bool {
         canOwnUser(sendStateEvent: .roomAvatar) || canOwnUser(sendStateEvent: .roomName) || canOwnUser(sendStateEvent: .roomTopic)
     }
-
+    
     /// Can own user edit any of the security and privacy settings.
     func canOwnUserEditSecurityAndPrivacy(isSpace: Bool, joinRule: JoinRule?) -> Bool {
         let canOwnUserChangeAddress = switch joinRule {
@@ -53,7 +53,7 @@ extension RoomPowerLevelsProxyProtocol {
         default:
             false
         }
-
+        
         return if isSpace {
             canOwnUser(sendStateEvent: .roomJoinRules) || canOwnUserChangeAddress
         } else {

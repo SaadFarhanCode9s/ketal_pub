@@ -30,10 +30,10 @@ protocol NotificationManagerProtocol: AnyObject {
     func registrationFailed(with error: Error)
     func showLocalNotification(with title: String, subtitle: String?) async
     func setUserSession(_ userSession: UserSessionProtocol?)
-
+    
     func requestAuthorization()
-
+    
     func removeDeliveredMessageNotifications(for roomID: String) async
-
+    
     func removeDeliveredNotificationsForFullyReadRooms(_ rooms: [RoomSummary]) async
 }

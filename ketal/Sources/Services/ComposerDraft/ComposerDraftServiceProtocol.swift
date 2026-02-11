@@ -14,7 +14,7 @@ struct ComposerDraftProxy: Equatable {
         case newMessage
         case reply(eventID: String)
         case edit(eventID: String)
-
+        
         var toRust: MatrixRustSDK.ComposerDraftType {
             switch self {
             case .newMessage:
@@ -25,7 +25,7 @@ struct ComposerDraftProxy: Equatable {
                 return .reply(eventId: eventID)
             }
         }
-
+        
         init(from rustDraftType: MatrixRustSDK.ComposerDraftType) {
             switch rustDraftType {
             case .newMessage:
@@ -37,11 +37,11 @@ struct ComposerDraftProxy: Equatable {
             }
         }
     }
-
+    
     let plainText: String
     let htmlText: String?
     let draftType: ComposerDraftType
-
+    
     var toRust: ComposerDraft {
         ComposerDraft(plainText: plainText, htmlText: htmlText, draftType: draftType.toRust, attachments: [])
     }

@@ -7,7 +7,7 @@
 //
 
 import AnalyticsEvents
-@testable import ElementX
+@testable import ketal
 import PostHog
 import XCTest
 

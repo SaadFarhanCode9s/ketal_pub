@@ -12,13 +12,13 @@ import PostHog
 // sourcery: AutoMockable
 protocol PHGPostHogProtocol {
     func optIn()
-
+    
     func optOut()
-
+    
     func reset()
-
+    
     func capture(_ event: String, properties: [String: Any]?, userProperties: [String: Any]?)
-
+    
     func screen(_ screenTitle: String, properties: [String: Any]?)
 }
 

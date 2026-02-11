@@ -15,7 +15,7 @@ enum MediaPlayerProviderError: Error {
 @MainActor
 protocol MediaPlayerProviderProtocol {
     var player: AudioPlayerProtocol { get }
-
+    
     func playerState(for id: AudioPlayerStateIdentifier) -> AudioPlayerState?
     func register(audioPlayerState: AudioPlayerState)
     func unregister(audioPlayerState: AudioPlayerState)

@@ -21,7 +21,7 @@ protocol KnockRequestProxyProtocol {
     var reason: String? { get }
     var formattedTimestamp: String? { get }
     var isSeen: Bool { get }
-
+    
     func accept() async -> Result<Void, KnockRequestProxyError>
     func decline() async -> Result<Void, KnockRequestProxyError>
     func ban() async -> Result<Void, KnockRequestProxyError>

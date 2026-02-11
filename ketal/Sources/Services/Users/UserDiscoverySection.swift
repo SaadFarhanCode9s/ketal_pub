@@ -11,7 +11,7 @@ import Foundation
 struct UserDiscoverySection {
     let type: UserDiscoverySectionType
     let users: [UserProfileProxy]
-
+    
     var title: String? {
         switch type {
         case .searchResult:

@@ -21,12 +21,12 @@ class VoiceMessageMediaManager: VoiceMessageMediaManagerProtocol {
     private let mediaProvider: MediaProviderProtocol
     private let voiceMessageCache: VoiceMessageCacheProtocol
     private let audioConverter: AudioConverterProtocol
-
+    
     private let processingQueue: DispatchQueue
     private var conversionRequests = [MediaSourceProxy: VoiceMessageConversionRequest]()
-
+    
     private let supportedVoiceMessageMimeType = "audio/ogg"
-
+    
     init(mediaProvider: MediaProviderProtocol,
          voiceMessageCache: VoiceMessageCacheProtocol = VoiceMessageCache(),
          audioConverter: AudioConverterProtocol = AudioConverter(),
@@ -40,22 +40,22 @@ class VoiceMessageMediaManager: VoiceMessageMediaManagerProtocol {
     deinit {
         voiceMessageCache.clearCache()
     }
-
+    
     func loadVoiceMessageFromSource(_ source: MediaSourceProxy, body: String?) async throws -> URL {
         guard let mimeType = source.mimeType, mimeType.starts(with: supportedVoiceMessageMimeType) else {
             throw VoiceMessageMediaManagerError.unsupportedMimeTye
         }
-
+        
         // Do we already have a converted version?
         if let fileURL = voiceMessageCache.fileURL(for: source) {
             return fileURL
         }
-
+                
         // Otherwise, load the file from source
         guard case .success(let fileHandle) = await mediaProvider.loadFileFromSource(source, filename: body) else {
             throw MediaProviderError.failedRetrievingFile
         }
-
+        
         return try await enqueueVoiceMessageConversionRequest(forSource: source) { [audioConverter, voiceMessageCache] in
             // Do we already have a converted version?
             if let fileURL = voiceMessageCache.fileURL(for: source) {
@@ -79,32 +79,32 @@ class VoiceMessageMediaManager: VoiceMessageMediaManagerProtocol {
             }
         }
     }
-
+    
     // MARK: - Private
-
+    
     private func enqueueVoiceMessageConversionRequest(forSource source: MediaSourceProxy, operation: @escaping () throws -> URL) async throws -> URL {
         if let conversionRequests = conversionRequests[source] {
             return try await withCheckedThrowingContinuation { continuation in
                 conversionRequests.continuations.append(continuation)
             }
         }
-
+        
         let conversionRequest = VoiceMessageConversionRequest()
         conversionRequests[source] = conversionRequest
-
+        
         defer {
             conversionRequests[source] = nil
         }
-
+        
         do {
             let result = try await Task.dispatch(on: processingQueue) {
                 try operation()
             }
-
+            
             conversionRequest.continuations.forEach { $0.resume(returning: result) }
-
+            
             return result
-
+            
         } catch {
             conversionRequest.continuations.forEach { $0.resume(throwing: error) }
             throw error

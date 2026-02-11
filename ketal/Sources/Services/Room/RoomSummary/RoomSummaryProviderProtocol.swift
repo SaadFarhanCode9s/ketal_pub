@@ -13,7 +13,7 @@ import MatrixRustSDK
 enum RoomSummaryProviderState {
     case notLoaded
     case loaded(totalNumberOfRooms: UInt)
-
+    
     var isLoaded: Bool {
         switch self {
         case .loaded:
@@ -22,7 +22,7 @@ enum RoomSummaryProviderState {
             return false
         }
     }
-
+    
     var totalNumberOfRooms: UInt? {
         switch self {
         case .loaded(let totalNumberOfRooms):
@@ -48,16 +48,16 @@ enum RoomSummaryProviderFilter: Equatable {
 protocol StaticRoomSummaryProviderProtocol {
     /// Publishes the current state the summary provider is finding itself in
     var statePublisher: CurrentValuePublisher<RoomSummaryProviderState, Never> { get }
-
+    
     /// Publishes the currently available room summaries
     var roomListPublisher: CurrentValuePublisher<[RoomSummary], Never> { get }
-
+    
     func setRoomList(_ roomList: RoomList)
 }
 
 // sourcery: AutoMockable
 protocol RoomSummaryProviderProtocol: StaticRoomSummaryProviderProtocol {
     func updateVisibleRange(_ range: Range<Int>)
-
+    
     func setFilter(_ filter: RoomSummaryProviderFilter)
 }

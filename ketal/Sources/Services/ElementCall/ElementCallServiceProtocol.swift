@@ -18,14 +18,14 @@ enum ElementCallServiceAction {
 // sourcery: AutoMockable
 protocol ElementCallServiceProtocol {
     var actions: AnyPublisher<ElementCallServiceAction, Never> { get }
-
+    
     var ongoingCallRoomIDPublisher: CurrentValuePublisher<String?, Never> { get }
-
+    
     func setClientProxy(_ clientProxy: ClientProxyProtocol)
-
+    
     func setupCallSession(roomID: String, roomDisplayName: String) async
-
+    
     func tearDownCallSession()
-
+    
     func setAudioEnabled(_ enabled: Bool, roomID: String)
 }

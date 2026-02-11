@@ -19,7 +19,7 @@ protocol BaseRoomInfoProxyProtocol {
     var joinedMembersCount: Int { get }
     var isDirect: Bool { get }
     var isSpace: Bool { get }
-
+    
     var successor: SuccessorRoom? { get }
     var heroes: [RoomHero] { get }
 }
@@ -38,12 +38,12 @@ protocol RoomInfoProxyProtocol: BaseRoomInfoProxyProtocol {
     var isDirect: Bool { get }
     var isSpace: Bool { get }
     var isFavourite: Bool { get }
-
+    
     var canonicalAlias: String? { get }
     var alternativeAliases: [String] { get }
     var membership: Membership { get }
     var inviter: RoomMemberProxyProtocol? { get }
-
+    
     var activeMembersCount: Int { get }
     var invitedMembersCount: Int { get }
     var joinedMembersCount: Int { get }
@@ -59,7 +59,7 @@ protocol RoomInfoProxyProtocol: BaseRoomInfoProxyProtocol {
     var pinnedEventIDs: Set<String> { get }
     var joinRule: JoinRule? { get }
     var historyVisibility: RoomHistoryVisibility { get }
-
+    
     var powerLevels: RoomPowerLevelsProxyProtocol? { get }
 }
 
@@ -69,15 +69,15 @@ extension BaseRoomInfoProxyProtocol {
         guard successor == nil else {
             return .tombstoned
         }
-
+        
         if isSpace {
             return .space(id: id, name: displayName, avatarURL: avatarURL)
         }
-
+        
         if isDirect, avatarURL == nil, heroes.count == 1 {
             return .heroes(heroes.map(UserProfileProxy.init))
         }
-
+        
         return .room(id: id, name: displayName, avatarURL: avatarURL)
     }
 }
@@ -88,7 +88,7 @@ extension RoomInfoProxyProtocol {
         guard let joinRule else {
             return nil
         }
-
+        
         return switch joinRule {
         case .invite, .knock, .restricted, .knockRestricted:
             true
@@ -98,39 +98,39 @@ extension RoomInfoProxyProtocol {
             nil
         }
     }
-
+    
     /// Checks if the other person left the room in a direct chat
     var isUserAloneInDirectRoom: Bool {
         isDirect && activeMembersCount == 1
     }
-
+    
     /// Find the first alias that matches the given homeserver
     /// - Parameters:
     ///   - serverName: the homserver in question
     ///   - useFallback: whether to return any alias if none match
     func firstAliasMatching(serverName: String?, useFallback: Bool) -> String? {
         guard let serverName else { return nil }
-
+        
         // Check if the canonical alias matches the homeserver
         if let canonicalAlias,
            canonicalAlias.range(of: serverName) != nil {
             return canonicalAlias
         }
-
+        
         // Otherwise check the alternative aliases and return the first one that matches
         if let matchingAlternativeAlias = alternativeAliases.filter({ $0.range(of: serverName) != nil }).first {
             return matchingAlternativeAlias
         }
-
+        
         guard useFallback else {
             return nil
         }
-
+        
         // Or just return the canonical alias if any
         if let canonicalAlias {
             return canonicalAlias
         }
-
+        
         // And finally return whatever the first alternative alias is
         return alternativeAliases.first
     }

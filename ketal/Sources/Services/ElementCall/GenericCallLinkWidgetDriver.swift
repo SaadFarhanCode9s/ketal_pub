@@ -11,19 +11,19 @@ import SwiftUI
 
 class GenericCallLinkWidgetDriver: ElementCallWidgetDriverProtocol {
     private let url: URL
-
+    
     let widgetID = UUID().uuidString
     let messagePublisher = PassthroughSubject<String, Never>()
-
+    
     private let actionsSubject: PassthroughSubject<ElementCallWidgetDriverAction, Never> = .init()
     var actions: AnyPublisher<ElementCallWidgetDriverAction, Never> {
         actionsSubject.eraseToAnyPublisher()
     }
-
+    
     init(url: URL) {
         self.url = url
     }
-
+    
     func start(baseURL: URL,
                clientID: String,
                colorScheme: ColorScheme,
@@ -32,7 +32,7 @@ class GenericCallLinkWidgetDriver: ElementCallWidgetDriverProtocol {
         MXLog.error("Nothing to start, use the configuration's URL directly instead.")
         return .success(url)
     }
-
+    
     func handleMessage(_ message: String) async -> Result<Bool, ElementCallWidgetDriverError> {
         // The web view doesn't send us messages through the Widget API, so nothing to implement (yet?).
         .failure(.driverNotSetup)

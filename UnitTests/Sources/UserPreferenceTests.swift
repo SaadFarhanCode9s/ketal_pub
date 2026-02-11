@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ElementX
+@testable import ketal
 import Foundation
 import XCTest
 
@@ -175,7 +175,7 @@ private extension String {
     static let key3 = "foo.codable"
     static let key4 = "foo.volatile.codable"
     static let key5 = "foo.plist.array"
-    static let userDefaultsSuiteName = "io.element.elementx.unitests"
+    static let userDefaultsSuiteName = "io.ketal.unitests"
 }
 
 private extension UserDefaults {

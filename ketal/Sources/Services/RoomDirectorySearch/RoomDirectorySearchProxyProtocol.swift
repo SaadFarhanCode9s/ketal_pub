@@ -11,7 +11,7 @@ import Foundation
 // sourcery: AutoMockable
 protocol RoomDirectorySearchProxyProtocol {
     var resultsPublisher: CurrentValuePublisher<[RoomDirectorySearchResult], Never> { get }
-
+    
     func search(query: String?) async -> Result<Void, RoomDirectorySearchError>
     func nextPage() async -> Result<Void, RoomDirectorySearchError>
 }

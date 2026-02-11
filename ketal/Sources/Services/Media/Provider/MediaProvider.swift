@@ -14,7 +14,7 @@ struct MediaProvider: MediaProviderProtocol {
     private let mediaLoader: MediaLoaderProtocol
     private let imageCache: Kingfisher.ImageCache
     private let homeserverReachabilityPublisher: CurrentValuePublisher<NetworkMonitorReachability, Never>?
-
+    
     init(mediaLoader: MediaLoaderProtocol,
          imageCache: Kingfisher.ImageCache,
          homeserverReachabilityPublisher: CurrentValuePublisher<NetworkMonitorReachability, Never>?) {
@@ -22,9 +22,9 @@ struct MediaProvider: MediaProviderProtocol {
         self.imageCache = imageCache
         self.homeserverReachabilityPublisher = homeserverReachabilityPublisher
     }
-
+    
     // MARK: Images
-
+    
     func imageFromSource(_ source: MediaSourceProxy?, size: CGSize?) -> UIImage? {
         guard let url = source?.url else {
             return nil
@@ -32,14 +32,14 @@ struct MediaProvider: MediaProviderProtocol {
         let cacheKey = cacheKeyForURL(url, size: size)
         return imageCache.retrieveImageInMemoryCache(forKey: cacheKey, options: nil)
     }
-
+    
     func loadImageFromSource(_ source: MediaSourceProxy, size: CGSize?) async -> Result<UIImage, MediaProviderError> {
         if let image = imageFromSource(source, size: size) {
             return .success(image)
         }
-
+        
         let cacheKey = cacheKeyForURL(source.url, size: size)
-
+        
         if let cacheResult = try? await imageCache.retrieveImage(forKey: cacheKey, options: nil),
            let image = cacheResult.image {
             return .success(image)
@@ -66,30 +66,30 @@ struct MediaProvider: MediaProviderProtocol {
             return .failure(.failedRetrievingImage)
         }
     }
-
+    
     func loadImageRetryingOnReconnection(_ source: MediaSourceProxy, size: CGSize?) -> Task<UIImage, any Error> {
         guard let homeserverReachabilityPublisher else {
             fatalError("This method shouldn't be invoked without a homeserver reachability publisher set.")
         }
-
+        
         return Task {
             if case let .success(image) = await loadImageFromSource(source, size: size) {
                 return image
             }
-
+            
             guard !Task.isCancelled else {
                 throw MediaProviderError.cancelled
             }
-
+            
             for await reachability in homeserverReachabilityPublisher.values {
                 guard !Task.isCancelled else {
                     throw MediaProviderError.cancelled
                 }
-
+                
                 guard reachability == .reachable else {
                     continue
                 }
-
+                
                 switch await loadImageFromSource(source, size: size) {
                 case .success(let image):
                     return image
@@ -101,11 +101,11 @@ struct MediaProvider: MediaProviderProtocol {
                     }
                 }
             }
-
+            
             throw MediaProviderError.cancelled
         }
     }
-
+    
     func loadImageDataFromSource(_ source: MediaSourceProxy) async -> Result<Data, MediaProviderError> {
         do {
             let imageData = try await mediaLoader.loadMediaContentForSource(source)
@@ -115,9 +115,9 @@ struct MediaProvider: MediaProviderProtocol {
             return .failure(.failedRetrievingImage)
         }
     }
-
+    
     // MARK: Files
-
+    
     func loadFileFromSource(_ source: MediaSourceProxy, filename: String?) async -> Result<MediaFileHandleProxy, MediaProviderError> {
         do {
             let file = try await mediaLoader.loadMediaFileForSource(source, filename: filename)
@@ -127,9 +127,9 @@ struct MediaProvider: MediaProviderProtocol {
             return .failure(.failedRetrievingFile)
         }
     }
-
+    
     // MARK: Thumbnail
-
+    
     func loadThumbnailForSource(source: MediaSourceProxy, size: CGSize) async -> Result<Data, MediaProviderError> {
         do {
             let thumbnailData = try await mediaLoader.loadMediaThumbnailForSource(source, width: UInt(size.width), height: UInt(size.height))
@@ -139,9 +139,9 @@ struct MediaProvider: MediaProviderProtocol {
             return .failure(.failedRetrievingThumbnail)
         }
     }
-
+    
     // MARK: - Private
-
+    
     private func cacheKeyForURL(_ url: URL, size: CGSize?) -> String {
         if let size {
             return "\(url.absoluteString){\(size.width),\(size.height)}"

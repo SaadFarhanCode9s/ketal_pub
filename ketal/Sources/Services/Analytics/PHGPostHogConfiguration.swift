@@ -17,7 +17,7 @@ extension PostHogConfig {
         
         // We only want to track the events provided by the AnalyticsEvents package
         postHogConfiguration.enableSwizzling = false
-
+        
         return postHogConfiguration
     }
 }

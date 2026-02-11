@@ -31,7 +31,7 @@ extension RoomRole {
             self = .user
         }
     }
-
+    
     init(_ role: RoomMemberRole, powerLevel: RoomPowerLevel) {
         switch role {
         case .creator:
@@ -49,7 +49,7 @@ extension RoomRole {
             self = .user
         }
     }
-
+        
     var isAdminOrHigher: Bool {
         switch self {
         case .administrator, .creator, .owner:
@@ -58,7 +58,7 @@ extension RoomRole {
             return false
         }
     }
-
+    
     var isOwner: Bool {
         switch self {
         case .creator, .owner:
@@ -76,7 +76,7 @@ extension RoomRole {
             self = .owner
             return
         }
-
+        
         do {
             switch try suggestedRoleForPowerLevel(powerLevel: .value(value: powerLevelValue)) {
             case .administrator:
@@ -93,7 +93,7 @@ extension RoomRole {
             self = .user
         }
     }
-
+    
     var rustRole: RoomMemberRole {
         switch self {
         case .creator:
@@ -106,7 +106,7 @@ extension RoomRole {
             .user
         }
     }
-
+    
     /// To be used when setting the power level of a user to get the suggested equivalent power level value for that specific role
     /// NOTE: Do not use for comparison, use the true power level instead.
     var powerLevelValue: Int64 {
@@ -117,13 +117,13 @@ extension RoomRole {
             return Int64(value)
         }
     }
-
+    
     var powerLevel: RoomPowerLevel {
         guard self != .owner else {
             // Would be better if the SDK would return this, maybe a `suggestedPowerLevelValueForRole` function would solve the problem
             return .value(150)
         }
-
+        
         do {
             return try RoomPowerLevel(rustPowerLevel: suggestedPowerLevelForRole(role: rustRole))
         } catch {

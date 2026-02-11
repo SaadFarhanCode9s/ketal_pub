@@ -21,7 +21,7 @@ struct EmojiItem: Equatable, Identifiable {
 
 struct EmojiCategory: Equatable, Identifiable {
     static let frequentlyUsedCategoryIdentifier = "io.ketal.frequently_used"
-
+    
     let id: String
     let emojis: [EmojiItem]
 }
@@ -35,9 +35,9 @@ enum EmojiProviderState {
 @MainActor
 protocol EmojiProviderProtocol {
     var state: EmojiProviderState { get }
-
+    
     func categories(searchString: String?) async -> [EmojiCategory]
-
+    
     func frequentlyUsedSystemEmojis() -> [String]
     func markEmojiAsFrequentlyUsed(_ emoji: String)
 }

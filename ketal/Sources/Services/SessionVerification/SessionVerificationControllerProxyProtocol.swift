@@ -41,7 +41,7 @@ struct SessionVerificationRequestDetails {
 struct SessionVerificationEmoji: Hashable {
     let symbol: String
     let description: String
-
+    
     var localizedDescription: String {
         SASL10n.localizedDescription(for: description.lowercased())
     }
@@ -50,20 +50,20 @@ struct SessionVerificationEmoji: Hashable {
 // sourcery: AutoMockable
 protocol SessionVerificationControllerProxyProtocol {
     var actions: PassthroughSubject<SessionVerificationControllerProxyAction, Never> { get }
-
+    
     func acknowledgeVerificationRequest(details: SessionVerificationRequestDetails) async -> Result<Void, SessionVerificationControllerProxyError>
-
+    
     func acceptVerificationRequest() async -> Result<Void, SessionVerificationControllerProxyError>
-
+        
     func requestDeviceVerification() async -> Result<Void, SessionVerificationControllerProxyError>
-
+    
     func requestUserVerification(_ userID: String) async -> Result<Void, SessionVerificationControllerProxyError>
-
+    
     func startSasVerification() async -> Result<Void, SessionVerificationControllerProxyError>
-
+    
     func approveVerification() async -> Result<Void, SessionVerificationControllerProxyError>
-
+    
     func declineVerification() async -> Result<Void, SessionVerificationControllerProxyError>
-
+    
     func cancelVerification() async -> Result<Void, SessionVerificationControllerProxyError>
 }

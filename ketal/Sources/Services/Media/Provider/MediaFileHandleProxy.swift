@@ -15,12 +15,12 @@ import Foundation
 final class MediaFileHandleProxy: Sendable {
     /// The underlying handle for the file.
     private let handle: MediaFileHandleProtocol
-
+    
     /// Creates a new instance from the Rust type.
     init(handle: MediaFileHandleProtocol) {
         self.handle = handle
     }
-
+    
     /// Creates an unmanaged instance (for mocking etc), using a raw `URL`
     ///
     /// A media file created from a URL won't have the automatic clean-up mechanism
@@ -28,7 +28,7 @@ final class MediaFileHandleProxy: Sendable {
     static func unmanaged(url: URL) -> MediaFileHandleProxy {
         MediaFileHandleProxy(handle: UnmanagedMediaFileHandle(url: url))
     }
-
+    
     /// The media file's location on disk.
     var url: URL? {
         do {
@@ -47,7 +47,7 @@ extension MediaFileHandleProxy: Hashable {
     static func == (lhs: MediaFileHandleProxy, rhs: MediaFileHandleProxy) -> Bool {
         lhs.url == rhs.url
     }
-
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(url)
     }
@@ -62,13 +62,13 @@ private final class UnmanagedMediaFileHandle: MediaFileHandleProtocol {
     func persist(path: String) throws -> Bool {
         false
     }
-
+    
     let url: URL
-
+    
     init(url: URL) {
         self.url = url
     }
-
+    
     func path() -> String {
         url.path()
     }

@@ -11,18 +11,18 @@ import MatrixRustSDK
 
 class KnockedRoomProxy: KnockedRoomProxyProtocol {
     private let room: Room
-
+    
     lazy var id: String = room.id()
     lazy var ownUserID: String = room.ownUserId()
-
+    
     let info: BaseRoomInfoProxyProtocol
-
+        
     init(room: Room) async throws {
         self.room = room
-
+        
         info = try await RoomInfoProxy(roomInfo: room.roomInfo())
     }
-
+    
     func cancelKnock() async -> Result<Void, RoomProxyError> {
         do {
             return try await .success(room.leave())

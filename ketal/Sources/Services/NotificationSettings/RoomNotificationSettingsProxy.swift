@@ -11,15 +11,15 @@ import MatrixRustSDK
 
 struct RoomNotificationSettingsProxy: RoomNotificationSettingsProxyProtocol {
     private let roomNotificationSettings: RoomNotificationSettings
-
+    
     var mode: RoomNotificationModeProxy {
         RoomNotificationModeProxy.from(roomNotificationMode: roomNotificationSettings.mode)
     }
-
+    
     var isDefault: Bool {
         roomNotificationSettings.isDefault
     }
-
+    
     init(roomNotificationSettings: RoomNotificationSettings) {
         self.roomNotificationSettings = roomNotificationSettings
     }

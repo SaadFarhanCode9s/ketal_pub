@@ -30,9 +30,12 @@ protocol AudioRecorderProtocol: AnyObject {
     var currentTime: TimeInterval { get }
     var isRecording: Bool { get }
     var audioFileURL: URL? { get }
-
+    
     func record(audioFileURL: URL) async
     func stopRecording() async
     func deleteRecording() async
     func averagePower() -> Float
 }
+
+// sourcery: AutoMockable
+extension AudioRecorderProtocol { }

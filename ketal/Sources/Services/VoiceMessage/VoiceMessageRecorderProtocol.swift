@@ -38,7 +38,7 @@ protocol VoiceMessageRecorderProtocol {
     func stopPlayback() async
     func seekPlayback(to progress: Double) async
     func deleteRecording() async
-
+    
     func sendVoiceMessage(timelineController: TimelineControllerProtocol,
                           audioConverter: AudioConverterProtocol) async -> Result<Void, VoiceMessageRecorderError>
 }

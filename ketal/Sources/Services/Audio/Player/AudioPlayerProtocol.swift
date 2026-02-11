@@ -40,9 +40,9 @@ protocol AudioPlayerProtocol: AnyObject {
     var currentTime: TimeInterval { get }
     var playbackURL: URL? { get }
     var state: MediaPlayerState { get }
-
+    
     var actions: AnyPublisher<AudioPlayerAction, Never> { get }
-
+    
     func load(sourceURL: URL, playbackURL: URL, autoplay: Bool)
     func reset()
     func play()

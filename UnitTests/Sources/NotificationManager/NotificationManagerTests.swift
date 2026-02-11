@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import ketal
 import NotificationCenter
 import XCTest
 
@@ -245,7 +245,7 @@ extension NotificationManagerTests: @MainActor NotificationManagerDelegate {
         notificationTappedDelegateCalled = true
     }
     
-    func handleInlineReply(_ service: ElementX.NotificationManagerProtocol, content: UNNotificationContent, replyText: String) async {
+    func handleInlineReply(_ service: ketal.NotificationManagerProtocol, content: UNNotificationContent, replyText: String) async {
         handleInlineReplyDelegateCalled = true
     }
 }

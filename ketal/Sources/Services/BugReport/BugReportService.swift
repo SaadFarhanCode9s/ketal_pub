@@ -19,16 +19,16 @@ class BugReportService: NSObject, BugReportServiceProtocol {
     private let maxUploadSize: Int
     private let session: URLSession
     private let appHooks: AppHooks
-
+    
     private let progressSubject = PassthroughSubject<Double, Never>()
     private var cancellables = Set<AnyCancellable>()
-
+    
     var isEnabled: Bool {
         rageshakeURL != .disabled
     }
 
     var lastCrashEventID: String?
-
+    
     init(rageshakeURLPublisher: CurrentValuePublisher<RageshakeConfiguration, Never>,
          applicationID: String,
          sdkGitSHA: String,
@@ -41,75 +41,75 @@ class BugReportService: NSObject, BugReportServiceProtocol {
         self.maxUploadSize = maxUploadSize
         self.session = session
         self.appHooks = appHooks
-
+        
         super.init()
-
+        
         rageshakeURLPublisher
             .weakAssign(to: \.rageshakeURL, on: self)
             .store(in: &cancellables)
     }
 
     // MARK: - BugReportServiceProtocol
-
+    
     var crashedLastRun: Bool {
         SentrySDK.crashedLastRun
     }
-
+    
     // swiftlint:disable:next cyclomatic_complexity
     func submitBugReport(_ bugReport: BugReport,
                          progressListener: CurrentValueSubject<Double, Never>) async -> Result<SubmitBugReportResponse, BugReportServiceError> {
         guard case let .url(rageshakeURL) = rageshakeURL else {
             fatalError("No bug report URL set, the screen should not be shown in this case.")
         }
-
+        
         var bugReport = appHooks.bugReportHook.update(bugReport)
-
+        
         var params = [
             MultipartFormData(key: "text", type: .text(value: bugReport.text)),
             MultipartFormData(key: "can_contact", type: .text(value: "\(bugReport.canContact)"))
         ]
-
+        
         if let userID = bugReport.userID {
             params.append(.init(key: "user_id", type: .text(value: userID)))
         } else {
             bugReport.githubLabels.append("login")
         }
-
+        
         if let deviceID = bugReport.deviceID {
             params.append(.init(key: "device_id", type: .text(value: deviceID)))
         }
-
+        
         if let ed25519 = bugReport.ed25519, let curve25519 = bugReport.curve25519 {
             let compactKeys = "curve25519:\(curve25519), ed25519:\(ed25519)"
             params.append(.init(key: "device_keys", type: .text(value: compactKeys)))
         }
-
+        
         if let crashEventID = lastCrashEventID {
             params.append(MultipartFormData(key: "crash_report", type: .text(value: "<https://sentry.tools.element.io/organizations/element/issues/?project=44&query=\(crashEventID)>")))
             bugReport.githubLabels.append("crash")
         }
-
+        
         params.append(contentsOf: defaultParams)
-
+        
         if InfoPlistReader.main.baseBundleIdentifier == "io.ketal.nightly" {
             bugReport.githubLabels.append("Nightly")
         }
-
+        
         if ProcessInfo.processInfo.isiOSAppOnMac {
             bugReport.githubLabels.append("macOS")
         }
-
+        
         for label in bugReport.githubLabels {
             params.append(MultipartFormData(key: "label", type: .text(value: label)))
         }
-
+        
         if let logFiles = bugReport.logFiles {
             let logAttachments = await zipFiles(logFiles)
             for url in logAttachments.files {
                 params.append(MultipartFormData(key: "compressed-log", type: .file(url: url)))
             }
         }
-
+        
         for url in bugReport.files {
             params.append(MultipartFormData(key: "file", type: .file(url: url)))
         }
@@ -136,32 +136,32 @@ class BugReportService: NSObject, BugReportServiceProtocol {
             .receive(on: DispatchQueue.main)
             .weakAssign(to: \.value, on: progressListener)
             .store(in: &cancellables)
-
+        
         do {
             let (data, response) = try await session.dataWithRetry(for: request, delegate: self)
-
+            
             guard let httpResponse = response as? HTTPURLResponse else {
                 let errorDescription = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Unknown error"
                 MXLog.error("Failed to submit bug report: \(errorDescription)")
                 MXLog.error("Response: \(response)")
                 return .failure(.serverError(response, errorDescription))
             }
-
+            
             guard httpResponse.statusCode == 200 else {
                 let errorDescription = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Unknown error"
                 MXLog.error("Failed to submit bug report: \(errorDescription) (\(httpResponse.statusCode))")
                 MXLog.error("Response: \(httpResponse)")
                 return .failure(.httpError(httpResponse, errorDescription))
             }
-
+            
             // Parse the JSON data
             let decoder = JSONDecoder()
             let uploadResponse = try decoder.decode(SubmitBugReportResponse.self, from: data)
-
+            
             lastCrashEventID = nil
-
+            
             MXLog.info("Feedback submitted.")
-
+            
             return .success(uploadResponse)
         } catch {
             return .failure(.uploadFailure(error))
@@ -209,9 +209,9 @@ class BugReportService: NSObject, BugReportServiceProtocol {
 
     private func zipFiles(_ logFiles: [URL]) async -> Logs {
         MXLog.info("zipFiles")
-
+        
         var compressedLogs = Logs(maxFileSize: maxUploadSize)
-
+        
         for url in logFiles {
             do {
                 try attachFile(at: url, to: &compressedLogs)
@@ -220,12 +220,12 @@ class BugReportService: NSObject, BugReportServiceProtocol {
                 // Continue so that other logs can still be sent.
             }
         }
-
+        
         MXLog.info("zipFiles: originalSize: \(compressedLogs.originalSize), zippedSize: \(compressedLogs.zippedSize)")
 
         return compressedLogs
     }
-
+    
     /// Zips a file creating chunks based on 10MB inputs.
     private func attachFile(at url: URL, to zippedFiles: inout Logs) throws {
         // We check the compressed size to determine whether or not to attach the files.
@@ -238,32 +238,32 @@ class BugReportService: NSObject, BugReportServiceProtocol {
         }
         
         let fileHandle = try FileHandle(forReadingFrom: url)
-
+        
         while let data = try fileHandle.readToEnd() {
             if let zippedData = (data as NSData).gzipped() {
                 let zippedURL = URL.temporaryDirectory.appending(path: url.lastPathComponent)
-
+                
                 // Remove old zipped file if exists
                 try? FileManager.default.removeItem(at: zippedURL)
-
+                
                 try zippedData.write(to: zippedURL)
                 zippedFiles.appendFile(at: zippedURL, zippedSize: zippedData.count, originalSize: data.count)
             }
         }
     }
-
+    
     /// A collection of logs to be uploaded to the bug report service.
     struct Logs {
         /// The maximum total size of all the files.
         let maxFileSize: Int
-
+        
         /// The files included.
         private(set) var files: [URL] = []
         /// The total size of the files after compression.
         private(set) var zippedSize = 0
         /// The original size of the files.
         private(set) var originalSize = 0
-
+        
         mutating func appendFile(at url: URL, zippedSize: Int, originalSize: Int) {
             guard self.zippedSize + zippedSize < maxFileSize else {
                 MXLog.error("Logs too large, skipping attachment: \(url.lastPathComponent)")

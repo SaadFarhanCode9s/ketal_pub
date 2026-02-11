@@ -20,7 +20,7 @@ public struct TitleAndIcon: View {
     private let icon: KeyPath<CompoundIcons, Image>
     private let iconStyle: BigIcon.Style
     private let button: ButtonDetails?
-    
+
     public init(title: String,
                 subtitle: String? = nil,
                 icon: KeyPath<CompoundIcons, Image>,
@@ -32,17 +32,17 @@ public struct TitleAndIcon: View {
         self.iconStyle = iconStyle
         self.button = button
     }
-    
+
     public var body: some View {
         VStack(spacing: 16) {
             BigIcon(icon: icon, style: iconStyle)
-            
+
             VStack(spacing: 8) {
                 Text(title)
                     .foregroundColor(.compound.textPrimary)
                     .font(.compound.headingMDBold)
                     .multilineTextAlignment(.center)
-                
+
                 if let subtitle {
                     Text(subtitle)
                         .foregroundColor(.compound.textSecondary)
@@ -50,7 +50,7 @@ public struct TitleAndIcon: View {
                         .multilineTextAlignment(.center)
                 }
             }
-            
+
             if let button {
                 Button(button.title, action: button.action)
                     .buttonStyle(.compound(.tertiary, size: .small))
@@ -64,7 +64,7 @@ public extension TitleAndIcon {
     struct ButtonDetails {
         public let title: String
         public let action: () -> Void
-        
+
         public init(title: String, action: @escaping () -> Void) {
             self.title = title
             self.action = action
@@ -78,18 +78,18 @@ public struct TitleAndIcon_Previews: PreviewProvider, TestablePreview {
     public static var previews: some View {
         states
     }
-    
+
     public static var states: some View {
         VStack(spacing: 84) {
             TitleAndIcon(title: "Headline",
                          icon: \.circle,
                          iconStyle: .defaultSolid)
-            
+
             TitleAndIcon(title: "Headline",
                          subtitle: "Description goes here",
                          icon: \.circle,
                          iconStyle: .defaultSolid)
-            
+
             TitleAndIcon(title: "Headline",
                          subtitle: "Description goes here",
                          icon: \.circle,

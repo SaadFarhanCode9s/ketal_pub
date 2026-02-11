@@ -9,7 +9,7 @@ if [ ! $# -eq 1 ]; then
     exit 1
 fi
 
-SCREENS_DIR="../../ElementX/Sources/Screens"/$1Screen
+SCREENS_DIR="../../ketal/Sources/Screens"/$1Screen
 UNIT_TESTS_DIR="../../UnitTests/Sources"
 
 if [ -e $SCREENS_DIR ]; then

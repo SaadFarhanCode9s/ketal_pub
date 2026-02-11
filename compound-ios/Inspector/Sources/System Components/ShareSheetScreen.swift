@@ -16,7 +16,7 @@ struct ShareSheetScreen: View {
                 .font(.footnote)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-            
+
             ShareLink(item: URL(string: "https://element.io")!, subject: Text("The subject"), message: Text("The message"))
                 .padding(.top)
         }

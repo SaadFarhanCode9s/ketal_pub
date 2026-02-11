@@ -6,14 +6,14 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ElementX
+@testable import ketal
 import XCTest
 
 @MainActor
 class RoomRolesAndPermissionsScreenViewModelTests: XCTestCase {
     var viewModel: RoomRolesAndPermissionsScreenViewModelProtocol!
     var roomProxy: JoinedRoomProxyMock!
-    
+
     var context: RoomRolesAndPermissionsScreenViewModelType.Context {
         viewModel.context
     }
@@ -29,50 +29,50 @@ class RoomRolesAndPermissionsScreenViewModelTests: XCTestCase {
         XCTAssertEqual(context.viewState.administratorCount, 2)
         XCTAssertEqual(context.viewState.moderatorCount, 1)
     }
-    
+
     func testResetPermissions() async throws {
         setupViewModel(members: .allMembersAsAdmin)
-        
+
         context.send(viewAction: .reset)
         XCTAssertNotNil(context.alertInfo)
-        
+
         context.alertInfo?.primaryButton.action?()
-        
+
         try await Task.sleep(for: .milliseconds(100))
-        
+
         XCTAssertTrue(roomProxy.resetPowerLevelsCalled)
     }
-    
+
     func testDemoteToModerator() async throws {
         setupViewModel(members: .allMembersAsAdmin)
-        
+
         context.send(viewAction: .editOwnUserRole)
         XCTAssertNotNil(context.alertInfo)
-        
+
         context.alertInfo?.verticalButtons?.first { $0.title.localizedStandardContains("moderator") }?.action?()
-        
+
         try await Task.sleep(for: .milliseconds(100))
-        
+
         XCTAssertTrue(roomProxy.updatePowerLevelsForUsersCalled)
         XCTAssertEqual(roomProxy.updatePowerLevelsForUsersReceivedUpdates?.first?.powerLevel,
                        RoomRole.moderator.powerLevelValue)
     }
-    
+
     func testDemoteToMember() async throws {
         setupViewModel(members: .allMembersAsAdmin)
-        
+
         context.send(viewAction: .editOwnUserRole)
         XCTAssertNotNil(context.alertInfo)
-        
+
         context.alertInfo?.verticalButtons?.first { $0.title.localizedStandardContains("member") }?.action?()
-        
+
         try await Task.sleep(for: .milliseconds(100))
-        
+
         XCTAssertTrue(roomProxy.updatePowerLevelsForUsersCalled)
         XCTAssertEqual(roomProxy.updatePowerLevelsForUsersReceivedUpdates?.first?.powerLevel,
                        RoomRole.user.powerLevelValue)
     }
-    
+
     private func setupViewModel(members: [RoomMemberProxyMock]) {
         roomProxy = JoinedRoomProxyMock(.init(members: members))
         viewModel = RoomRolesAndPermissionsScreenViewModel(roomProxy: roomProxy,

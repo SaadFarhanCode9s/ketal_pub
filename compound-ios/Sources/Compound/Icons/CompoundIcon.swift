@@ -26,7 +26,7 @@ public struct CompoundIcon: View {
         case medium
         /// A custom icon size.
         case custom(CGFloat)
-        
+
         var value: CGFloat {
             switch self {
             case .xSmall: return 16
@@ -36,15 +36,15 @@ public struct CompoundIcon: View {
             }
         }
     }
-    
+
     private var image: Image
     private var size: Size
     private var font: Font
-    
+
     private var fontSize: FontSize {
         FontSize.reflecting(font) ?? .style(.body)
     }
-    
+
     /// Creates an icon using a key path from the Compound tokens. The size will be
     /// 24pt and will scale relative to the `bodyLG` font when Dynamic Type is used.
     ///
@@ -55,7 +55,7 @@ public struct CompoundIcon: View {
         size = .medium
         font = .compound.bodyLG
     }
-    
+
     /// Creates an icon using a key path from the Compound tokens.
     ///
     /// - Parameters:
@@ -67,7 +67,7 @@ public struct CompoundIcon: View {
         self.size = size
         self.font = font
     }
-    
+
     /// Creates an icon using a custom image to allow assets from outside
     /// of Compound to scale in the same way as icons. The size will be 24pt
     /// and will scale relative to the `bodyLG` font when Dynamic Type is used.
@@ -81,7 +81,7 @@ public struct CompoundIcon: View {
         size = .medium
         font = .compound.bodyLG
     }
-    
+
     /// Creates an icon using a custom image to allow assets from outside
     /// of Compound to scale in the same way as icons.
     ///
@@ -96,7 +96,7 @@ public struct CompoundIcon: View {
         self.size = size
         self.font = font
     }
-    
+
     public var body: some View {
         image
             .resizable()
@@ -108,11 +108,11 @@ public struct CompoundIcon: View {
 /// scaled dynamically based upon the specified text style.
 private struct CompoundIconFrame: ViewModifier {
     @ScaledMetric private var size: CGFloat
-    
+
     init(fontSize: CGFloat, textStyle: Font.TextStyle) {
         _size = ScaledMetric(wrappedValue: fontSize, relativeTo: textStyle)
     }
-    
+
     func body(content: Content) -> some View {
         content
             .frame(width: size, height: size)
@@ -132,7 +132,7 @@ public extension Label {
             CompoundIcon(icon)
         }
     }
-    
+
     /// Creates a label with an icon from Compound and a title generated from a string.
     /// - Parameters:
     ///   - title: A string used as the label’s title.
@@ -166,7 +166,7 @@ struct CompoundIcon_Previews: PreviewProvider, TestablePreview {
         accessibilityLabels
             .previewDisplayName("Accessibility Labels")
     }
-    
+
     static var accessibilityIcons: some View {
         VStack(spacing: 8) {
             ForEach(DynamicTypeSize.allCases, id: \.self) { size in
@@ -179,7 +179,7 @@ struct CompoundIcon_Previews: PreviewProvider, TestablePreview {
             }
         }
     }
-    
+
     static var accessibilityLabels: some View {
         Grid(alignment: .leading) {
             ForEach(DynamicTypeSize.allCases, id: \.self) { size in
@@ -196,7 +196,7 @@ struct CompoundIcon_Previews: PreviewProvider, TestablePreview {
             }
         }
     }
-    
+
     static var form: some View {
         Form {
             Section {
@@ -217,7 +217,7 @@ struct CompoundIcon_Previews: PreviewProvider, TestablePreview {
             .padding()
         }
     }
-    
+
     static var buttons: some View {
         VStack(spacing: 8) {
             Button { } label: {
@@ -227,7 +227,7 @@ struct CompoundIcon_Previews: PreviewProvider, TestablePreview {
             }
             .font(.compound.bodyLG)
             .buttonStyle(.borderedProminent)
-            
+
             Button { } label: {
                 Label { Text("Body Small") } icon: {
                     CompoundIcon(\.userProfile, size: .small, relativeTo: .compound.bodySM)
@@ -235,7 +235,7 @@ struct CompoundIcon_Previews: PreviewProvider, TestablePreview {
             }
             .font(.compound.bodySM)
             .buttonStyle(.borderedProminent)
-            
+
             Button { } label: {
                 Label { Text("Body xSmall") } icon: {
                     CompoundIcon(\.userProfile, size: .xSmall, relativeTo: .compound.bodyXS)

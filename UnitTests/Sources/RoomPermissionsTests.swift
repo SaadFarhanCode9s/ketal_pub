@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ElementX
+@testable import ketal
 import MatrixRustSDK
 import XCTest
 
@@ -24,10 +24,10 @@ class RoomPermissionsTests: XCTestCase {
                                                 roomAvatar: 0,
                                                 roomTopic: 0,
                                                 spaceChild: 100)
-        
+
         // When creating room permissions from them.
         let permissions = RoomPermissions(powerLevels: powerLevels)
-        
+
         // Then the permissions should be created with values mapped to the correct role.
         XCTAssertEqual(permissions.ban, RoomRole.administrator.powerLevelValue)
         XCTAssertEqual(permissions.invite, RoomRole.administrator.powerLevelValue)

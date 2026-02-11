@@ -1,10 +1,10 @@
 sources:
   include:
-    - ../../ElementX
+    - ../../ketal
     - ../../NSE
   exclude:
-    - ../../ElementX/Sources/Mocks/SDK
+    - ../../ketal/Sources/Mocks/SDK
 templates:
   - AutoMockable.stencil
 output:
-  ../../ElementX/Sources/Mocks/Generated/GeneratedMocks.swift
+  ../../ketal/Sources/Mocks/Generated/GeneratedMocks.swift

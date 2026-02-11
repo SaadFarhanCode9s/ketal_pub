@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import ketal
 import Kingfisher
 import XCTest
 
@@ -16,29 +16,29 @@ final class MediaProviderTests: XCTestCase {
     private var mediaLoader: MediaLoaderMock!
     private var imageCache: MockImageCache!
     private var reachabilitySubject = CurrentValueSubject<NetworkMonitorReachability, Never>(.reachable)
-    
+
     var mediaProvider: MediaProvider!
-    
+
     override func setUp() {
         mediaLoader = MediaLoaderMock()
         imageCache = MockImageCache(name: "Test")
-        
+
         mediaProvider = MediaProvider(mediaLoader: mediaLoader,
                                       imageCache: imageCache,
                                       homeserverReachabilityPublisher: reachabilitySubject.asCurrentValuePublisher())
     }
-    
+
     func testLoadingRetriedOnReconnection() async throws {
         let testImage = try loadTestImage()
         guard let pngData = testImage.pngData() else {
             XCTFail("Test image should contain valid .png data")
             return
         }
-        
+
         let loadTask = try mediaProvider.loadImageRetryingOnReconnection(MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpeg"))
-        
+
         reachabilitySubject.send(.unreachable)
-        
+
         mediaLoader.loadMediaContentForSourceClosure = { [reachabilitySubject] _ in
             switch reachabilitySubject.value {
             case .unreachable:
@@ -48,30 +48,30 @@ final class MediaProviderTests: XCTestCase {
                 return pngData
             }
         }
-        
+
         let result = try? await loadTask.value
-        
+
         XCTAssertNotNil(result)
         XCTAssertEqual(mediaLoader.loadMediaContentForSourceCallsCount, 2)
     }
-    
+
     func testLoadingRetriedOnReconnectionCancelsAfterSecondFailure() async throws {
         let loadTask = try mediaProvider.loadImageRetryingOnReconnection(MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpeg"))
-        
+
         reachabilitySubject.send(.reachable)
-        
+
         mediaLoader.loadMediaContentForSourceThrowableError = MediaProviderTestsError.error
-        
+
         let result = try? await loadTask.value
-        
+
         XCTAssertNil(result)
     }
-    
+
     func test_whenImageFromSourceWithSourceNil_nilReturned() {
         let image = mediaProvider.imageFromSource(nil, size: Avatars.Size.room(on: .timeline).scaledSize)
         XCTAssertNil(image)
     }
-    
+
     func test_whenImageFromSourceWithSourceNotNilAndImageCacheContainsImage_ImageIsReturned() throws {
         let avatarSize = Avatars.Size.room(on: .timeline)
         let url = URL.mockMXCImage
@@ -82,13 +82,13 @@ final class MediaProviderTests: XCTestCase {
                                                       size: avatarSize.scaledSize)
         XCTAssertEqual(image, imageForKey)
     }
-    
+
     func test_whenImageFromSourceWithSourceNotNilAndImageNotCached_nilReturned() throws {
         let image = try mediaProvider.imageFromSource(MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpeg"),
                                                       size: Avatars.Size.room(on: .timeline).scaledSize)
         XCTAssertNil(image)
     }
-    
+
     func test_whenLoadImageFromSourceAndImageCacheContainsImage_successIsReturned() async throws {
         let avatarSize = Avatars.Size.room(on: .timeline)
         let url = URL.mockMXCImage
@@ -99,7 +99,7 @@ final class MediaProviderTests: XCTestCase {
                                                                  size: avatarSize.scaledSize)
         XCTAssertEqual(Result.success(imageForKey), result)
     }
-    
+
     func test_whenLoadImageFromSourceAndImageNotCachedAndRetrieveImageSucceeds_successIsReturned() async throws {
         let avatarSize = Avatars.Size.room(on: .timeline)
         let url = URL.mockMXCImage
@@ -110,13 +110,13 @@ final class MediaProviderTests: XCTestCase {
                                                                  size: avatarSize.scaledSize)
         XCTAssertEqual(Result.success(imageForKey), result)
     }
-    
+
     func test_whenLoadImageFromSourceAndImageNotCachedAndRetrieveImageFails_imageThumbnailIsLoaded() async throws {
         let avatarSize = Avatars.Size.room(on: .timeline)
         let expectedImage = try loadTestImage()
-        
+
         mediaLoader.loadMediaThumbnailForSourceWidthHeightReturnValue = expectedImage.pngData()
-        
+
         let result = try await mediaProvider.loadImageFromSource(MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpeg"),
                                                                  size: avatarSize.scaledSize)
         switch result {
@@ -126,7 +126,7 @@ final class MediaProviderTests: XCTestCase {
             XCTFail("Should be success")
         }
     }
-    
+
     func test_whenLoadImageFromSourceAndImageNotCachedAndRetrieveImageFails_imageIsStored() async throws {
         let avatarSize = Avatars.Size.room(on: .timeline)
         let url = URL.mockMXCImage
@@ -134,18 +134,18 @@ final class MediaProviderTests: XCTestCase {
         let expectedImage = try loadTestImage()
 
         mediaLoader.loadMediaThumbnailForSourceWidthHeightReturnValue = expectedImage.pngData()
-        
+
         _ = try await mediaProvider.loadImageFromSource(MediaSourceProxy(url: url, mimeType: "image/jpeg"),
                                                         size: avatarSize.scaledSize)
         let storedImage = try XCTUnwrap(imageCache.storedImages[key])
         XCTAssertEqual(expectedImage.pngData(), storedImage.pngData())
     }
-    
+
     func test_whenLoadImageFromSourceAndImageNotCachedAndRetrieveImageFailsAndNoAvatarSize_imageContentIsLoaded() async throws {
         let expectedImage = try loadTestImage()
 
         mediaLoader.loadMediaContentForSourceReturnValue = expectedImage.pngData()
-        
+
         let result = try await mediaProvider.loadImageFromSource(MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpeg"),
                                                                  size: nil)
         switch result {
@@ -155,10 +155,10 @@ final class MediaProviderTests: XCTestCase {
             XCTFail("Should be success")
         }
     }
-    
+
     func test_whenLoadImageFromSourceAndImageNotCachedAndRetrieveImageFailsAndLoadImageThumbnailFails_errorIsThrown() async throws {
         mediaLoader.loadMediaThumbnailForSourceWidthHeightThrowableError = MediaProviderTestsError.error
-        
+
         let result = try await mediaProvider.loadImageFromSource(MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpeg"),
                                                                  size: Avatars.Size.room(on: .timeline).scaledSize)
         switch result {
@@ -168,10 +168,10 @@ final class MediaProviderTests: XCTestCase {
             XCTAssertEqual(error, MediaProviderError.failedRetrievingImage)
         }
     }
-    
+
     func test_whenLoadImageFromSourceAndImageNotCachedAndRetrieveImageFailsAndNoAvatarSizeAndLoadImageContentFails_errorIsThrown() async throws {
         mediaLoader.loadMediaContentForSourceThrowableError = MediaProviderTestsError.error
-        
+
         let result = try await mediaProvider.loadImageFromSource(MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpeg"),
                                                                  size: nil)
         switch result {
@@ -181,10 +181,10 @@ final class MediaProviderTests: XCTestCase {
             XCTAssertEqual(error, MediaProviderError.failedRetrievingImage)
         }
     }
-    
+
     func test_whenLoadImageFromSourceAndImageNotCachedAndRetrieveImageFailsAndImageThumbnailIsLoadedWithCorruptedData_errorIsThrown() async throws {
         mediaLoader.loadMediaThumbnailForSourceWidthHeightReturnValue = Data()
-        
+
         let result = try await mediaProvider.loadImageFromSource(MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpeg"),
                                                                  size: Avatars.Size.room(on: .timeline).scaledSize)
         switch result {
@@ -194,7 +194,7 @@ final class MediaProviderTests: XCTestCase {
             XCTAssertEqual(error, MediaProviderError.invalidImageData)
         }
     }
-    
+
     private func loadTestImage() throws -> UIImage {
         guard let path = Bundle(for: Self.self).path(forResource: "test_image", ofType: "png"),
               let image = UIImage(contentsOfFile: path) else {

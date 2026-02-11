@@ -13,7 +13,7 @@ struct ListInlinePicker<SelectedValue: Hashable>: View {
     @Binding var selection: SelectedValue
     let items: [(title: String, tag: SelectedValue)]
     let isWaiting: Bool
-    
+
     var body: some View {
         ForEach(items, id: \.tag) { item in
             ListRow(label: .plain(title: item.title),
@@ -36,10 +36,10 @@ struct ListInlinePicker_Previews: PreviewProvider, TestablePreview {
     static var previews: some View {
         Preview()
     }
-    
+
     struct Preview: View {
         @State var selection = "Item 1"
-        
+
         let items = ["Item 1", "Item 2", "Item 3"]
         var body: some View {
             Form {
@@ -49,14 +49,14 @@ struct ListInlinePicker_Previews: PreviewProvider, TestablePreview {
                                      items: items.map { (title: $0, tag: $0) },
                                      isWaiting: false)
                 }
-                
+
                 Section("Compound with loader") {
                     ListInlinePicker(title: "Title",
                                      selection: $selection,
                                      items: items.map { (title: $0, tag: $0) },
                                      isWaiting: true)
                 }
-                
+
                 Section("Native") {
                     Picker("", selection: $selection) {
                         ForEach(items, id: \.self) { item in

@@ -11,14 +11,14 @@ import XCTest
 enum Application {
     @discardableResult static func launch() -> XCUIApplication {
         let app = XCUIApplication()
-        
+
         let launchEnvironment = [
             "IS_RUNNING_INTEGRATION_TESTS": "1"
         ]
-        
+
         app.launchEnvironment = launchEnvironment
         app.launch()
-        
+
         return app
     }
 }
@@ -29,25 +29,25 @@ extension XCUIApplication {
               homeserver.count > 0 else {
             return nil
         }
-        
+
         return homeserver
     }
-    
+
     var username: String {
         guard let username = ProcessInfo.processInfo.environment["INTEGRATION_TESTS_USERNAME"],
               username.count > 0 else {
             return "default"
         }
-        
+
         return username
     }
-    
+
     var password: String {
         guard let password = ProcessInfo.processInfo.environment["INTEGRATION_TESTS_PASSWORD"],
               password.count > 0 else {
             return "default"
         }
-        
+
         return password
     }
 }

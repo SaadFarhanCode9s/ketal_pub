@@ -25,7 +25,7 @@ public enum ListRowPadding {
                                           leading: horizontal,
                                           bottom: vertical,
                                           trailing: horizontal)
-    
+
     public static let textFieldInsets = EdgeInsets(top: 11,
                                                    leading: horizontal,
                                                    bottom: 11,
@@ -34,10 +34,10 @@ public enum ListRowPadding {
 
 public struct ListRow<Icon: View, DetailsIcon: View, CustomContent: View, SelectionValue: Hashable>: View {
     @Environment(\.isEnabled) private var isEnabled
-    
+
     let label: ListRowLabel<Icon>
     let details: ListRowDetails<DetailsIcon>?
-    
+
     public enum Kind<CustomView: View, Selection: Hashable> {
         case label
         case button(action: () -> Void)
@@ -49,16 +49,16 @@ public struct ListRow<Icon: View, DetailsIcon: View, CustomContent: View, Select
         case multiSelection(isSelected: Bool, action: () -> Void)
         case textField(text: Binding<String>, axis: Axis?)
         case secureField(text: Binding<String>)
-        
+
         case custom(() -> CustomView)
-        
+
         public static func textField(text: Binding<String>) -> Self {
             .textField(text: text, axis: nil)
         }
     }
-    
+
     let kind: Kind<CustomContent, SelectionValue>
-    
+
     public var body: some View {
         rowContent
             .buttonStyle(ListRowButtonStyle())
@@ -66,7 +66,7 @@ public struct ListRow<Icon: View, DetailsIcon: View, CustomContent: View, Select
             .listRowBackground(Color.compound.bgCanvasDefaultLevel1)
             .listRowSeparatorTint(ListRowColor.separatorTint)
     }
-    
+
     @ViewBuilder
     var rowContent: some View {
         switch kind {
@@ -104,7 +104,7 @@ public struct ListRow<Icon: View, DetailsIcon: View, CustomContent: View, Select
                     if let details {
                         ListRowTrailingSection(details)
                     }
-                    
+
                     // Note: VoiceOver label already provided.
                     Toggle("", isOn: binding)
                         .toggleStyle(.compound)
@@ -145,7 +145,7 @@ public struct ListRow<Icon: View, DetailsIcon: View, CustomContent: View, Select
             .tint(.compound.iconAccentTertiary)
             .foregroundStyle(isEnabled ? .compound.textPrimary : .compound.textDisabled)
             .listRowInsets(ListRowPadding.textFieldInsets)
-        
+
         case .custom(let content):
             content()
         }
@@ -163,7 +163,7 @@ public extension ListRow where CustomContent == EmptyView {
         self.details = details
         self.kind = kind
     }
-    
+
     init(label: ListRowLabel<Icon>,
          details: ListRowDetails<DetailsIcon>? = nil,
          kind: Kind<CustomContent, SelectionValue>) where SelectionValue == String {
@@ -182,7 +182,7 @@ public extension ListRow where DetailsIcon == EmptyView, CustomContent == EmptyV
         self.details = details
         self.kind = kind
     }
-    
+
     init(label: ListRowLabel<Icon>,
          details: ListRowDetails<DetailsIcon>? = nil,
          kind: Kind<CustomContent, SelectionValue>) where SelectionValue == String {
@@ -199,7 +199,7 @@ public extension ListRow where Icon == EmptyView, DetailsIcon == EmptyView {
         details = nil
         self.kind = kind
     }
-    
+
     init(kind: Kind<CustomContent, SelectionValue>) where SelectionValue == String {
         label = ListRowLabel()
         details = nil
@@ -216,7 +216,7 @@ private struct RowContent<Label: View, DetailsIcon: View>: View {
     let details: ListRowDetails<DetailsIcon>?
     var accessory: ListRowAccessory?
     let label: () -> Label
-    
+
     var body: some View {
         // If not custom, the label() content usually includes a leading `ListRowPadding.horizontal`
         // that's why the external `HStack` has 0 spacing.
@@ -226,11 +226,11 @@ private struct RowContent<Label: View, DetailsIcon: View>: View {
                 accessory
                     .padding(.leading, ListRowPadding.horizontal)
             }
-            
+
             HStack(spacing: ListRowTrailingSectionSpacing.horizontal) {
                 label()
                     .frame(maxWidth: .infinity)
-                
+
                 if details != nil || accessory != nil {
                     ListRowTrailingSection(details,
                                            // Prevent multi selection to appear on the trailing side
@@ -274,7 +274,7 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                 actionButtons
                 plainButton
             }
-            
+
             centeredActionButtonSections
             descriptionLabelSection
             avatarSection
@@ -284,7 +284,7 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
         .frame(idealHeight: 2275) // Snapshot height
         .previewLayout(.sizeThatFits)
     }
-    
+
     static var labels: some View {
         ListRow(label: .default(title: "Label",
                                 description: "Non-interactive item",
@@ -294,7 +294,7 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                                 isWaiting: true),
                 kind: .label)
     }
-    
+
     @ViewBuilder static var buttons: some View {
         ListRow(label: .default(title: "Title",
                                 description: "Description…",
@@ -316,7 +316,7 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                                 systemIcon: .squareDashed),
                 kind: .navigationLink { print("Perform navigation!") })
     }
-    
+
     @ViewBuilder static var pickers: some View {
         ListRow(label: .default(title: "Title",
                                 description: "Description…",
@@ -338,7 +338,7 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                                       (title: "Item 2", tag: "Item 2"),
                                       (title: "Item 3", tag: "Item 3")]))
     }
-    
+
     @ViewBuilder static var toggles: some View {
         ListRow(label: .default(title: "Title",
                                 description: "Description…",
@@ -354,7 +354,7 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                 details: .isWaiting(true),
                 kind: .toggle(.constant(false)))
     }
-    
+
     @ViewBuilder static var selection: some View {
         ListRow(label: .default(title: "Title",
                                 description: "Description…",
@@ -369,14 +369,14 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                 kind: .selection(isSelected: true) {
                     print("I was tapped!")
                 })
-        
+
         ListRow(label: .plain(title: "Title"),
                 kind: .inlinePicker(selection: .constant("Item 1"),
                                     items: [(title: "Item 1", tag: "Item 1"),
                                             (title: "Item 2", tag: "Item 2"),
                                             (title: "Item 3", tag: "Item 3")]))
     }
-    
+
     @ViewBuilder static var actionButtons: some View {
         ListRow(label: .action(title: "Title",
                                systemIcon: .squareDashed),
@@ -390,26 +390,26 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                 kind: .button { print("I was tapped!") })
             .disabled(true)
     }
-    
+
     static var plainButton: some View {
         ListRow(label: .plain(title: "Title"),
                 kind: .button { print("I was tapped!") })
     }
-    
+
     @ViewBuilder static var centeredActionButtonSections: some View {
         Section {
             ListRow(label: .centeredAction(title: "Title",
                                            systemIcon: .squareDashed),
                     kind: .button { print("I was tapped!") })
         }
-        
+
         Section {
             ListRow(label: .centeredAction(title: "Title",
                                            systemIcon: .squareDashed,
                                            role: .destructive),
                     kind: .button { print("I was tapped!") })
         }
-        
+
         Section {
             ListRow(label: .centeredAction(title: "Title",
                                            systemIcon: .squareDashed),
@@ -417,14 +417,14 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                 .disabled(true)
         }
     }
-    
+
     static var descriptionLabelSection: some View {
         Section {
             ListRow(label: .description("This is a row in the list, with a multiline description but it doesn't have either an icon or a title, just this text here."),
                     kind: .label)
         }
     }
-    
+
     static var avatarSection: some View {
         Section {
             ListRow(label: .avatar(title: "Alice",
@@ -448,7 +448,7 @@ public struct ListRow_Previews: PreviewProvider, TestablePreview {
                     kind: .button { })
         }
     }
-    
+
     static var othersSection: some View {
         Section {
             ListRow(kind: .custom {

@@ -13,7 +13,7 @@ import SwiftUI
 /// The main label style used in the leading section of `ListRow`.
 struct ListRowLabelStyle: LabelStyle {
     let iconAlignment: VerticalAlignment
-    
+
     func makeBody(configuration: Configuration) -> some View {
         HStack(alignment: iconAlignment, spacing: 16) {
             configuration.icon
@@ -37,7 +37,7 @@ struct ListRowCenteredLabelStyle: LabelStyle {
 /// Unlike the other styles, this one sizes the avatar internally.
 struct ListRowAvatarLabelStyle: LabelStyle {
     @ScaledMetric private var avatarSize = 32.0
-    
+
     func makeBody(configuration: Configuration) -> some View {
         HStack(alignment: .center, spacing: 16) {
             configuration.icon
@@ -52,12 +52,12 @@ public struct ListRowLabel<Icon: View>: View {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.lineLimit) private var lineLimit
     @ScaledMetric private var iconSize = 30.0
-    
+
     var title: String?
     var status: String?
     var description: String?
     var icon: Icon?
-    
+
     var role: Role?
     public enum Role {
         /// A role that indicates a destructive action.
@@ -67,13 +67,13 @@ public struct ListRowLabel<Icon: View>: View {
         /// The label should contain a description when using this role.
         case error
     }
-    
-    var iconAlignment: VerticalAlignment = .top
+
+    var iconAlignment: VerticalAlignment = .center
     var hideIconBackground = false
-    
+
     enum Layout { case `default`, centered, avatar }
     var layout: Layout = .default
-    
+
     var titleColor: Color {
         guard isEnabled else { return .compound.textDisabled }
         return role == .destructive ? .compound.textCriticalPrimary : .compound.textPrimary
@@ -82,11 +82,11 @@ public struct ListRowLabel<Icon: View>: View {
     var titleLineLimit: Int? {
         layout == .avatar ? 1 : lineLimit
     }
-    
+
     var statusColor: Color {
         isEnabled ? .compound.textSecondary : .compound.textDisabled
     }
-    
+
     var descriptionColor: Color {
         isEnabled ? .compound.textSecondary : .compound.textDisabled
     }
@@ -95,31 +95,19 @@ public struct ListRowLabel<Icon: View>: View {
         guard layout == .avatar else { return lineLimit }
         return role != .error ? 1 : lineLimit
     }
-    
+
     var iconForegroundColor: Color {
         guard isEnabled else { return .compound.iconTertiaryAlpha }
-        if role == .destructive { return .compound.iconCriticalPrimary }
-        if hideIconBackground {
-            return .compound.iconTertiaryAlpha
-        } else {
-            if #available(iOS 26, *) {
-                return .compound.iconSecondary
-            } else {
-                return .compound.iconPrimary
-            }
-        }
+        if role == .destructive { return .compound.textCriticalPrimary }
+        return hideIconBackground ? .compound.iconPrimary : .compound.iconTertiaryAlpha
     }
-    
+
     var iconBackgroundColor: Color {
         if hideIconBackground { return .clear }
-        if #available(iOS 26, *) {
-            return .clear
-        } else {
-            guard isEnabled else { return .compound._bgSubtleSecondaryAlpha }
-            return role == .destructive ? .compound._bgCriticalSubtleAlpha : .compound._bgSubtleSecondaryAlpha
-        }
+        guard isEnabled else { return .compound._bgSubtleSecondaryAlpha }
+        return role == .destructive ? .compound._bgCriticalSubtleAlpha : .compound._bgSubtleSecondaryAlpha
     }
-    
+
     public var body: some View {
         Group {
             switch layout {
@@ -134,7 +122,7 @@ public struct ListRowLabel<Icon: View>: View {
         .padding(.leading, ListRowPadding.horizontal)
         .padding(.vertical, ListRowPadding.vertical)
     }
-    
+
     var defaultBody: some View {
         Label {
             titleAndDescription
@@ -149,7 +137,7 @@ public struct ListRowLabel<Icon: View>: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .labelStyle(ListRowLabelStyle(iconAlignment: iconAlignment))
     }
-    
+
     var centeredBody: some View {
         Label {
             if let title {
@@ -165,7 +153,7 @@ public struct ListRowLabel<Icon: View>: View {
         .labelStyle(ListRowCenteredLabelStyle())
         .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
     }
-    
+
     var avatarBody: some View {
         Label {
             titleAndDescription
@@ -175,7 +163,7 @@ public struct ListRowLabel<Icon: View>: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .labelStyle(ListRowAvatarLabelStyle())
     }
-    
+
     var titleAndDescription: some View {
         VStack(alignment: .leading, spacing: 2) {
             if let title {
@@ -184,7 +172,7 @@ public struct ListRowLabel<Icon: View>: View {
                         .font(.compound.bodyLG)
                         .foregroundColor(titleColor)
                         .lineLimit(titleLineLimit)
-                    
+
                     // Status is only available in the avatar init which requires a title,
                     // so no need to worry about the outer `if let` being nil in this instance.
                     if let status {
@@ -195,14 +183,14 @@ public struct ListRowLabel<Icon: View>: View {
                     }
                 }
             }
-            
+
             if let description {
                 HStack(alignment: .top, spacing: 4) {
                     if role == .error {
                         CompoundIcon(\.errorSolid, size: .xSmall, relativeTo: .compound.bodySM)
                             .foregroundStyle(.compound.iconCriticalPrimary)
                     }
-                    
+
                     Text(description)
                         .font(.compound.bodySM)
                         .foregroundColor(descriptionColor)
@@ -212,45 +200,45 @@ public struct ListRowLabel<Icon: View>: View {
         }
         .accessibilityElement(children: .combine)
     }
-    
+
     // MARK: - Initialisers
-    
+
     public static func `default`(title: String,
                                  description: String? = nil,
                                  icon: Icon,
                                  role: ListRowLabel.Role? = nil,
-                                 iconAlignment: VerticalAlignment = .top) -> ListRowLabel {
+                                 iconAlignment: VerticalAlignment = .center) -> ListRowLabel {
         ListRowLabel(title: title,
                      description: description,
                      icon: icon,
                      role: role,
                      iconAlignment: iconAlignment)
     }
-    
+
     public static func `default`(title: String,
                                  description: String? = nil,
                                  icon: KeyPath<CompoundIcons, Image>,
                                  role: ListRowLabel.Role? = nil,
-                                 iconAlignment: VerticalAlignment = .top) -> ListRowLabel where Icon == CompoundIcon {
+                                 iconAlignment: VerticalAlignment = .center) -> ListRowLabel where Icon == CompoundIcon {
         .default(title: title,
                  description: description,
                  icon: CompoundIcon(icon),
                  role: role,
                  iconAlignment: iconAlignment)
     }
-    
+
     public static func `default`(title: String,
                                  description: String? = nil,
                                  systemIcon: SFSymbol,
                                  role: ListRowLabel.Role? = nil,
-                                 iconAlignment: VerticalAlignment = .top) -> ListRowLabel where Icon == Image {
+                                 iconAlignment: VerticalAlignment = .center) -> ListRowLabel where Icon == Image {
         .default(title: title,
                  description: description,
                  icon: Image(systemSymbol: systemIcon),
                  role: role,
                  iconAlignment: iconAlignment)
     }
-    
+
     public static func action(title: String,
                               icon: Icon,
                               role: ListRowLabel.Role? = nil) -> ListRowLabel {
@@ -259,19 +247,19 @@ public struct ListRowLabel<Icon: View>: View {
                      role: role,
                      hideIconBackground: true)
     }
-    
+
     public static func action(title: String,
                               icon: KeyPath<CompoundIcons, Image>,
                               role: ListRowLabel.Role? = nil) -> ListRowLabel where Icon == CompoundIcon {
         .action(title: title, icon: CompoundIcon(icon), role: role)
     }
-    
+
     public static func action(title: String,
                               systemIcon: SFSymbol,
                               role: ListRowLabel.Role? = nil) -> ListRowLabel where Icon == Image {
         .action(title: title, icon: Image(systemSymbol: systemIcon), role: role)
     }
-    
+
     public static func centeredAction(title: String,
                                       icon: Icon,
                                       role: ListRowLabel.Role? = nil) -> ListRowLabel {
@@ -281,29 +269,29 @@ public struct ListRowLabel<Icon: View>: View {
                      hideIconBackground: true,
                      layout: .centered)
     }
-    
+
     public static func centeredAction(title: String,
                                       icon: KeyPath<CompoundIcons, Image>,
                                       role: ListRowLabel.Role? = nil) -> ListRowLabel where Icon == CompoundIcon {
         .centeredAction(title: title, icon: CompoundIcon(icon), role: role)
     }
-    
+
     public static func centeredAction(title: String,
                                       systemIcon: SFSymbol,
                                       role: ListRowLabel.Role? = nil) -> ListRowLabel where Icon == Image {
         .centeredAction(title: title, icon: Image(systemSymbol: systemIcon), role: role)
     }
-    
+
     public static func plain(title: String,
                              description: String? = nil,
                              role: ListRowLabel.Role? = nil) -> ListRowLabel where Icon == EmptyView {
         ListRowLabel(title: title, description: description, role: role, hideIconBackground: true)
     }
-    
+
     public static func description(_ description: String) -> ListRowLabel where Icon == EmptyView {
         ListRowLabel(description: description)
     }
-    
+
     /// A label that displays an avatar as it's icon, such as a user profile row or for a room picker.
     public static func avatar(title: String,
                               status: String? = nil,
@@ -315,7 +303,6 @@ public struct ListRowLabel<Icon: View>: View {
                      description: description,
                      icon: icon,
                      role: role,
-                     iconAlignment: .center,
                      layout: .avatar)
     }
 }
@@ -328,42 +315,42 @@ struct ListRowLabel_Previews: PreviewProvider, TestablePreview {
             Section {
                 Group {
                     ListRowLabel.default(title: "Person", icon: Image(systemName: "person"))
-                    
+
                     ListRowLabel.default(title: "Help",
                                          description: "Supporting text",
                                          systemIcon: .questionmarkCircle)
-                    
+
                     ListRowLabel.default(title: "Trash",
                                          icon: Image(systemName: "trash"),
                                          role: .destructive)
                 }
-                
+
                 Group {
                     ListRowLabel.action(title: "Camera",
                                         icon: Image(systemName: "camera"))
-                    
+
                     ListRowLabel.action(title: "Remove",
                                         icon: Image(systemName: "person.badge.minus"),
                                         role: .destructive)
-                    
+
                     ListRowLabel.centeredAction(title: "Person",
                                                 icon: Image(systemName: "person"))
                     ListRowLabel.centeredAction(title: "Remove",
                                                 systemIcon: .personBadgeMinus,
                                                 role: .destructive)
                 }
-                
+
                 Group {
                     ListRowLabel.plain(title: "Person")
                     ListRowLabel.plain(title: "Remove",
                                        role: .destructive)
                     ListRowLabel.plain(title: "Plain", description: "Description")
                 }
-                
+
                 ListRowLabel.description("This is a row in the list, that only contains a description and doesn't have either an icon or a title.")
             }
             .listRowInsets(EdgeInsets())
-            
+
             Section {
                 ListRowLabel.avatar(title: "Alice",
                                     description: "@alice:example.com",
@@ -378,7 +365,7 @@ struct ListRowLabel_Previews: PreviewProvider, TestablePreview {
                                     role: .error)
             }
             .listRowInsets(EdgeInsets())
-            
+
             Section {
                 ListRow(label: .description("This is a row in the list, with a multiline description but it doesn't have either an icon or a title, just this text here."),
                         kind: .label)

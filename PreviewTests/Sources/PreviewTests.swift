@@ -18,7 +18,7 @@ class PreviewTests: XCTestCase {
         let name: String
         let device: String
     }
-    
+
     private let deviceConfig: ViewImageConfig = .iPhoneX
     private let simulatorDevice: String? = "iPhone14,6" // iPhone SE 3rd Generation
     private let requiredOSVersion = (major: 26, minor: 1)
@@ -30,7 +30,7 @@ class PreviewTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        
+
         if ProcessInfo().environment["RECORD_FAILURES"].map(Bool.init) == true {
             recordMode = .failed
         }
@@ -38,7 +38,7 @@ class PreviewTests: XCTestCase {
         checkEnvironments()
         UIView.setAnimationsEnabled(false)
     }
-    
+
     /// Check environments to avoid problems with snapshots on different devices or OS.
     private func checkEnvironments() {
         if let simulatorDevice {
@@ -56,21 +56,21 @@ class PreviewTests: XCTestCase {
             fatalError("Specify at least one snapshot device to test on.")
         }
     }
-    
+
     // MARK: - Snapshots
 
     func assertSnapshots(matching preview: _Preview, testName: String = #function, step: Int) async throws {
         let preferences = SnapshotPreferences()
-        
+
         let preferenceReadingView = preview.content
             .onPreferenceChange(SnapshotPrecisionPreferenceKey.self) { preferences.precision = $0 }
             .onPreferenceChange(SnapshotPerceptualPrecisionPreferenceKey.self) { preferences.perceptualPrecision = $0 }
             .onPreferenceChange(SnapshotFulfillmentPreferenceKey.self) { preferences.fulfillmentSource = $0?.source }
-        
+
         // Render an image of the view in order to trigger the preference updates to occur.
         let imageRenderer = ImageRenderer(content: preferenceReadingView)
         _ = imageRenderer.uiImage
-        
+
         switch preferences.fulfillmentSource {
         case .publisher(let publisher):
             let deferred = deferFulfillment(publisher) { $0 == true }
@@ -81,10 +81,10 @@ class PreviewTests: XCTestCase {
         case .none:
             break
         }
-        
+
         var sanitizedSuiteName = String(testName.suffix(testName.count - "test".count).dropLast(2))
         sanitizedSuiteName = sanitizedSuiteName.prefix(1).lowercased() + sanitizedSuiteName.dropFirst()
-        
+
         for snapshotDevice in snapshotDevices {
             guard var device = PreviewDevice(rawValue: snapshotDevice.device).snapshotDevice() else {
                 fatalError("Unknown device name: \(snapshotDevice.device)")
@@ -93,14 +93,14 @@ class PreviewTests: XCTestCase {
             device.safeArea = .one
             // Ignore specific device display scale
             let traits = UITraitCollection(displayScale: 2.0)
-            
+
             var testName = ""
             if let displayName = preview.displayName {
                 testName = "\(displayName)-\(snapshotDevice.name)-\(localeCode)"
             } else {
                 testName = "\(snapshotDevice.name)-\(localeCode)-\(step)"
             }
-            
+
             let isScreen = switch preview.layout {
             case .device: true
             default: false
@@ -116,7 +116,7 @@ class PreviewTests: XCTestCase {
             }
         }
     }
-    
+
     private var localeCode: String {
         if UserDefaults.standard.bool(forKey: "NSDoubleLocalizedStrings") {
             return "pseudo"
@@ -142,7 +142,7 @@ class PreviewTests: XCTestCase {
         let matchingView = isScreen ? AnyView(view) : AnyView(view
             .frame(width: device.size?.width)
             .fixedSize(horizontal: false, vertical: true))
-        
+
         return withSnapshotTesting(record: recordMode) {
             verifySnapshot(of: matchingView,
                            as: .prefireImage(preferences: preferences,
@@ -152,7 +152,7 @@ class PreviewTests: XCTestCase {
                            testName: testName)
         }
     }
-    
+
     private func wait(for duration: TimeInterval) {
         let expectation = XCTestExpectation(description: "Wait")
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
@@ -231,7 +231,7 @@ private extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
 
                     controller = hostingController
                 }
-                
+
                 return snapshotView(config: config,
                                     drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
                                     traits: traits,

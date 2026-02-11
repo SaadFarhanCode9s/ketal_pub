@@ -15,18 +15,18 @@ final class DecorativeColorsTests: XCTestCase {
     struct TestCase {
         let input: String
         private let webOutput: Int
-        
+
         /// remember that web starts the index from 1 while we start from 0
         var output: Int {
             webOutput - 1
         }
-        
+
         init(input: String, webOutput: Int) {
             self.input = input
             self.webOutput = webOutput
         }
     }
-    
+
     func testAvatarColorHash() {
         // Match the tests with the web ones for consistency between the two platforms
         // https://github.com/element-hq/compound-web/blob/4608dc807c9c904874eac67ff22be3213f4a261d/src/components/Avatar/Avatar.test.tsx#L62
@@ -38,7 +38,7 @@ final class DecorativeColorsTests: XCTestCase {
             .init(input: "@elena:example.org", webOutput: 4),
             .init(input: "@fanny:example.org", webOutput: 3)
         ]
-        
+
         for testCase in testCases {
             XCTAssertEqual(Color.compound.decorativeColor(for: testCase.input), Color.compound.decorativeColors[testCase.output])
         }

@@ -22,7 +22,7 @@ struct FontsScreen: View {
 struct FontItem: View {
     let font: Font
     let name: String
-    
+
     var body: some View {
         Text(name)
             .font(font)

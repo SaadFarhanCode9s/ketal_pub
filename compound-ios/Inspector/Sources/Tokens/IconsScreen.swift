@@ -11,7 +11,7 @@ import SwiftUI
 
 struct IconsScreen: View {
     let icons = Image.compound.allValues.sorted(by: { $0.name < $1.name })
-    
+
     var body: some View {
         ScreenContent(navigationTitle: "Icons") {
             ForEach(icons, id: \.name) { icon in
@@ -24,7 +24,7 @@ struct IconsScreen: View {
 struct IconItem: View {
     let icon: Image
     let name: String
-    
+
     var body: some View {
         Label {
             Text(name)

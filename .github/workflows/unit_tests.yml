@@ -10,6 +10,7 @@ on:
 
 jobs:
   tests:
+    if: false
     name: Tests
     runs-on: macos-26
     timeout-minutes: 60

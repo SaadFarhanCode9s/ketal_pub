@@ -13,7 +13,7 @@ public extension View {
     func scaledFrame(size: CGFloat, alignment: Alignment = .center, relativeTo textStyle: Font.TextStyle = .body) -> some View {
         scaledFrame(width: size, height: size, alignment: alignment, relativeTo: textStyle)
     }
-    
+
     /// Positions this view within an invisible frame with a size that scales relative to the user's selected font size.
     func scaledFrame(width: CGFloat, height: CGFloat, alignment: Alignment = .center, relativeTo textStyle: Font.TextStyle = .body) -> some View {
         modifier(ScaledFrameModifier(width: width, height: height, alignment: alignment, relativeTo: textStyle))
@@ -24,13 +24,13 @@ private struct ScaledFrameModifier: ViewModifier {
     @ScaledMetric var width: CGFloat
     @ScaledMetric var height: CGFloat
     let alignment: Alignment
-    
+
     init(width: CGFloat, height: CGFloat, alignment: Alignment, relativeTo textStyle: Font.TextStyle) {
         _width = ScaledMetric(wrappedValue: width, relativeTo: textStyle)
         _height = ScaledMetric(wrappedValue: height, relativeTo: textStyle)
         self.alignment = alignment
     }
-    
+
     func body(content: Content) -> some View {
         content.frame(width: width, height: height, alignment: alignment)
     }
@@ -47,7 +47,7 @@ struct ScaledFrameModifier_Previews: PreviewProvider, TestablePreview {
             }
         }
     }
-    
+
     static var likeButtonLabel: some View {
         Image(systemSymbol: .heartCircleFill)
             .resizable()

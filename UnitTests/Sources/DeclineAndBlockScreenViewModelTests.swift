@@ -6,18 +6,18 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ElementX
+@testable import ketal
 import XCTest
 
 @MainActor
 class DeclineAndBlockScreenViewModelTests: XCTestCase {
     var viewModel: DeclineAndBlockScreenViewModelProtocol!
     var clientProxy: ClientProxyMock!
-    
+
     var context: DeclineAndBlockScreenViewModelType.Context {
         viewModel.context
     }
-    
+
     override func setUp() {
         clientProxy = ClientProxyMock(.init())
         viewModel = DeclineAndBlockScreenViewModel(userID: "@alice:matrix.org",
@@ -25,13 +25,13 @@ class DeclineAndBlockScreenViewModelTests: XCTestCase {
                                                    clientProxy: clientProxy,
                                                    userIndicatorController: UserIndicatorControllerMock())
     }
-    
+
     func testInitialState() {
         XCTAssertFalse(context.viewState.isDeclineDisabled)
         XCTAssertFalse(context.shouldReport)
         XCTAssertTrue(context.shouldBlockUser)
     }
-    
+
     func testDeclineDisabled() {
         context.shouldBlockUser = false
         XCTAssertTrue(context.viewState.isDeclineDisabled)
@@ -43,7 +43,7 @@ class DeclineAndBlockScreenViewModelTests: XCTestCase {
         context.reportReason = "Test reason"
         XCTAssertFalse(context.viewState.isDeclineDisabled)
     }
-    
+
     func testDeclineBlockAndReport() async throws {
         let reason = "Test reason"
         clientProxy.roomForIdentifierClosure = { id in
@@ -61,10 +61,10 @@ class DeclineAndBlockScreenViewModelTests: XCTestCase {
             XCTAssertEqual(userId, "@alice:matrix.org")
             return .success(())
         }
-        
+
         context.shouldReport = true
         context.reportReason = reason
-        
+
         let deferredAction = deferFulfillment(viewModel.actionsPublisher) { action in
             action == .dismiss(hasDeclined: true)
         }

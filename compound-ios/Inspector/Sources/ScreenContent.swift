@@ -12,7 +12,7 @@ import SwiftUI
 struct ScreenContent<Content: View>: View {
     let navigationTitle: String
     @ViewBuilder var content: () -> Content
-    
+
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 16) {

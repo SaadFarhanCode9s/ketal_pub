@@ -10,16 +10,16 @@ struct BumpCalendarVersion: ParsableCommand {
         try updateProjectYAML()
         try Zsh.run(command: "xcodegen")
     }
-    
+
     /// Updates the project YAML with the new version.
     private func updateProjectYAML() throws {
         let yamlURL = URL.projectDirectory.appendingPathComponent("project.yml")
         let yamlString = try String(contentsOf: yamlURL)
-        
+
         // Use regex instead of Yams to preserve any whitespace, comments etc in the file.
         let marketingVersionRegex = /MARKETING_VERSION:\s*([^\s]+)/
         var updatedYAMLString = ""
-        
+
         yamlString.enumerateLines { line, _ in
             let processedLine = if let match = line.firstMatch(of: marketingVersionRegex),
                                    let newVersion = try? generateNewVersion(from: String(match.1)) {
@@ -27,13 +27,13 @@ struct BumpCalendarVersion: ParsableCommand {
             } else {
                 line
             }
-            
+
             updatedYAMLString.append(processedLine + "\n")
         }
-        
+
         try updatedYAMLString.write(to: yamlURL, atomically: true, encoding: .utf8)
     }
-    
+
     /// Returns the new version string if a change is necessary.
     ///
     /// **Note:** This tool does *not* handle patch bumps, those are done automatically in the release script.
@@ -42,9 +42,9 @@ struct BumpCalendarVersion: ParsableCommand {
         let releaseYear = Calendar.current.component(.year, from: releaseDate) % 1000 // We use the short year.
         let releaseMonth = Calendar.current.component(.month, from: releaseDate)
         let versionComponents = currentVersion.split(separator: ".").compactMap { Int($0) }
-        
+
         guard versionComponents.count == 3 else { fatalError("Unexpected version format: \(currentVersion)") }
-        
+
         if versionComponents[0] != releaseYear || versionComponents[1] != releaseMonth {
             return "\(releaseYear).\(String(format: "%02d", releaseMonth)).0"
         } else {

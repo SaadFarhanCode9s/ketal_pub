@@ -21,14 +21,14 @@ struct ColorsScreen: View {
 
 struct ColorItem: View {
     @Environment(\.self) private var environment
-    
+
     let color: Color
     let name: String
-    
+
     var body: some View {
         HStack {
             swatch
-            
+
             VStack(alignment: .leading) {
                 Text(name)
                     .font(.compound.bodyLG)
@@ -40,7 +40,7 @@ struct ColorItem: View {
             .layoutPriority(1)
         }
     }
-    
+
     var swatch: some View {
         swatchShape
             .foregroundColor(color)
@@ -52,7 +52,7 @@ struct ColorItem: View {
                     .opacity(0.2)
             }
     }
-    
+
     var swatchShape: some InsettableShape {
         RoundedRectangle(cornerRadius: 12, style: .continuous)
     }
@@ -73,7 +73,7 @@ private extension Float {
     var asHex: String {
         String(format: "%02X", Int((self * 255).rounded()))
     }
-    
+
     var asPercentage: String {
         String(format: "%.0f%%", self * 100)
     }

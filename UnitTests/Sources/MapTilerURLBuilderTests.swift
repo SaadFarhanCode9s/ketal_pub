@@ -7,7 +7,7 @@
 //
 
 import CoreLocation
-@testable import ElementX
+@testable import ketal
 import XCTest
 
 final class MapTilerURLBuilderTests: XCTestCase {
@@ -15,9 +15,9 @@ final class MapTilerURLBuilderTests: XCTestCase {
     private static let apiKey = "some_key"
     private static let lightStyleID = "9bc819c8-e627-474a-a348-ec144fe3d810"
     private static let darkStyleID = "dea61faf-292b-4774-9660-58fcef89a7f3"
-    
+
     var builder: MapTilerURLBuilderProtocol!
-    
+
     override func setUp() {
         builder = MapTilerConfiguration(baseURL: Self.baseURL,
                                         apiKey: Self.apiKey,
@@ -52,23 +52,23 @@ final class MapTilerURLBuilderTests: XCTestCase {
         let expectedURL: URL = "http://www.foo.com/dea61faf-292b-4774-9660-58fcef89a7f3/style.json?key=some_key"
         XCTAssertEqual(url, expectedURL)
     }
-    
+
     func testNilAPIKey() {
         let configuration = MapTilerConfiguration(baseURL: Self.baseURL,
                                                   apiKey: nil,
                                                   lightStyleID: Self.lightStyleID,
                                                   darkStyleID: Self.darkStyleID)
         XCTAssertFalse(configuration.isEnabled)
-        
+
         builder = configuration
-        
+
         let staticMapURL = builder.staticMapTileImageURL(for: .dark,
                                                          coordinates: .init(latitude: 1, longitude: 2),
                                                          zoomLevel: 5,
                                                          size: .init(width: 300, height: 200),
                                                          attribution: .topLeft)
         XCTAssertNil(staticMapURL)
-        
+
         let dynamicMapURL = builder.interactiveMapURL(for: .light)
         XCTAssertNil(dynamicMapURL)
     }

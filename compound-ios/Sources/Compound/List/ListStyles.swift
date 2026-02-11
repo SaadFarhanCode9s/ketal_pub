@@ -15,7 +15,7 @@ public extension View {
             .scrollContentBackground(.hidden)
             .background(Color.compound.bgSubtleSecondaryLevel0.ignoresSafeArea())
     }
-    
+
     /// Styles a list section header using the Compound design tokens.
     func compoundListSectionHeader() -> some View {
         font(headerFont)
@@ -25,7 +25,7 @@ public extension View {
                                       bottom: 8,
                                       trailing: ListRowPadding.horizontal))
     }
-    
+
     /// Styles a list section footer using the Compound design tokens.
     func compoundListSectionFooter() -> some View {
         font(.compound.bodySM)
@@ -35,9 +35,9 @@ public extension View {
                                       bottom: 10,
                                       trailing: ListRowPadding.horizontal))
     }
-    
+
     // MARK: - Private
-    
+
     private var headerFont: Font {
         if #available(iOS 26.0, *) {
             .compound.bodyMDSemibold
@@ -56,21 +56,21 @@ struct ListTextStyles_Previews: PreviewProvider, TestablePreview {
                 Text("This is a footer down ere")
                     .compoundListSectionFooter()
             }
-            
+
             Section {
                 ListRow(label: .plain(title: "Second!"), kind: .label)
             } header: {
                 Text("Section Title")
                     .compoundListSectionHeader()
             }
-            
+
             Section {
                 ListRow(label: .plain(title: "Third!"), kind: .label)
             } header: {
                 Text("Section Title")
                     .compoundListSectionHeader()
             }
-            
+
             Section {
                 ListRow(label: .plain(title: "I was slow, I'm last."), kind: .label)
             } footer: {
@@ -80,7 +80,7 @@ struct ListTextStyles_Previews: PreviewProvider, TestablePreview {
         }
         .compoundList()
         .previewDisplayName("Form")
-        
+
         List {
             Section {
                 ListRow(label: .plain(title: "Hello"), kind: .label)

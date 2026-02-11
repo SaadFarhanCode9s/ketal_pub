@@ -15,18 +15,18 @@ struct NavigationBarScreen: View {
         case inline
         case hidden
     }
-    
+
     enum BackButtonMode {
         case navigation
         case cancellationAction
         case hidden
     }
-    
+
     @State private var titleMode = TitleMode.inline
     @State private var backButtonMode = BackButtonMode.navigation
     @State private var hasConfirmationAction = true
     @State private var hasPrimaryAction = false
-    
+
     var body: some View {
         Form {
             Section {
@@ -39,7 +39,7 @@ struct NavigationBarScreen: View {
                         .listRowBackground(Color.clear)
                 })
             }
-            
+
             Section {
                 ListRow(label: .plain(title: "Title"),
                         kind: .picker(selection: $titleMode, items: [
@@ -53,7 +53,7 @@ struct NavigationBarScreen: View {
                             (title: "Cancelation Action", tag: .cancellationAction),
                             (title: "Hidden", tag: .hidden)
                         ]))
-                
+
                 ListRow(label: .plain(title: "Confirmation Action"),
                         kind: .toggle($hasConfirmationAction))
                 ListRow(label: .plain(title: "Primary Action"),
@@ -62,7 +62,7 @@ struct NavigationBarScreen: View {
                 Text("Configuration")
                     .compoundListSectionHeader()
             }
-            
+
             Section {
                 ListRow(kind: .custom {
                     VStack {
@@ -85,13 +85,13 @@ struct NavigationBarScreen: View {
                     Button("Confirm") { }
                 }
             }
-            
+
             if hasPrimaryAction {
                 ToolbarItem(placement: .primaryAction) {
                     Button("Primary") { }
                 }
             }
-            
+
             if backButtonMode == .cancellationAction {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { }

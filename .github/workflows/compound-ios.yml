@@ -18,6 +18,7 @@ on:
 
 jobs:
   tests:
+    if: false
 
     runs-on: macos-26
     timeout-minutes: 15

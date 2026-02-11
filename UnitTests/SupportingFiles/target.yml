@@ -19,7 +19,7 @@ schemes:
       disableMainThreadChecker: false
       gatherCoverageData: true
       coverageTargets:
-        - ElementX
+        - ketal
       testPlans:
         - path: UnitTests.xctestplan
           defaultPlan: true
@@ -30,7 +30,7 @@ targets:
     platform: iOS
 
     dependencies:
-    - target: ElementX
+    - target: ketal
     - package: MatrixRustSDK
     - package: AsyncAlgorithms
     - package: Clocks
@@ -50,8 +50,8 @@ targets:
     - path: ../Sources
     - path: ../SupportingFiles
     - path: ../../DevelopmentAssets
-    - path: ../../ElementX/Sources/Other/Extensions/Publisher.swift
-    - path: ../../ElementX/Sources/Other/Extensions/XCTestCase.swift
-    - path: ../../ElementX/Sources/Other/InfoPlistReader.swift
+    - path: ../../ketal/Sources/Other/Extensions/Publisher.swift
+    - path: ../../ketal/Sources/Other/Extensions/XCTestCase.swift
+    - path: ../../ketal/Sources/Other/InfoPlistReader.swift
     - path: ../../Tools/Scripts/Templates/SimpleScreenExample/Tests/Unit
     

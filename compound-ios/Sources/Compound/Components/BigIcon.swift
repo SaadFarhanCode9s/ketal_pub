@@ -19,7 +19,7 @@ public struct BigIcon: View {
         case alert
         case successSolid
         case success
-        
+
         var foregroundColor: Color {
             switch self {
             case .defaultSolid, .default:
@@ -30,7 +30,7 @@ public struct BigIcon: View {
                 .compound.iconSuccessPrimary
             }
         }
-        
+
         var backgroundFillColor: Color {
             switch self {
             case .defaultSolid:
@@ -44,16 +44,16 @@ public struct BigIcon: View {
             }
         }
     }
-    
+
     /// The icon that is shown.
     private let icon: KeyPath<CompoundIcons, Image>
     private let style: Style
-    
+
     public init(icon: KeyPath<CompoundIcons, Image>, style: Style = .defaultSolid) {
         self.icon = icon
         self.style = style
     }
-    
+
     public var body: some View {
         CompoundIcon(icon, size: .custom(32), relativeTo: .compound.headingLG)
             .modifier(BigIconModifier(style: style))
@@ -74,7 +74,7 @@ public extension Image {
 
 private struct BigIconModifier: ViewModifier {
     let style: BigIcon.Style
-    
+
     func body(content: Content) -> some View {
         content
             .scaledFrame(size: 64, relativeTo: .compound.headingLG)
@@ -99,23 +99,23 @@ public struct BigIcon_Previews: PreviewProvider, TestablePreview {
                 Image(systemSymbol: .serverRack)
                     .bigIcon(insets: 19)
             }
-            
+
             states
         }
     }
-    
+
     public static var states: some View {
         VStack(spacing: 20) {
             HStack(spacing: 20) {
                 BigIcon(icon: \.helpSolid)
                 BigIcon(icon: \.helpSolid, style: .default)
             }
-            
+
             HStack(spacing: 20) {
                 BigIcon(icon: \.errorSolid, style: .alertSolid)
                 BigIcon(icon: \.errorSolid, style: .alert)
             }
-            
+
             HStack(spacing: 20) {
                 BigIcon(icon: \.checkCircleSolid, style: .successSolid)
                 BigIcon(icon: \.checkCircleSolid, style: .success)

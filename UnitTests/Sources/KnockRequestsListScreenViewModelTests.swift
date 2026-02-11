@@ -6,27 +6,27 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ElementX
+@testable import ketal
 import XCTest
 
 @MainActor
 class KnockRequestsListScreenViewModelTests: XCTestCase {
     var viewModel: KnockRequestsListScreenViewModelProtocol!
-    
+
     var context: KnockRequestsListScreenViewModelType.Context {
         viewModel.context
     }
-    
+
     override func setUpWithError() throws {
         AppSettings.resetAllSettings()
     }
-    
+
     func testLoadingState() async throws {
         let roomProxyMock = JoinedRoomProxyMock(.init(knockRequestsState: .loading, joinRule: .knock))
         viewModel = KnockRequestsListScreenViewModel(roomProxy: roomProxyMock,
                                                      mediaProvider: MediaProviderMock(),
                                                      userIndicatorController: UserIndicatorControllerMock())
-        
+
         let deferred = deferFulfillment(context.$viewState) { state in
             !state.shouldDisplayRequests &&
                 state.isKnockableRoom &&
@@ -38,13 +38,13 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         }
         try await deferred.fulfill()
     }
-    
+
     func testEmptyState() async throws {
         let roomProxyMock = JoinedRoomProxyMock(.init(knockRequestsState: .loaded([]), joinRule: .knock))
         viewModel = KnockRequestsListScreenViewModel(roomProxy: roomProxyMock,
                                                      mediaProvider: MediaProviderMock(),
                                                      userIndicatorController: UserIndicatorControllerMock())
-        
+
         let deferred = deferFulfillment(context.$viewState) { state in
             !state.shouldDisplayRequests &&
                 state.isKnockableRoom &&
@@ -56,7 +56,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         }
         try await deferred.fulfill()
     }
-    
+
     func testLoadedState() async throws {
         let roomProxyMock = JoinedRoomProxyMock(.init(members: [.mockAdmin],
                                                       knockRequestsState: .loaded([KnockRequestProxyMock(.init(eventID: "1", userID: "@alice:matrix.org")),
@@ -68,7 +68,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         viewModel = KnockRequestsListScreenViewModel(roomProxy: roomProxyMock,
                                                      mediaProvider: MediaProviderMock(),
                                                      userIndicatorController: UserIndicatorControllerMock())
-        
+
         var deferred = deferFulfillment(context.$viewState) { state in
             state.shouldDisplayRequests &&
                 state.isKnockableRoom &&
@@ -82,7 +82,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
                 state.shouldDisplayAcceptAllButton
         }
         try await deferred.fulfill()
-        
+
         deferred = deferFulfillment(context.$viewState) { state in
             state.shouldDisplayRequests &&
                 state.handledEventIDs == ["1"] &&
@@ -92,13 +92,13 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         }
         context.send(viewAction: .acceptRequest(eventID: "1"))
         try await deferred.fulfill()
-        
+
         deferred = deferFulfillment(context.$viewState) { state in
             state.bindings.alertInfo?.id == .declineRequest
         }
         context.send(viewAction: .declineRequest(eventID: "2"))
         try await deferred.fulfill()
-        
+
         guard let declineAlertInfo = context.alertInfo else {
             XCTFail("Can't be nil")
             return
@@ -112,13 +112,13 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         }
         declineAlertInfo.primaryButton.action?()
         try await deferred.fulfill()
-        
+
         deferred = deferFulfillment(context.$viewState) { state in
             state.bindings.alertInfo?.id == .declineAndBan
         }
         context.send(viewAction: .ban(eventID: "3"))
         try await deferred.fulfill()
-        
+
         guard let banAlertInfo = context.alertInfo else {
             XCTFail("Can't be nil")
             return
@@ -133,7 +133,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         banAlertInfo.primaryButton.action?()
         try await deferred.fulfill()
     }
-    
+
     func testAcceptAll() async throws {
         let roomProxyMock = JoinedRoomProxyMock(.init(knockRequestsState: .loaded([KnockRequestProxyMock(.init(eventID: "1", userID: "@alice:matrix.org")),
                                                                                    KnockRequestProxyMock(.init(eventID: "2", userID: "@bob:matrix.org")),
@@ -143,7 +143,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         viewModel = KnockRequestsListScreenViewModel(roomProxy: roomProxyMock,
                                                      mediaProvider: MediaProviderMock(),
                                                      userIndicatorController: UserIndicatorControllerMock())
-        
+
         var deferred = deferFulfillment(context.$viewState) { state in
             state.shouldDisplayRequests &&
                 state.isKnockableRoom &&
@@ -157,18 +157,18 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
                 state.shouldDisplayAcceptAllButton
         }
         try await deferred.fulfill()
-        
+
         deferred = deferFulfillment(context.$viewState) { state in
             state.bindings.alertInfo?.id == .acceptAllRequests
         }
         context.send(viewAction: .acceptAllRequests)
         try await deferred.fulfill()
-        
+
         guard let alertInfo = context.alertInfo else {
             XCTFail("Can't be nil")
             return
         }
-        
+
         deferred = deferFulfillment(context.$viewState) { state in
             !state.shouldDisplayRequests &&
                 state.handledEventIDs == ["1", "2", "3", "4"] &&
@@ -178,7 +178,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         alertInfo.primaryButton.action?()
         try await deferred.fulfill()
     }
-    
+
     func testLoadedStateBecomesEmptyIfTheJoinRuleIsNotKnocking() async throws {
         // If there is a sudden change in the rule, but the requests are still published, we want to hide all of them and show the empty view
         let roomProxyMock = JoinedRoomProxyMock(.init(members: [.mockAdmin],
@@ -191,7 +191,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         viewModel = KnockRequestsListScreenViewModel(roomProxy: roomProxyMock,
                                                      mediaProvider: MediaProviderMock(),
                                                      userIndicatorController: UserIndicatorControllerMock())
-        
+
         let deferred = deferFulfillment(context.$viewState) { state in
             !state.shouldDisplayRequests &&
                 state.shouldDisplayEmptyView &&
@@ -200,7 +200,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         }
         try await deferred.fulfill()
     }
-    
+
     func testLoadedStateBecomesEmptyIfPermissionsAreRemoved() async throws {
         // If there is a sudden change in permissions, and the user can't do any other action, we hide all the requests and shoe the empty view
         let roomProxyMock = JoinedRoomProxyMock(.init(knockRequestsState: .loaded([KnockRequestProxyMock(.init(eventID: "1", userID: "@alice:matrix.org")),
@@ -212,7 +212,7 @@ class KnockRequestsListScreenViewModelTests: XCTestCase {
         viewModel = KnockRequestsListScreenViewModel(roomProxy: roomProxyMock,
                                                      mediaProvider: MediaProviderMock(),
                                                      userIndicatorController: UserIndicatorControllerMock())
-        
+
         let deferred = deferFulfillment(context.$viewState) { state in
             !state.shouldDisplayRequests &&
                 state.shouldDisplayEmptyView &&

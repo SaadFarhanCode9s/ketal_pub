@@ -19,7 +19,7 @@ struct SidebarList: View {
         .listStyle(.sidebar)
         .tint(.compound.iconAccentTertiary)
     }
-    
+
     var tokensSection: some View {
         Section("Tokens") {
             NavigationLink(value: Screen.colors) {
@@ -36,7 +36,7 @@ struct SidebarList: View {
             }
         }
     }
-    
+
     var componentsSection: some View {
         Section("Components") {
             NavigationLink(value: Screen.buttons) {
@@ -53,25 +53,25 @@ struct SidebarList: View {
             }
         }
     }
-    
+
     var systemComponentsSection: some View {
         Section("System Components") {
             NavigationLink(value: Screen.actionSheet) {
                 Label("Action Sheets", systemImage: "window.shade.closed")
             }
-            
+
             NavigationLink(value: Screen.alert) {
                 Label("Alerts", systemImage: "exclamationmark.triangle")
             }
-            
+
             NavigationLink(value: Screen.contextMenu) {
                 Label("Context Menus", systemImage: "contextualmenu.and.cursorarrow")
             }
-            
+
             NavigationLink(value: Screen.navigationBar) {
                 Label("Navigation Bar", systemImage: "window.shade.open")
             }
-            
+
             NavigationLink(value: Screen.shareSheet) {
                 Label("Share Sheet", systemImage: "square.and.arrow.up")
             }

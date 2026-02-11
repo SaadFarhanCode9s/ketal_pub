@@ -11,15 +11,15 @@ import XCTest
 @MainActor
 final class AccessibilityTests: XCTestCase {
     var app: XCUIApplication!
-    
+
     func performAccessibilityAudit(named name: String) async throws {
         let client = try UITestsSignalling.Client(mode: .tests)
         app = Application.launch(viewID: name)
         await client.waitForApp()
         defer { try? client.stop() }
-        
+
         try client.send(.accessibilityAudit(.nextPreview))
-        
+
         // To handle location sharing popup in CI
         allowLocationPermissions()
         forLoop: for await signal in client.signals.values {
@@ -38,10 +38,10 @@ final class AccessibilityTests: XCTestCase {
                 XCTFail("Unhandled signal")
             }
         }
-        
+
         app.terminate()
     }
-    
+
     private func allowLocationPermissions() {
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         let notificationAlertAllowButton = springboard.buttons["Allow While Using App"].firstMatch
@@ -49,7 +49,7 @@ final class AccessibilityTests: XCTestCase {
             notificationAlertAllowButton.tap()
         }
     }
-    
+
     private func performAccessibilityAuditForPreview(named name: String) {
         // Alows us to log the name of the preview that is being tested
         XCTContext.runActivity(named: name) { _ in
@@ -60,27 +60,27 @@ final class AccessibilityTests: XCTestCase {
                     if Self.ignoredA11yTest[name]?.isAccessibilityIssueFiltered(issue) == true {
                         return true
                     }
-                    
+
                     // Remove false positives for null elements
                     guard let element = issue.element else {
                         return true
                     }
-                    
+
                     // We are fine with elements that only partially support dynamic types
                     guard issue.compactDescription != Self.partiallyUnsupportedDynamicTypeMessage else {
                         return true
                     }
-                    
+
                     // We can filter out matrix entities from the non human-readable error
                     if issue.compactDescription == Self.notHumanReadableMessage, Self.isMatrixIdentifier(element.label) {
                         return true
                     }
-                    
+
                     // Additional filters for specific elements that lead to false positives or neglectable issues.
                     if Self.ignoredA11yIdentifiers[element.identifier]?.isAccessibilityIssueFiltered(issue) == true {
                         return true
                     }
-                    
+
                     return false
                 }
             } catch {
@@ -88,20 +88,20 @@ final class AccessibilityTests: XCTestCase {
             }
         }
     }
-    
+
     private static func isMatrixIdentifier(_ string: String) -> Bool {
         MatrixEntityRegex.isMatrixRoomAlias(string) || MatrixEntityRegex.isMatrixUserIdentifier(string) || string == PillUtilities.atRoom || MatrixEntityRegex.isLegacyMatrixRoomID(string)
     }
-    
+
     private static let partiallyUnsupportedDynamicTypeMessage = "Dynamic Type font sizes are partially unsupported"
     private static let notHumanReadableMessage = "Label not human-readable"
     private static let elementHasNoDescription = "Element has no description"
-    
+
     /// Use this array to filter add specific filters to ignore specific issues for certain elements
     private static let ignoredA11yIdentifiers: [String: [FilterType]] = [
         A11yIdentifiers.serverConfirmationScreen.serverPicker: [.compactDescription(notHumanReadableMessage)]
     ]
-    
+
     /// Use this array to filter add specific filters to ignore specific tests
     private static let ignoredA11yTest: [String: [FilterType]] = [
         // It's an image rendering test doesn't need to have descriptions

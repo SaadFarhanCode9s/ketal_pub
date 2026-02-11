@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ElementX
+@testable import ketal
 import XCTest
 
 @MainActor
@@ -20,35 +20,37 @@ class UserProfileScreenViewModelTests: XCTestCase {
         let profile = UserProfileProxy(userID: "@alice:matrix.org", displayName: "Alice", avatarURL: .mockMXCAvatar)
         let clientProxy = ClientProxyMock(.init())
         clientProxy.profileForReturnValue = .success(profile)
-        
+
         viewModel = UserProfileScreenViewModel(userID: profile.userID,
                                                isPresentedModally: false,
                                                userSession: UserSessionMock(.init(clientProxy: clientProxy)),
                                                userIndicatorController: ServiceLocator.shared.userIndicatorController,
-                                               analytics: ServiceLocator.shared.analytics)
-        
+                                               analytics: ServiceLocator.shared.analytics,
+                                               appSettings: ServiceLocator.shared.settings)
+
         let waitForMemberToLoad = deferFulfillment(context.observe(\.viewState.userProfile)) { $0 != nil }
         try await waitForMemberToLoad.fulfill()
-        
+
         XCTAssertFalse(context.viewState.isOwnUser)
         XCTAssertEqual(context.viewState.userProfile, profile)
         XCTAssertNotNil(context.viewState.permalink)
     }
-    
+
     func testInitialStateAccountOwner() async throws {
         let profile = UserProfileProxy(userID: RoomMemberProxyMock.mockMe.userID, displayName: "Me", avatarURL: .mockMXCAvatar)
         let clientProxy = ClientProxyMock(.init())
         clientProxy.profileForReturnValue = .success(profile)
-        
+
         viewModel = UserProfileScreenViewModel(userID: profile.userID,
                                                isPresentedModally: false,
                                                userSession: UserSessionMock(.init(clientProxy: clientProxy)),
                                                userIndicatorController: ServiceLocator.shared.userIndicatorController,
-                                               analytics: ServiceLocator.shared.analytics)
-        
+                                               analytics: ServiceLocator.shared.analytics,
+                                               appSettings: ServiceLocator.shared.settings)
+
         let waitForMemberToLoad = deferFulfillment(context.observe(\.viewState.userProfile)) { $0 != nil }
         try await waitForMemberToLoad.fulfill()
-        
+
         XCTAssertTrue(context.viewState.isOwnUser)
         XCTAssertEqual(context.viewState.userProfile, profile)
         XCTAssertNotNil(context.viewState.permalink)

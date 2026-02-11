@@ -22,7 +22,7 @@ public struct CompoundButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityShowButtonShapes) private var accessibilityShowButtonShapes
-    
+
     var kind: Kind
     public enum Kind {
         /// A stroked button that uses colour to highlight important actions.
@@ -36,7 +36,7 @@ public struct CompoundButtonStyle: ButtonStyle {
         /// A plain button with no padding.
         case textLink
     }
-    
+
     var size: Size
     public enum Size {
         /// A button that is prominently sized.
@@ -48,7 +48,7 @@ public struct CompoundButtonStyle: ButtonStyle {
         /// A (super/primary/secondary) button that should be place within a toolbar.
         case toolbarIcon
     }
-    
+
     private var font: Font {
         if kind == .textLink, size == .small {
             .compound.bodyMDSemibold
@@ -56,12 +56,12 @@ public struct CompoundButtonStyle: ButtonStyle {
             .compound.bodyLGSemibold
         }
     }
-    
+
     private var horizontalPadding: CGFloat {
         if kind == .textLink {
             return 0
         }
-        
+
         return switch size {
         case .large: 20
         case .medium: 20
@@ -74,7 +74,7 @@ public struct CompoundButtonStyle: ButtonStyle {
         if kind == .textLink {
             return 0
         }
-        
+
         return switch size {
         case .large: 14
         case .medium: 7
@@ -82,12 +82,12 @@ public struct CompoundButtonStyle: ButtonStyle {
         case .toolbarIcon: 3
         }
     }
-    
+
     private var maxWidth: CGFloat? {
         if kind == .textLink {
             return nil
         }
-        
+
         return switch size {
         case .large: .infinity
         case .medium: nil
@@ -95,11 +95,11 @@ public struct CompoundButtonStyle: ButtonStyle {
         case .toolbarIcon: nil
         }
     }
-    
+
     private var pressedOpacity: Double {
         colorScheme == .light ? 0.3 : 0.6
     }
-    
+
     private var isUnderlined: Bool {
         kind == .textLink && accessibilityShowButtonShapes
     }
@@ -118,7 +118,7 @@ public struct CompoundButtonStyle: ButtonStyle {
             }
             .contentShape(contentShape)
     }
-    
+
     @ViewBuilder
     private func makeBackground(configuration: Self.Configuration) -> some View {
         switch kind {
@@ -165,7 +165,7 @@ public struct CompoundButtonStyle: ButtonStyle {
             return configuration.isPressed ? .compound.bgActionPrimaryPressed : .compound.bgActionPrimaryRest
         }
     }
-    
+
     private func strokeColor(configuration: Self.Configuration) -> Color {
         if configuration.role == .destructive {
             return .compound.borderCriticalPrimary.opacity(configuration.isPressed ? pressedOpacity : 1)
@@ -173,7 +173,7 @@ public struct CompoundButtonStyle: ButtonStyle {
             return .compound.borderInteractiveSecondary.opacity(configuration.isPressed ? pressedOpacity : 1)
         }
     }
-    
+
     private func textColor(configuration: Configuration) -> Color {
         if kind == .primary {
             return .compound.textOnSolidPrimary
@@ -194,7 +194,7 @@ public struct CompoundButtonStyle_Previews: PreviewProvider, TestablePreview {
         }
         .previewLayout(.fixed(width: 390, height: 1875))
     }
-    
+
     @ViewBuilder
     public static var states: some View {
         Section {
@@ -202,31 +202,31 @@ public struct CompoundButtonStyle_Previews: PreviewProvider, TestablePreview {
         } header: {
             Header(title: "Large")
         }
-        
+
         Section {
             buttons(.medium)
         } header: {
             Header(title: "Medium")
         }
-        
+
         Section {
             buttons(.small)
         } header: {
             Header(title: "Small")
         }
-        
+
         Section {
             textLinks(.medium)
         } header: {
             Header(title: "Text Link")
         }
-        
+
         Section {
             textLinks(.small)
         } header: {
             Header(title: "Text Link Small")
         }
-        
+
         Section {
             startChat
                 .padding(.bottom) // Only for the snapshot.
@@ -234,74 +234,74 @@ public struct CompoundButtonStyle_Previews: PreviewProvider, TestablePreview {
             Header(title: "Start chat")
         }
     }
-    
+
     public static func buttons(_ size: CompoundButtonStyle.Size) -> some View {
         VStack(spacing: 8) {
             Button("Super") { }
                 .buttonStyle(.compound(.super, size: size))
-            
+
             Button("Disabled") { }
                 .buttonStyle(.compound(.super, size: size))
                 .disabled(true)
-            
+
             Button("Primary") { }
                 .buttonStyle(.compound(.primary, size: size))
-            
+
             Button("Destructive", role: .destructive) { }
                 .buttonStyle(.compound(.primary, size: size))
-            
+
             Button("Disabled") { }
                 .buttonStyle(.compound(.primary, size: size))
                 .disabled(true)
-            
+
             Button("Secondary") { }
                 .buttonStyle(.compound(.secondary, size: size))
-            
+
             Button("Destructive", role: .destructive) { }
                 .buttonStyle(.compound(.secondary, size: size))
-            
+
             Button("Disabled") { }
                 .buttonStyle(.compound(.secondary, size: size))
                 .disabled(true)
-            
+
             Button("Tertiary") { }
                 .buttonStyle(.compound(.tertiary, size: size))
-            
+
             Button("Destructive", role: .destructive) { }
                 .buttonStyle(.compound(.tertiary, size: size))
-            
+
             Button("Disabled") { }
                 .buttonStyle(.compound(.tertiary, size: size))
                 .disabled(true)
         }
         .padding(.horizontal)
     }
-    
+
     static func textLinks(_ size: CompoundButtonStyle.Size) -> some View {
         HStack(spacing: 20) {
             Button("Text Link") { }
                 .buttonStyle(.compound(.textLink, size: size))
-            
+
             Button("Destructive", role: .destructive) { }
                 .buttonStyle(.compound(.textLink, size: size))
-            
+
             Button("Disabled") { }
                 .buttonStyle(.compound(.textLink, size: size))
                 .disabled(true)
         }
         .padding(.top, 1)
     }
-    
+
     static var startChat: some View {
         Button { } label: {
             CompoundIcon(\.plus)
         }
         .buttonStyle(.compound(.super, size: .toolbarIcon))
     }
-    
+
     struct Header: View {
         let title: String
-        
+
         var body: some View {
             Text(title)
                 .foregroundStyle(.compound.textSecondary)

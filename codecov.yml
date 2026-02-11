@@ -9,12 +9,12 @@ coverage:
     patch: false
 
 ignore:
-  - "ElementX/Sources/Generated"
-  - "ElementX/Sources/Mocks"
-  - "ElementX/Sources/Vendor"
-  - "ElementX/Sources/UITests"
-  - "ElementX/Sources/UnitTests"
-  - "ElementX/Sources/Settings/DeveloperOptionsScreen"
+  - "ketal/Sources/Generated"
+  - "ketal/Sources/Mocks"
+  - "ketal/Sources/Vendor"
+  - "ketal/Sources/UITests"
+  - "ketal/Sources/UnitTests"
+  - "ketal/Sources/Settings/DeveloperOptionsScreen"
   - "SDKMocks/Sources/Generated"
   - "Tools"
   - "**/Mock*.swift"

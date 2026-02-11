@@ -1,7 +1,7 @@
 sources:
   include:
-    - ../../ElementX
+    - ../../ketal
 templates:
   - TestablePreviewsDictionary.stencil
 output:
-  ../../ElementX/Sources/Other/TestablePreview/TestablePreviewsDictionary.swift
+  ../../ketal/Sources/Other/TestablePreview/TestablePreviewsDictionary.swift

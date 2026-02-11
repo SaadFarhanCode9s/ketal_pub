@@ -18,12 +18,12 @@ public extension View {
 private struct ScaledOffsetModifier: ViewModifier {
     @ScaledMetric var x: CGFloat
     @ScaledMetric var y: CGFloat
-    
+
     init(x: CGFloat, y: CGFloat, relativeTo textStyle: Font.TextStyle) {
         _x = ScaledMetric(wrappedValue: x, relativeTo: textStyle)
         _y = ScaledMetric(wrappedValue: y, relativeTo: textStyle)
     }
-    
+
     func body(content: Content) -> some View {
         content.offset(x: x, y: y)
     }
@@ -40,7 +40,7 @@ struct ScaledOffsetModifier_Previews: PreviewProvider, TestablePreview {
             }
         }
     }
-    
+
     static var verifiedUserComposite: some View {
         CompoundIcon(\.userSolid)
             .foregroundStyle(.compound.iconAccentTertiary)

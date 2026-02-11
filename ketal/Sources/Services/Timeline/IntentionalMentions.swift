@@ -19,7 +19,7 @@ extension IntentionalMentions {
     static var empty: Self {
         IntentionalMentions(userIDs: .init(), atRoom: false)
     }
-
+    
     func toRustMentions() -> Mentions {
         Mentions(userIds: Array(userIDs), room: atRoom)
     }

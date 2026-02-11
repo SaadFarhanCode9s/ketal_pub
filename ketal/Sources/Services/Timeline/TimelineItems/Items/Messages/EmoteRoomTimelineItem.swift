@@ -14,17 +14,17 @@ struct EmoteRoomTimelineItem: TextBasedRoomTimelineItem, Equatable {
     let isOutgoing: Bool
     let isEditable: Bool
     let canBeRepliedTo: Bool
-
+    
     let sender: TimelineItemSender
-
+    
     let content: EmoteRoomTimelineItemContent
-
+    
     var properties = RoomTimelineItemProperties()
-
+    
     var body: String {
         content.body
     }
-
+    
     var contentType: EventBasedMessageTimelineItemContentType {
         .emote(content)
     }

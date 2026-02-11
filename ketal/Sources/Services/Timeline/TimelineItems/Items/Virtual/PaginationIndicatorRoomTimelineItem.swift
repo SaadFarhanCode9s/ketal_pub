@@ -10,10 +10,10 @@ import Foundation
 
 struct PaginationIndicatorRoomTimelineItem: DecorationTimelineItemProtocol, Equatable {
     let id: TimelineItemIdentifier
-
+    
     enum Position {
         case start, end
-
+        
         var id: String {
             switch self {
             case .start: "backwardPaginationIndicatorTimelineItemIdentifier"
@@ -21,7 +21,7 @@ struct PaginationIndicatorRoomTimelineItem: DecorationTimelineItemProtocol, Equa
             }
         }
     }
-
+    
     init(position: Position) {
         id = .virtual(uniqueID: .init(position.id))
     }

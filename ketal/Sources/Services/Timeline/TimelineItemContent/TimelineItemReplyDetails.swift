@@ -18,7 +18,7 @@ enum TimelineItemReplyDetails: Hashable {
     case loading(eventID: String)
     case loaded(sender: TimelineItemSender, eventID: String, eventContent: TimelineEventContent)
     case error(eventID: String, message: String)
-
+    
     var eventID: String {
         switch self {
         case .notLoaded(let eventID), .loading(let eventID), .loaded(_, let eventID, _), .error(let eventID, _):

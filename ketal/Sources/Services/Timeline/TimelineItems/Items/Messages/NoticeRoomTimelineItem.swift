@@ -14,17 +14,17 @@ struct NoticeRoomTimelineItem: TextBasedRoomTimelineItem, Equatable {
     let isOutgoing: Bool
     let isEditable: Bool
     let canBeRepliedTo: Bool
-
+    
     let sender: TimelineItemSender
-
+    
     let content: NoticeRoomTimelineItemContent
-
+    
     var properties = RoomTimelineItemProperties()
-
+    
     var body: String {
         content.body
     }
-
+    
     var contentType: EventBasedMessageTimelineItemContentType {
         .notice(content)
     }

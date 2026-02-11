@@ -26,15 +26,15 @@ final class RoomTimelineItemViewState: Identifiable, Equatable, ObservableObject
     convenience init(item: RoomTimelineItemProtocol, groupStyle: TimelineGroupStyle) {
         self.init(type: .init(item: item), groupStyle: groupStyle)
     }
-
+    
     // MARK: - Equatable
-
+    
     static func == (lhs: RoomTimelineItemViewState, rhs: RoomTimelineItemViewState) -> Bool {
         lhs.type == rhs.type && lhs.groupStyle == rhs.groupStyle
     }
-
+    
     // MARK: Identifiable
-
+    
     /// The `timelineID` of the item, used for the timeline view level identification, do not use for any business logic use `identifier` instead
     var id: TimelineItemIdentifier.UniqueID {
         identifier.uniqueID

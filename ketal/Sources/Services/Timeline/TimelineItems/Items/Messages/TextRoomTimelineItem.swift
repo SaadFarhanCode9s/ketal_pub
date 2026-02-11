@@ -16,31 +16,31 @@ struct TextRoomTimelineItem: TextBasedRoomTimelineItem, Equatable {
     let isEditable: Bool
     let canBeRepliedTo: Bool
     var shouldBoost = false
-
+    
     let sender: TimelineItemSender
-
+    
     let content: TextRoomTimelineItemContent
-
+    
     var properties = RoomTimelineItemProperties()
-
+    
     var body: String {
         content.body
     }
-
+    
     var contentType: EventBasedMessageTimelineItemContentType {
         .text(content)
     }
-
+    
     var links: [URL] {
         guard let attributedString = content.formattedBody else {
             return []
         }
-
+        
         let links = attributedString.runs.compactMap { (run: AttributedString.Runs.Run) -> URL? in
             if run.link == nil {
                 return nil
             }
-
+            
             guard run.elementX.eventOnRoomAlias == nil,
                   run.elementX.eventOnRoomID == nil,
                   run.elementX.roomAlias == nil,
@@ -48,10 +48,10 @@ struct TextRoomTimelineItem: TextBasedRoomTimelineItem, Equatable {
                   run.elementX.userID == nil else {
                 return nil
             }
-
+            
             return run.link
         }
-
+        
         return Array(links.uniqued())
     }
 }

@@ -21,7 +21,7 @@ struct TimelineControllerFactory: TimelineControllerFactoryProtocol {
                            mediaProvider: mediaProvider,
                            appSettings: ServiceLocator.shared.settings)
     }
-
+    
     func buildThreadTimelineController(threadRootEventID: String,
                                        initialFocussedEventID: String?,
                                        roomProxy: JoinedRoomProxyProtocol,
@@ -39,7 +39,7 @@ struct TimelineControllerFactory: TimelineControllerFactoryProtocol {
             return .failure(.roomProxyError(error))
         }
     }
-
+    
     func buildPinnedEventsTimelineController(roomProxy: JoinedRoomProxyProtocol,
                                              timelineItemFactory: RoomTimelineItemFactoryProtocol,
                                              mediaProvider: MediaProviderProtocol) async -> Result<TimelineControllerProtocol, TimelineFactoryControllerError> {
@@ -55,7 +55,7 @@ struct TimelineControllerFactory: TimelineControllerFactoryProtocol {
             return .failure(.roomProxyError(error))
         }
     }
-
+    
     func buildMessageFilteredTimelineController(focus: TimelineFocus,
                                                 allowedMessageTypes: [TimelineAllowedMessageType],
                                                 presentation: TimelineKind.MediaPresentation,

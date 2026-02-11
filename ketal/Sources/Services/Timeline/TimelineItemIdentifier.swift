@@ -17,30 +17,30 @@ import Foundation
 enum TimelineItemIdentifier: Hashable, Sendable {
     struct UniqueID: Hashable {
         let value: String
-
+        
         init(_ value: String) {
             self.value = value
         }
-
+        
         init(rustValue: TimelineUniqueId) {
             self.init(rustValue.id)
         }
-
+        
         var rustValue: TimelineUniqueId {
             .init(id: value)
         }
     }
-
+    
     enum EventOrTransactionID: Hashable {
         case eventID(String), transactionID(String)
-
+        
         init(rustValue: EventOrTransactionId) {
             switch rustValue {
             case .eventId(let eventID): self = .eventID(eventID)
             case .transactionId(let transactionID): self = .transactionID(transactionID)
             }
         }
-
+        
         var rustValue: EventOrTransactionId {
             switch self {
             case .eventID(let eventID): .eventId(eventId: eventID)
@@ -48,27 +48,27 @@ enum TimelineItemIdentifier: Hashable, Sendable {
             }
         }
     }
-
+    
     case event(uniqueID: UniqueID, eventOrTransactionID: EventOrTransactionID)
     case virtual(uniqueID: UniqueID)
-
+    
     var uniqueID: UniqueID {
         switch self {
         case .event(let uniqueID, _): uniqueID
         case .virtual(let uniqueID): uniqueID
         }
     }
-
+    
     var eventOrTransactionID: EventOrTransactionID? {
         guard case let .event(_, eventOrTransactionID) = self else { return nil }
         return eventOrTransactionID
     }
-
+    
     var eventID: String? {
         guard case let .event(_, .eventID(eventID)) = self else { return nil }
         return eventID
     }
-
+    
     var transactionID: String? {
         guard case let .event(_, .transactionID(transactionID)) = self else { return nil }
         return transactionID
@@ -81,7 +81,7 @@ extension TimelineItemIdentifier {
     static var randomEvent: Self {
         .event(uniqueID: .init(UUID().uuidString), eventOrTransactionID: .eventID(UUID().uuidString))
     }
-
+    
     static var randomVirtual: Self {
         .virtual(uniqueID: .init(UUID().uuidString))
     }

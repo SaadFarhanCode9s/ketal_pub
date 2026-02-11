@@ -33,7 +33,7 @@ extension EventBasedMessageTimelineItemProtocol {
             false
         }
     }
-
+    
     var mediaCaption: String? {
         switch contentType {
         case .audio(let content):
@@ -48,7 +48,7 @@ extension EventBasedMessageTimelineItemProtocol {
             nil
         }
     }
-
+    
     var hasMediaCaption: Bool {
         mediaCaption != nil
     }

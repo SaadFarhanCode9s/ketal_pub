@@ -15,12 +15,12 @@ struct StickerRoomTimelineItem: EventBasedTimelineItemProtocol, Equatable {
     let isOutgoing: Bool
     let isEditable: Bool
     let canBeRepliedTo: Bool
-
+    
     let sender: TimelineItemSender
-
+    
     let imageInfo: ImageInfoProxy
-
+    
     var blurhash: String?
-
+    
     var properties = RoomTimelineItemProperties()
 }

@@ -13,8 +13,10 @@ import EmbeddedElementCall
 import Foundation
 import SwiftUI
 
-// Common settings between app and NSE
-protocol CommonSettingsProtocol {
+/// Common settings between app and NSE
+protocol CommonSettingsProtocol: AnyObject {
+    var lastNotificationBootTime: TimeInterval? { get set }
+    
     var logLevel: LogLevel { get }
     var traceLogPacks: Set<TraceLogPack> { get }
     var bugReportRageshakeURL: RemotePreference<RageshakeConfiguration> { get }
@@ -23,6 +25,12 @@ protocol CommonSettingsProtocol {
     var enableKeyShareOnInvite: Bool { get }
     var threadsEnabled: Bool { get }
     var hideQuietNotificationAlerts: Bool { get }
+}
+
+enum AppBuildType {
+    case debug
+    case nightly
+    case release
 }
 
 /// Store Element specific app settings.
@@ -49,6 +57,7 @@ final class AppSettings {
         case enableNotifications
         case enableInAppNotifications
         case pusherProfileTag
+        case lastNotificationBootTime
         case logLevel
         case traceLogPacks
         case viewSourceEnabled
@@ -72,6 +81,7 @@ final class AppSettings {
         case linkNewDeviceEnabled
         
         // Spaces
+        case spaceFiltersEnabled
         case spaceSettingsEnabled
         case createSpaceEnabled
         
@@ -85,15 +95,18 @@ final class AppSettings {
     /// UserDefaults to be used on reads and writes.
     private static var store: UserDefaults! = UserDefaults(suiteName: suiteName)
     
-    /// Whether or not the app is a development build that isn't in production.
-    static var isDevelopmentBuild: Bool = {
+    static var appBuildType: AppBuildType {
         #if DEBUG
-        true
+        return .debug
         #else
-        let apps = ["io.ketal.nightly", "io.ketal.pr"]
-        return apps.contains(InfoPlistReader.main.baseBundleIdentifier)
+        switch InfoPlistReader.main.baseBundleIdentifier {
+        case "io.ketal.nightly":
+            return .nightly
+        default:
+            return .release
+        }
         #endif
-    }()
+    }
         
     static func resetAllSettings() {
         MXLog.warning("Resetting the AppSettings.")
@@ -301,6 +314,10 @@ final class AppSettings {
     @UserPreference(key: UserDefaultsKeys.pusherProfileTag, storageType: .userDefaults(store))
     var pusherProfileTag: String?
     
+    /// The device's last boot time as recorded by the NSE.
+    @UserPreference(key: UserDefaultsKeys.lastNotificationBootTime, storageType: .userDefaults(store))
+    var lastNotificationBootTime: TimeInterval?
+    
     // MARK: - Logging
         
     @UserPreference(key: UserDefaultsKeys.logLevel, defaultValue: LogLevel.info, storageType: .userDefaults(store))
@@ -403,14 +420,17 @@ final class AppSettings {
     
     // MARK: - Feature Flags
     
-    // Spaces
-    @UserPreference(key: UserDefaultsKeys.spaceSettingsEnabled, defaultValue: false, storageType: .userDefaults(store))
+    /// Spaces
+    @UserPreference(key: UserDefaultsKeys.spaceSettingsEnabled, defaultValue: true, storageType: .volatile)
     var spaceSettingsEnabled
     
-    @UserPreference(key: UserDefaultsKeys.createSpaceEnabled, defaultValue: false, storageType: .userDefaults(store))
+    @UserPreference(key: UserDefaultsKeys.createSpaceEnabled, defaultValue: true, storageType: .volatile)
     var createSpaceEnabled
     
-    // Others
+    @UserPreference(key: UserDefaultsKeys.spaceFiltersEnabled, defaultValue: true, storageType: .volatile)
+    var spaceFiltersEnabled
+    
+    /// Others
     @UserPreference(key: UserDefaultsKeys.publicSearchEnabled, defaultValue: false, storageType: .userDefaults(store))
     var publicSearchEnabled
     

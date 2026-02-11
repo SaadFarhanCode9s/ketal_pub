@@ -15,7 +15,7 @@ import MatrixRustSDK
 /// protocol with a specialisation for the type it listens for.
 final class SDKListener<T> {
     private let onUpdateClosure: (T) -> Void
-    
+
     /// Creates a new listener.
     /// - Parameter onUpdateClosure: A closure that will be called whenever a new value is available.
     init(_ onUpdateClosure: @escaping (T) -> Void) {
@@ -87,12 +87,6 @@ extension SDKListener: SendQueueRoomErrorListener where T == (String, ClientErro
     }
 }
 
-extension SDKListener: SendQueueRoomUpdateListener where T == (String, RoomSendQueueUpdate) {
-    func onUpdate(roomId: String, update: RoomSendQueueUpdate) {
-        onUpdateClosure((roomId, update))
-    }
-}
-
 // MARK: SecureBackupController
 
 extension SDKListener: BackupStateListener where T == BackupState {
@@ -156,12 +150,6 @@ extension SDKListener: SpaceRoomListPaginationStateListener where T == SpaceRoom
 extension SDKListener: SpaceRoomListSpaceListener where T == SpaceRoom? {
     func onUpdate(space: SpaceRoom?) {
         onUpdateClosure(space)
-    }
-}
-
-extension SDKListener: SpaceServiceSpaceFiltersListener where T == [SpaceFilterUpdate] {
-    func onUpdate(filterUpdates: [SpaceFilterUpdate]) {
-        onUpdateClosure(filterUpdates)
     }
 }
 

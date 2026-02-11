@@ -14,7 +14,7 @@ struct EncryptedRoomTimelineItem: EventBasedTimelineItemProtocol, Equatable {
         case olmV1Curve25519AesSha2(senderKey: String)
         case unknown
     }
-    
+
     enum UTDCause: Hashable {
         case sentBeforeWeJoined
         case verificationViolation
@@ -25,7 +25,7 @@ struct EncryptedRoomTimelineItem: EventBasedTimelineItemProtocol, Equatable {
         case witheldBySender
         case withheldForUnverifiedOrInsecureDevice
     }
-    
+
     let id: TimelineItemIdentifier
     let body: String
     let encryptionType: EncryptionType
@@ -33,8 +33,8 @@ struct EncryptedRoomTimelineItem: EventBasedTimelineItemProtocol, Equatable {
     let isOutgoing: Bool
     let isEditable: Bool
     let canBeRepliedTo: Bool
-    
+
     let sender: TimelineItemSender
-    
+
     var properties = RoomTimelineItemProperties()
 }

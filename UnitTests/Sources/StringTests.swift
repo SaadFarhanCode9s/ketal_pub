@@ -13,7 +13,7 @@ class StringTests: XCTestCase {
     func testEmptyIsAscii() {
         XCTAssertTrue("".isASCII)
     }
-    
+
     func testSpaceIsAscii() {
         XCTAssertTrue("".isASCII)
     }
@@ -21,15 +21,15 @@ class StringTests: XCTestCase {
     func testJohnnyIsAscii() {
         XCTAssertTrue("johnny".isASCII)
     }
-    
+
     func testJöhnnyIsNotAscii() {
         XCTAssertFalse("jöhnny".isASCII)
     }
-    
+
     func testJ🅾️hnnyIsNotAscii() {
         XCTAssertFalse("j🅾️hnny".isASCII)
     }
-    
+
     func testAsciifiedMethod() {
         // ASCII strings return themselves unchanged
         XCTAssertEqual("johnny".asciified(), "johnny")
@@ -37,7 +37,7 @@ class StringTests: XCTestCase {
         XCTAssertEqual("abc123".asciified(), "abc123")
         XCTAssertEqual("".asciified(), "")
         XCTAssertEqual(" ".asciified(), " ")
-        
+
         // Non-ASCII strings get converted or stripped
         XCTAssertEqual("jöhnny".asciified(), "johnny", "ö should become o")
         XCTAssertEqual("jåhnny".asciified(), "jahnny", "å should become a")
@@ -70,15 +70,15 @@ class StringTests: XCTestCase {
         result = ""
         XCTAssertEqual(String.generateBreakableWhitespaceEnd(whitespaceCount: count, layoutDirection: .rightToLeft), result)
     }
-    
+
     func testEllipsizeWorks() {
         XCTAssertEqual("ellipsize".ellipsize(length: 5), "ellip…")
     }
-    
+
     func testEllipsizeNotNeeded() {
         XCTAssertEqual("ellipsize".ellipsize(length: 15), "ellipsize")
     }
-    
+
     func testReplaceBreakOccurrences() {
         let input0 = "</p><p>"
         let input1 = "</p>\n<p>"
@@ -86,14 +86,14 @@ class StringTests: XCTestCase {
         let input3 = "</p>\n\n\n\n<p>"
         let input4 = "<p>a</p>\n<p>b</p>"
         let input5 = "empty"
-        
+
         let expectedOutput0 = input0
         let expectedOutput1 = "<br><br>"
         let expectedOutput2 = "<br><br><br>"
         let expectedOutput3 = "<br><br><br><br><br>"
         let expectedOutput4 = "<p>a<br><br>b</p>"
         let expectedOutput5 = input5
-        
+
         XCTAssertEqual(input0.replacingHtmlBreaksOccurrences(), expectedOutput0)
         XCTAssertEqual(input1.replacingHtmlBreaksOccurrences(), expectedOutput1)
         XCTAssertEqual(input2.replacingHtmlBreaksOccurrences(), expectedOutput2)

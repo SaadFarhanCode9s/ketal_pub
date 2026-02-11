@@ -18,7 +18,7 @@
                BlueprintIdentifier = "7A17BE29BAC81ADBAC6349D9"
                BuildableName = "PreviewTests.xctest"
                BlueprintName = "PreviewTests"
-               ReferencedContainer = "container:ketal.xcodeproj">
+               ReferencedContainer = "container:ElementX.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -42,7 +42,7 @@
             BlueprintIdentifier = "7A17BE29BAC81ADBAC6349D9"
             BuildableName = "PreviewTests.xctest"
             BlueprintName = "PreviewTests"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -53,9 +53,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C0FAEB81CFD9776CD78CE489"
-            BuildableName = "ketal.app"
-            BlueprintName = "ketal"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            BuildableName = "ElementX.app"
+            BlueprintName = "ElementX"
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </CodeCoverageTargets>
    </TestAction>
@@ -75,7 +75,7 @@
             BlueprintIdentifier = "7A17BE29BAC81ADBAC6349D9"
             BuildableName = "PreviewTests.xctest"
             BlueprintName = "PreviewTests"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <CommandLineArguments>
@@ -95,7 +95,7 @@
             BlueprintIdentifier = "7A17BE29BAC81ADBAC6349D9"
             BuildableName = "PreviewTests.xctest"
             BlueprintName = "PreviewTests"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

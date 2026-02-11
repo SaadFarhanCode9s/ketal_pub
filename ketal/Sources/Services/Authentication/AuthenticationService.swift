@@ -382,13 +382,13 @@ private extension HumanQrLoginError {
             .qrCodeError(.declined)
         case .LinkingNotSupported:
             .qrCodeError(.linkingNotSupported)
-        case .Expired, .NotFound: // The most likely cause of a .NotFound is that the rendezvous session expired on the server side
+        case .Expired:
             .qrCodeError(.expired)
         case .SlidingSyncNotAvailable:
             .qrCodeError(.deviceNotSupported)
         case .OtherDeviceNotSignedIn:
             .qrCodeError(.deviceNotSignedIn)
-        case .Unknown, .OidcMetadataInvalid, .CheckCodeAlreadySent, .CheckCodeCannotBeSent:
+        case .Unknown, .NotFound, .OidcMetadataInvalid, .CheckCodeAlreadySent, .CheckCodeCannotBeSent:
             .qrCodeError(.unknown)
         }
     }

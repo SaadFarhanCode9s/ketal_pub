@@ -11,19 +11,19 @@ import SwiftUI
 
 struct TimelineItemSender: Identifiable, Hashable {
     static let test = TimelineItemSender(id: "@test.matrix.org")
-    
+
     let id: String
     let displayName: String?
     let isDisplayNameAmbiguous: Bool
     let avatarURL: URL?
-    
+
     init(id: String, displayName: String? = nil, isDisplayNameAmbiguous: Bool = false, avatarURL: URL? = nil) {
         self.id = id
         self.displayName = displayName
         self.isDisplayNameAmbiguous = isDisplayNameAmbiguous
         self.avatarURL = avatarURL
     }
-    
+
     init(senderID: String, senderProfile: ProfileDetails) {
         switch senderProfile {
         case let .ready(displayName, isDisplayNameAmbiguous, avatarUrl):
@@ -38,12 +38,12 @@ struct TimelineItemSender: Identifiable, Hashable {
                       avatarURL: nil)
         }
     }
-        
+
     var disambiguatedDisplayName: String? {
         guard let displayName else {
             return nil
         }
-        
+
         return isDisplayNameAmbiguous ? "\(displayName) (\(id))" : displayName
     }
 }

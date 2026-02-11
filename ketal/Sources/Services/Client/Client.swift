@@ -16,14 +16,33 @@ extension ClientProtocol {
         } else {
             server() ?? homeserver()
         }
-        
+
         do {
             guard let url = URL(string: serverNameURLString)?.appending(path: "/.well-known/element/element.json") else {
                 return .failure(.invalidServerName)
             }
-            
+
             let data = try await getUrl(url: url.absoluteString)
-            
+
+            return .success(data)
+        } catch {
+            return .failure(.sdkError(error))
+        }
+    }
+
+    func clientWellKnown() async -> Result<Data, ClientProxyError> {
+        let serverNameURLString = if let userIDServerName = try? userIdServerName() {
+            "https://\(userIDServerName)"
+        } else {
+            server() ?? homeserver()
+        }
+
+        guard let url = URL(string: serverNameURLString)?.appending(path: "/.well-known/matrix/client") else {
+            return .failure(.invalidServerName)
+        }
+
+        do {
+            let data = try await getUrl(url: url.absoluteString)
             return .success(data)
         } catch {
             return .failure(.sdkError(error))

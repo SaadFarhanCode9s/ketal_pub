@@ -18,7 +18,7 @@ struct RestorationToken: Equatable {
     let sessionDirectories: SessionDirectories
     let passphrase: String
     let pusherNotificationClientIdentifier: String?
-    
+
     enum CodingKeys: CodingKey {
         case session
         case sessionDirectory
@@ -31,23 +31,23 @@ struct RestorationToken: Equatable {
 extension RestorationToken: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         let session = try container.decode(Session.self, forKey: .session)
         let dataDirectory = try container.decode(URL.self, forKey: .sessionDirectory)
         let cacheDirectory = try container.decodeIfPresent(URL.self, forKey: .cacheDirectory)
-        
+
         let sessionDirectories = if let cacheDirectory {
             SessionDirectories(dataDirectory: dataDirectory, cacheDirectory: cacheDirectory)
         } else {
             SessionDirectories(dataDirectory: dataDirectory)
         }
-        
+
         self = try .init(session: session,
                          sessionDirectories: sessionDirectories,
                          passphrase: container.decode(String.self, forKey: .passphrase),
                          pusherNotificationClientIdentifier: container.decodeIfPresent(String.self, forKey: .pusherNotificationClientIdentifier))
     }
-    
+
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(session, forKey: .session)
@@ -61,7 +61,7 @@ extension RestorationToken: Codable {
 extension MatrixRustSDK.Session: @retroactive Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         // The SDK no longer supports sliding sync proxies. We must bail here otherwise the
         // session would be restored using native sliding sync, but if the proxy was still
         // active its sync loop would be stealing keys away from us.
@@ -71,7 +71,7 @@ extension MatrixRustSDK.Session: @retroactive Codable {
         if (try? container.decodeIfPresent(String.self, forKey: .slidingSyncProxy)) != nil {
             throw RestorationTokenError.slidingSyncProxyNotSupported
         }
-        
+
         self = try .init(accessToken: container.decode(String.self, forKey: .accessToken),
                          refreshToken: container.decodeIfPresent(String.self, forKey: .refreshToken),
                          userId: container.decode(String.self, forKey: .userId),
@@ -80,7 +80,7 @@ extension MatrixRustSDK.Session: @retroactive Codable {
                          oidcData: container.decodeIfPresent(String.self, forKey: .oidcData),
                          slidingSyncVersion: .native)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(accessToken, forKey: .accessToken)
@@ -90,7 +90,7 @@ extension MatrixRustSDK.Session: @retroactive Codable {
         try container.encode(homeserverUrl, forKey: .homeserverUrl)
         try container.encode(oidcData, forKey: .oidcData)
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case accessToken, refreshToken, userId, deviceId, homeserverUrl, oidcData, slidingSyncProxy
     }

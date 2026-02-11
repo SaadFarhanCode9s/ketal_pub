@@ -14,11 +14,11 @@ protocol EventBasedTimelineItemProtocol: RoomTimelineItemProtocol, CustomStringC
     var isOutgoing: Bool { get }
     var isEditable: Bool { get }
     var canBeRepliedTo: Bool { get }
-    
+
     var sender: TimelineItemSender { get }
-    
+
     var body: String { get }
-    
+
     var properties: RoomTimelineItemProperties { get }
 }
 
@@ -34,19 +34,19 @@ extension EventBasedTimelineItemProtocol {
     var isRemoteMessage: Bool {
         id.eventID != nil
     }
-    
+
     var isRedacted: Bool {
         self is RedactedRoomTimelineItem
     }
-    
+
     var pollIfAvailable: Poll? {
         (self as? PollRoomTimelineItem)?.poll
     }
-    
+
     var hasStatusIcon: Bool {
-        hasFailedToSend || properties.encryptionAuthenticity != nil || properties.encryptionForwarder != nil
+        hasFailedToSend || properties.encryptionAuthenticity != nil
     }
-    
+
     var hasFailedToSend: Bool {
         properties.deliveryStatus?.isSendingFailed == true
     }
@@ -100,12 +100,12 @@ extension EventBasedTimelineItemProtocol {
             return true
         }
     }
-    
+
     var supportsMediaCaption: Bool {
         guard let messageBasedItem = self as? EventBasedMessageTimelineItemProtocol else { return false }
         return messageBasedItem.supportsMediaCaption
     }
-    
+
     var hasMediaCaption: Bool {
         guard let messageBasedItem = self as? EventBasedMessageTimelineItemProtocol else { return false }
         return messageBasedItem.hasMediaCaption

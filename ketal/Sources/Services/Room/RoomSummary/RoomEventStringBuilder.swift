@@ -14,20 +14,20 @@ struct RoomEventStringBuilder {
     let messageEventStringBuilder: RoomMessageEventStringBuilder
     let shouldDisambiguateDisplayNames: Bool
     let shouldPrefixSenderName: Bool
-    
+
     func buildAttributedString(for eventItemProxy: EventTimelineItemProxy) -> AttributedString? {
         buildAttributedString(for: eventItemProxy.content,
                               sender: eventItemProxy.sender,
                               isOutgoing: eventItemProxy.isOwn)
     }
-    
+
     func buildAttributedString(for content: TimelineItemContent, sender: TimelineItemSender, isOutgoing: Bool) -> AttributedString? {
         let displayName = if shouldDisambiguateDisplayNames {
             sender.disambiguatedDisplayName ?? sender.id
         } else {
             sender.displayName ?? sender.id
         }
-        
+
         switch content {
         case .msgLike(let messageLikeContent):
             switch messageLikeContent.kind {
@@ -88,20 +88,20 @@ struct RoomEventStringBuilder {
             return prefix(L10n.commonCallStarted, with: displayName, isOutgoing: isOutgoing)
         }
     }
-    
+
     private func prefix(_ eventSummary: String, with senderDisplayName: String, isOutgoing: Bool) -> AttributedString {
         guard shouldPrefixSenderName else {
             return AttributedString(eventSummary)
         }
         let attributedEventSummary = AttributedString(eventSummary.trimmingCharacters(in: .whitespacesAndNewlines))
-        
+
         var attributedSenderDisplayName = AttributedString(isOutgoing ? L10n.commonYou : senderDisplayName)
         attributedSenderDisplayName.bold()
-        
+
         // Don't include the message body in the markdown otherwise it makes tappable links.
         return attributedSenderDisplayName + ": " + attributedEventSummary
     }
-    
+
     static func pinnedEventStringBuilder(userID: String) -> Self {
         RoomEventStringBuilder(stateEventStringBuilder: .init(userID: userID,
                                                               shouldDisambiguateDisplayNames: false),

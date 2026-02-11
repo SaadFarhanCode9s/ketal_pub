@@ -15,14 +15,14 @@ import MatrixRustSDK
 enum MXLog {
     private nonisolated(unsafe) static var rootSpan: Span!
     private nonisolated(unsafe) static var currentTarget: String!
-    
+
     static func configure(currentTarget: String) {
         self.currentTarget = currentTarget
-        
+
         rootSpan = Span(file: #file, line: #line, level: .info, target: self.currentTarget, name: "root", bridgeTraceId: nil)
         rootSpan.enter()
     }
-    
+
     static func createSpan(_ name: String,
                            file: String = #file,
                            function: String = #function,
@@ -30,7 +30,7 @@ enum MXLog {
                            column: Int = #column) -> Span {
         createSpan(name, level: .info, file: file, function: function, line: line, column: column)
     }
-    
+
     static func verbose(_ message: Any,
                         file: String = #file,
                         function: String = #function,
@@ -38,7 +38,7 @@ enum MXLog {
                         column: Int = #column) {
         log(message, level: .trace, file: file, function: function, line: line, column: column)
     }
-    
+
     static func debug(_ message: Any,
                       file: String = #file,
                       function: String = #function,
@@ -46,7 +46,7 @@ enum MXLog {
                       column: Int = #column) {
         log(message, level: .debug, file: file, function: function, line: line, column: column)
     }
-    
+
     static func info(_ message: Any,
                      file: String = #file,
                      function: String = #function,
@@ -54,7 +54,7 @@ enum MXLog {
                      column: Int = #column) {
         log(message, level: .info, file: file, function: function, line: line, column: column)
     }
-    
+
     static func warning(_ message: Any,
                         file: String = #file,
                         function: String = #function,
@@ -62,7 +62,7 @@ enum MXLog {
                         column: Int = #column) {
         log(message, level: .warn, file: file, function: function, line: line, column: column)
     }
-    
+
     /// Log error.
     ///
     /// - Parameters:
@@ -74,7 +74,7 @@ enum MXLog {
                       column: Int = #column) {
         log(message, level: .error, file: file, function: function, line: line, column: column)
     }
-    
+
     /// Log failure.
     ///
     /// A failure is any type of programming error which should never occur in production. In `DEBUG` configuration
@@ -88,12 +88,12 @@ enum MXLog {
                         line: Int = #line,
                         column: Int = #column) {
         log(message, level: .error, file: file, function: function, line: line, column: column)
-        
+
         #if DEBUG
         assertionFailure("\(message)")
         #endif
     }
-    
+
     #if DEBUG
     private static let devPrefix = URL.documentsDirectory.pathComponents[2].uppercased()
     /// A helper method for print debugging, only available on debug builds.
@@ -108,9 +108,9 @@ enum MXLog {
         log("[\(devPrefix)] \(message)", level: .info, file: file, function: function, line: line, column: column)
     }
     #endif
-    
+
     // MARK: - Private
-    
+
     // periphery:ignore:parameters function,column
     private static func createSpan(_ name: String,
                                    level: LogLevel,
@@ -121,10 +121,10 @@ enum MXLog {
         if Span.current().isNone() {
             rootSpan.enter()
         }
-        
+
         return Span(file: file, line: UInt32(line), level: level.rustLogLevel, target: currentTarget, name: name, bridgeTraceId: nil)
     }
-    
+
     // periphery:ignore:parameters function,column
     private static func log(_ message: Any,
                             level: LogLevel,
@@ -135,11 +135,11 @@ enum MXLog {
         guard let rootSpan else {
             return
         }
-        
+
         if Span.current().isNone() {
             rootSpan.enter()
         }
-        
+
         logEvent(file: (file as NSString).lastPathComponent, line: UInt32(line), level: level.rustLogLevel, target: currentTarget, message: "\(message)")
     }
 }

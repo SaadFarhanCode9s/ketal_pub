@@ -15,7 +15,7 @@ extension MapTilerConfiguration: MapTilerURLBuilderProtocol {
         url?.appendPathComponent("style.json", conformingTo: .json)
         return url
     }
-    
+
     /// Used in the timeline where a full MGLMapView loading is unwanted
     func staticMapTileImageURL(for style: MapTilerStyle,
                                coordinates: CLLocationCoordinate2D,
@@ -33,18 +33,18 @@ extension MapTilerConfiguration: MapTilerURLBuilderProtocol {
         url?.append(queryItems: [.init(name: "attribution", value: attribution.rawValue)])
         return url
     }
-    
+
     // MARK: Private
-    
+
     private func styleURL(for style: MapTilerStyle) -> URL? {
         guard let apiKey else { return nil }
-        
+
         var url: URL = baseURL
         url.appendPathComponent(styleID(for: style), conformingTo: .item)
         url.append(queryItems: [URLQueryItem(name: "key", value: apiKey)])
         return url
     }
-    
+
     private func styleID(for style: MapTilerStyle) -> String {
         switch style {
         case .light: lightStyleID

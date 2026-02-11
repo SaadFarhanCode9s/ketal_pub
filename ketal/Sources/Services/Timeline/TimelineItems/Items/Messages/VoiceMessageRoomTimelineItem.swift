@@ -14,17 +14,17 @@ struct VoiceMessageRoomTimelineItem: EventBasedMessageTimelineItemProtocol, Equa
     let isOutgoing: Bool
     let isEditable: Bool
     let canBeRepliedTo: Bool
-    
+
     let sender: TimelineItemSender
-    
+
     let content: AudioRoomTimelineItemContent
 
     var properties = RoomTimelineItemProperties()
-    
+
     var body: String {
         content.caption ?? content.filename
     }
-    
+
     var contentType: EventBasedMessageTimelineItemContentType {
         .voice(content)
     }

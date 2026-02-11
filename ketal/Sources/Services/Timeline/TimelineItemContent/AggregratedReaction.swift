@@ -14,11 +14,11 @@ struct AggregatedReaction: Hashable, Identifiable {
     /// Reactions can be free text, so we need to limit the length
     /// displayed on screen.
     private static let maxDisplayChars = 16
-    
+
     var id: String {
         key
     }
-    
+
     /// The id of the account owner
     let accountOwnerID: String
     /// The reaction that was sent.
@@ -40,12 +40,12 @@ extension AggregatedReaction {
     var count: Int {
         senders.count
     }
-    
+
     /// Whether to highlight the reaction, indicating that the current user sent this reaction.
     var isHighlighted: Bool {
         senders.contains { $0.id == accountOwnerID }
     }
-    
+
     /// The key to be displayed on screen. See `maxDisplayChars`.
     var displayKey: String {
         key.ellipsize(length: Self.maxDisplayChars)

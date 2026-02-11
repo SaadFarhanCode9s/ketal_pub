@@ -17,7 +17,7 @@ enum UserAgentBuilder {
     static func makeASCIIUserAgent() -> String {
         makeUserAgent()?.asciified() ?? "unknown"
     }
-    
+
     static func makeUserAgent() -> String? {
         let clientName = InfoPlistReader.app.bundleDisplayName
         let clientVersion = InfoPlistReader.app.bundleShortVersionString

@@ -14,12 +14,12 @@ import UserNotifications
 final class NotificationManager: NSObject, NotificationManagerProtocol {
     private let notificationCenter: UserNotificationCenterProtocol
     private let appSettings: AppSettings
-    
+
     private var userSession: UserSessionProtocol?
-    
+
     private var cancellables = Set<AnyCancellable>()
     private var notificationsEnabled = false
-    
+
     init(notificationCenter: UserNotificationCenterProtocol,
          appSettings: AppSettings) {
         self.notificationCenter = notificationCenter
@@ -30,7 +30,7 @@ final class NotificationManager: NSObject, NotificationManagerProtocol {
     // MARK: NotificationManagerProtocol
 
     weak var delegate: NotificationManagerDelegate?
-    
+
     func start() {
         let replyAction = UNTextInputNotificationAction(identifier: NotificationConstants.Action.inlineReply,
                                                         title: L10n.actionQuickReply,
@@ -39,31 +39,25 @@ final class NotificationManager: NSObject, NotificationManagerProtocol {
                                                      actions: [replyAction],
                                                      intentIdentifiers: [],
                                                      options: [])
-        
+
         let inviteCategory = UNNotificationCategory(identifier: NotificationConstants.Category.invite,
                                                     actions: [],
                                                     intentIdentifiers: [],
                                                     options: [])
         notificationCenter.setNotificationCategories([messageCategory, inviteCategory])
         notificationCenter.delegate = self
-        
+
         notificationsEnabled = appSettings.enableNotifications
         MXLog.info("App setting 'enableNotifications' is '\(notificationsEnabled)'")
-        
+
         // Listen for changes to AppSettings.enableNotifications
         appSettings.$enableNotifications
             .sink { [weak self] newValue in
                 self?.enableNotifications(newValue)
             }
             .store(in: &cancellables)
-        
-        NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
-            .sink { [weak self] _ in
-                self?.removeReceivedWhileOfflineNotification()
-            }
-            .store(in: &cancellables)
     }
-    
+
     func requestAuthorization() {
         guard appSettings.enableNotifications, !userSession.isNil else { return }
         Task {
@@ -90,18 +84,18 @@ final class NotificationManager: NSObject, NotificationManagerProtocol {
 
     func setUserSession(_ userSession: UserSessionProtocol?) {
         self.userSession = userSession
-        
+
         // If notification permissions were given previously then attempt re-registering
         // for remote notifications on startup. Otherwise let the onboarding flow handle it
         Task { [weak self] in
             guard let self else { return }
-            
+
             if await notificationCenter.authorizationStatus() == .authorized, appSettings.enableNotifications {
                 await MainActor.run { [weak self] in
                     self?.delegate?.registerForRemoteNotifications()
                 }
             }
-            
+
             let settings = await notificationCenter.notificationSettings()
             MXLog.info("Notification sound enabled: \(settings.soundSetting == .enabled)")
         }
@@ -127,7 +121,7 @@ final class NotificationManager: NSObject, NotificationManagerProtocol {
             MXLog.error("Show local notification failed: \(error)")
         }
     }
-    
+
     func removeDeliveredMessageNotifications(for roomID: String) async {
         let notificationsIdentifiers = await notificationCenter
             .deliveredNotifications()
@@ -135,14 +129,14 @@ final class NotificationManager: NSObject, NotificationManagerProtocol {
             .map(\.request.identifier)
         notificationCenter.removeDeliveredNotifications(withIdentifiers: notificationsIdentifiers)
     }
-    
+
     func removeDeliveredNotificationsForFullyReadRooms(_ rooms: [RoomSummary]) async {
         let roomsToLastMessageDates = rooms
             .filter { $0.hasUnreadMessages == false }
             .reduce(into: [:]) { partialResult, roomSummary in
                 partialResult[roomSummary.id] = roomSummary.lastMessageDate
             }
-        
+
         let notificationsIdentifiers = await notificationCenter
             .deliveredNotifications()
             .filter { notification in
@@ -150,16 +144,12 @@ final class NotificationManager: NSObject, NotificationManagerProtocol {
                       let lastMessageDate = roomsToLastMessageDates[roomID] else {
                     return false
                 }
-                    
+
                 return notification.date <= lastMessageDate
             }
             .map(\.request.identifier)
-        
+
         notificationCenter.removeDeliveredNotifications(withIdentifiers: notificationsIdentifiers)
-    }
-    
-    private func removeReceivedWhileOfflineNotification() {
-        notificationCenter.removeDeliveredNotifications(withIdentifiers: [NotificationServiceExtension.receivedWhileOfflineNotificationID])
     }
 
     private func setPusher(with deviceToken: Data, clientProxy: ClientProxyProtocol) async -> Bool {
@@ -200,7 +190,7 @@ final class NotificationManager: NSObject, NotificationManagerProtocol {
         appSettings.pusherProfileTag = newTag
         return newTag
     }
-    
+
     private func enableNotifications(_ enable: Bool) {
         guard notificationsEnabled != enable else { return }
         notificationsEnabled = enable

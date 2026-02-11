@@ -7,15 +7,15 @@
 //
 
 import Combine
-@testable import ketal
 import Foundation
+@testable import ketal
 import XCTest
 
 @MainActor
 class AudioRecorderTests: XCTestCase {
     private var audioRecorder: AudioRecorder!
     private var audioSessionMock: AudioSessionMock!
-    
+
     override func setUp() async throws {
         audioSessionMock = AudioSessionMock()
         audioSessionMock.requestRecordPermissionClosure = { completion in
@@ -23,16 +23,16 @@ class AudioRecorderTests: XCTestCase {
         }
         audioRecorder = AudioRecorder(audioSession: audioSessionMock)
     }
-    
+
     override func tearDown() async throws {
         await audioRecorder?.cancelRecording()
     }
-    
+
     func testRecordWithoutPermission() async throws {
         audioSessionMock.requestRecordPermissionClosure = { completion in
             completion(false)
         }
-        
+
         let deferred = deferFulfillment(audioRecorder.actions) { action in
             switch action {
             case .didFailWithError(.recordPermissionNotGranted):

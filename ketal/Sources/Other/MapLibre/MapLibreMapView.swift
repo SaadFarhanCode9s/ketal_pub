@@ -16,10 +16,10 @@ struct MapLibreMapView: UIViewRepresentable {
         let zoomLevel: Double
         /// The initial zoom level used when the map it firstly loaded and the user location is not yet available, in case of annotations this property is not being used
         let initialZoomLevel: Double
-        
+
         /// The initial map center
         let mapCenter: CLLocationCoordinate2D
-        
+
         /// Map annotations
         let annotations: [LocationAnnotation]
 
@@ -30,15 +30,15 @@ struct MapLibreMapView: UIViewRepresentable {
             self.annotations = annotations
         }
     }
-    
+
     // MARK: - Properties
-    
+
     @Environment(\.colorScheme) private var colorScheme
-    
+
     let mapURLBuilder: MapTilerURLBuilderProtocol
 
     let options: Options
-    
+
     /// Behavior mode of the current user's location, can be hidden, only shown and shown following the user
     @Binding var showsUserLocationMode: ShowUserLocationMode
     /// Bind view errors if any
@@ -48,19 +48,19 @@ struct MapLibreMapView: UIViewRepresentable {
     @Binding var isLocationAuthorized: Bool?
     /// The radius of uncertainty for the location, measured in meters.
     @Binding var geolocationUncertainty: CLLocationAccuracy?
-    
+
     /// Called when the user pan on the map
     var userDidPan: (() -> Void)?
-    
+
     // MARK: - UIViewRepresentable
-    
+
     func makeUIView(context: Context) -> MLNMapView {
         let mapView = makeMapView()
         mapView.delegate = context.coordinator
         setupMap(mapView: mapView, with: options)
         return mapView
     }
-    
+
     func updateUIView(_ mapView: MLNMapView, context: Context) {
         // Don't set the same value twice. Otherwise, if there is an error loading the map, a loop
         // is caused as the `error` binding being set, which triggers this update, which sets a
@@ -69,14 +69,14 @@ struct MapLibreMapView: UIViewRepresentable {
         if mapView.styleURL != dynamicMapURL {
             mapView.styleURL = dynamicMapURL
         }
-        
+
         showUserLocation(in: mapView)
     }
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+
     // MARK: - Private
 
     private func setupMap(mapView: MLNMapView, with options: Options) {
@@ -84,7 +84,7 @@ struct MapLibreMapView: UIViewRepresentable {
         mapView.zoomLevel = options.annotations.isEmpty ? options.initialZoomLevel : options.zoomLevel
         mapView.centerCoordinate = options.mapCenter
     }
-    
+
     private func makeMapView() -> MLNMapView {
         let mapView = MLNMapView(frame: .zero, styleURL: mapURLBuilder.interactiveMapURL(for: colorScheme == .dark ? .dark : .light))
         mapView.logoViewPosition = .topLeft
@@ -95,7 +95,7 @@ struct MapLibreMapView: UIViewRepresentable {
         mapView.allowsTilting = false
         return mapView
     }
-    
+
     private func showUserLocation(in mapView: MLNMapView) {
         switch (showsUserLocationMode, options.annotations) {
         case (.showAndFollow, _):
@@ -123,7 +123,7 @@ extension MapLibreMapView {
         // MARK: - Properties
 
         var mapLibreView: MapLibreMapView
-        
+
         private var previousUserLocation: MLNUserLocation?
 
         // MARK: - Setup
@@ -131,22 +131,22 @@ extension MapLibreMapView {
         init(_ mapLibreView: MapLibreMapView) {
             self.mapLibreView = mapLibreView
         }
-        
+
         // MARK: - MLNMapViewDelegate
-        
+
         func mapView(_ mapView: MLNMapView, viewFor annotation: MLNAnnotation) -> MLNAnnotationView? {
             guard let annotation = annotation as? LocationAnnotation else {
                 return nil
             }
             return LocationAnnotationView(annotation: annotation)
         }
-        
+
         func mapViewDidFailLoadingMap(_ mapView: MLNMapView, withError error: Error) {
             if mapLibreView.error != .failedLoadingMap {
                 mapLibreView.error = .failedLoadingMap
             }
         }
-        
+
         func mapView(_ mapView: MLNMapView, didUpdate userLocation: MLNUserLocation?) {
             guard let userLocation else { return }
 
@@ -159,7 +159,7 @@ extension MapLibreMapView {
             previousUserLocation = userLocation
             updateGeolocationUncertainty(location: userLocation)
         }
-        
+
         func mapView(_ mapView: MLNMapView, didChangeLocationManagerAuthorization manager: MLNLocationManager) {
             switch manager.authorizationStatus {
             case .denied, .restricted:
@@ -172,7 +172,7 @@ extension MapLibreMapView {
                 break
             }
         }
-        
+
         func mapView(_ mapView: MLNMapView, regionDidChangeAnimated animated: Bool) {
             // Avoid `Publishing changes from within view update` warnings
             DispatchQueue.main.async { [mapLibreView] in

@@ -22,7 +22,7 @@ enum PhishingDetector {
            linkMatchLength <= match.range.length,
            let matchRange = Range(match.range, in: disambiguatedDisplayString) {
             let identifier = String(disambiguatedDisplayString[matchRange])
-            
+
             // We also make sure that the link string is just the user ID
             // We also trim any invalid character that might hide the phishing attempt
             // Like by using whitespaces emojis or other invalid symbols e.g click here [👉️ @alice:matrix.org](https://matrix.org)
@@ -37,7 +37,7 @@ enum PhishingDetector {
                   linkMatchLength <= match.range.length,
                   let matchRange = Range(match.range, in: disambiguatedDisplayString) {
             let alias = String(disambiguatedDisplayString[matchRange])
-            
+
             // We also make sure that the link string is just the user ID
             // We also trim any invalid character that might hide the phishing attempt
             // Like by using whitespaces emojis or other invalid symbols e.g click here [👉️ #room:matrix.org](https://matrix.org)
@@ -57,16 +57,16 @@ enum PhishingDetector {
                 return true
             }
         }
-        
+
         return false
     }
-    
+
     private static func isMatrixUserIDPhishingAttempt(internalURL: URL, identifier: String) -> Bool {
         // if is not a matrix entity then is a phishing attempt
         guard let internalMatrixEntity = parseMatrixEntityFrom(uri: internalURL.absoluteString) else {
             return true
         }
-        
+
         // If it is we check if is a user
         switch internalMatrixEntity.id {
         case .user(let id):
@@ -77,13 +77,13 @@ enum PhishingDetector {
         }
         return true
     }
-    
+
     private static func isRoomAliasPhishingAttempt(internalURL: URL, alias: String) -> Bool {
         // if is not a matrix entity then is a phishing attempt
         guard let internalMatrixEntity = parseMatrixEntityFrom(uri: internalURL.absoluteString) else {
             return true
         }
-        
+
         // If it is we check if is a user
         switch internalMatrixEntity.id {
         case .roomAlias(let internalAlias):

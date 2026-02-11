@@ -10,62 +10,48 @@ import SwiftUI
 
 struct ToolbarButton: View {
     enum Role {
-        static let cancel = Role.cancel(title: L10n.actionCancel)
-        static let done = Role.confirm(title: L10n.actionDone)
-        static let save = Role.confirm(title: L10n.actionSave)
+        case cancel
+        case done
+        case save
 
-        case cancel(title: String)
-        case confirm(title: String)
-        case destructive(title: String)
-        
         var title: String {
             switch self {
-            case .cancel(let title), .confirm(let title), .destructive(let title):
-                title
+            case .cancel:
+                L10n.actionCancel
+            case .done:
+                L10n.actionDone
+            case .save:
+                L10n.actionSave
             }
         }
-        
+
         @ViewBuilder
         var icon: some View {
             switch self {
             case .cancel:
                 CompoundIcon(\.close)
                     .foregroundStyle(.compound.iconPrimary)
-            case .confirm:
+            case .done, .save:
                 CompoundIcon(\.check)
-                    .foregroundStyle(.compound.iconOnSolidPrimary)
-            case .destructive:
-                CompoundIcon(\.delete)
                     .foregroundStyle(.compound.iconOnSolidPrimary)
             }
         }
-        
+
         var tint: Color {
             switch self {
             case .cancel:
                 .compound.bgCanvasDefault
-            case .confirm:
+            case .done, .save:
                 .compound.bgAccentRest
-            case .destructive:
-                .compound.bgCriticalPrimary
             }
         }
     }
-    
+
     let role: Role
     let action: () -> Void
-    
+
     var body: some View {
-        if #available(iOS 26, *) {
-            Button(action: action) {
-                role.icon
-                    .accessibilityLabel(role.title)
-            }
-            .tint(role.tint)
-            .backportButtonStyleGlassProminent()
-        } else {
-            Button(role.title, action: action)
-        }
+        Button(role.title, action: action)
     }
 }
 
@@ -79,9 +65,6 @@ struct ToolbarButton_Previews: PreviewProvider, TestablePreview {
                     }
                     ToolbarItem(placement: .cancellationAction) {
                         ToolbarButton(role: .cancel) { }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        ToolbarButton(role: .destructive(title: L10n.actionRemove)) { }
                     }
                 }
         }

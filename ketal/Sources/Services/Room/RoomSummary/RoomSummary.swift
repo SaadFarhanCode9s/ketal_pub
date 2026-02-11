@@ -14,14 +14,14 @@ struct RoomSummary {
     enum JoinRequestType {
         case invite(inviter: RoomMemberProxyProtocol?)
         case knock
-        
+
         var isInvite: Bool {
             switch self {
             case .invite: true
             default: false
             }
         }
-        
+
         var isKnock: Bool {
             switch self {
             case .knock: true
@@ -29,23 +29,23 @@ struct RoomSummary {
             }
         }
     }
-    
+
     enum LastMessageState { case sending, failed }
 
     let room: Room
-    
+
     let id: String
-    
+
     let joinRequestType: JoinRequestType?
-    
+
     let name: String
     let isDirect: Bool
     let isSpace: Bool
     let avatarURL: URL?
-    
+
     let heroes: [UserProfileProxy]
     let activeMembersCount: UInt
-    
+
     let lastMessage: AttributedString?
     let lastMessageDate: Date?
     let lastMessageState: LastMessageState?
@@ -55,13 +55,13 @@ struct RoomSummary {
     let notificationMode: RoomNotificationModeProxy?
     let canonicalAlias: String?
     let alternativeAliases: Set<String>
-    
+
     let hasOngoingCall: Bool
-    
+
     let isMarkedUnread: Bool
     let isFavourite: Bool
     let isTombstoned: Bool
-    
+
     var hasUnreadMessages: Bool {
         unreadMessagesCount > 0
     }
@@ -90,29 +90,29 @@ extension RoomSummary: CustomStringConvertible {
         - notificationMode: \(notificationMode?.rawValue ?? "nil")
         """
     }
-    
+
     /// Used where summaries are shown in a list e.g. message forwarding,
     /// global search, share destination list etc.
     var roomListDescription: String {
         if isDirect {
             return canonicalAlias ?? ""
         }
-        
+
         if let alias = canonicalAlias {
             return alias
         }
-        
+
         guard heroes.count > 0 else {
             return ""
         }
-        
+
         var heroComponents = heroes.compactMap(\.displayName)
-        
+
         let othersCount = Int(activeMembersCount) - heroes.count
         if othersCount > 0 {
             heroComponents.append(L10n.commonManyMembers(othersCount))
         }
-        
+
         return heroComponents.formatted(.list(type: .and))
     }
 }
@@ -126,10 +126,10 @@ extension RoomSummary {
         isDirect = true
         isSpace = false
         avatarURL = nil
-        
+
         heroes = []
         activeMembersCount = 0
-        
+
         lastMessage = AttributedString(string)
         lastMessageDate = .mock
         lastMessageState = nil
@@ -140,19 +140,19 @@ extension RoomSummary {
         canonicalAlias = nil
         alternativeAliases = []
         hasOngoingCall = false
-        
+
         joinRequestType = nil
         isMarkedUnread = false
         isFavourite = false
         isTombstoned = false
     }
-    
+
     /// This doesn't have to work properly for DM invites, the heroes are always empty
     var avatar: RoomAvatar {
         guard !isTombstoned else {
             return .tombstoned
         }
-        
+
         if isSpace {
             return .space(id: id, name: name, avatarURL: avatarURL)
         } else if isDirect, avatarURL == nil, heroes.count == 1 {

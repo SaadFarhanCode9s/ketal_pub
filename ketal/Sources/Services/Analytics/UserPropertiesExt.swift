@@ -19,7 +19,7 @@ extension AnalyticsEvent {
         case .unverified:
             .NotVerified
         }
-        
+
         let analyticsRecoveryState: AnalyticsEvent.UserProperties.RecoveryState? = switch recoveryState {
         case .enabled:
             .Enabled
@@ -32,7 +32,7 @@ extension AnalyticsEvent {
         case .settingUp:
             nil
         }
-        
+
         return UserProperties(allChatsActiveFilter: nil, ftueUseCaseSelection: nil, numFavouriteRooms: nil, numSpaces: nil, recoveryState: analyticsRecoveryState, verificationState: analyticsVerificationState)
     }
 }

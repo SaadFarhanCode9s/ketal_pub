@@ -6,30 +6,30 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ketal
 import Foundation
+@testable import ketal
 import XCTest
 
 class ArrayTests: XCTestCase {
     func testGrouping() {
         XCTAssertEqual([].groupBy { $0 == 0 }, [])
-        
+
         XCTAssertEqual([0].groupBy { $0 == 0 }, [[0]])
-        
+
         XCTAssertEqual([1].groupBy { $0 == 0 }, [[1]])
-        
+
         XCTAssertEqual([0, 0, 0].groupBy { $0 == 0 }, [[0, 0, 0]])
-        
+
         XCTAssertEqual([1, 1, 1].groupBy { $0 == 0 }, [[1], [1], [1]])
-        
+
         XCTAssertEqual([1, 0, 0, 1].groupBy { $0 == 0 }, [[1], [0, 0], [1]])
-        
+
         XCTAssertEqual([0, 0, 1, 0].groupBy { $0 == 0 }, [[0, 0], [1], [0]])
-        
+
         XCTAssertEqual([0, 0, 0, 1, 2, 3, 0].groupBy { $0 == 0 }, [[0, 0, 0], [1], [2], [3], [0]])
-        
+
         XCTAssertEqual([0, 0, 0, 1, 2, 3, 0, 0].groupBy { $0 == 0 }, [[0, 0, 0], [1], [2], [3], [0, 0]])
-        
+
         XCTAssertEqual([0, 0, 0, 1, 0, 2, 3, 0, 0].groupBy { $0 == 0 }, [[0, 0, 0], [1], [0], [2], [3], [0, 0]])
     }
 }

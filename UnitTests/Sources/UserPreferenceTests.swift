@@ -6,8 +6,8 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ketal
 import Foundation
+@testable import ketal
 import XCTest
 
 final class UserPreferenceTests: XCTestCase {
@@ -21,126 +21,126 @@ final class UserPreferenceTests: XCTestCase {
             let value = TestPreferences()
             value.plist = "Hello"
         }
-        
+
         setPreference()
-        
+
         let value = TestPreferences()
-        
+
         XCTAssertEqual(value.plist, "Hello")
         XCTAssertNotNil(UserDefaults.testDefaults.string(forKey: .key2), "Hello")
         XCTAssertNil(UserDefaults.testDefaults.data(forKey: .key2), "Hello")
     }
-    
+
     func testStoreCodableValue() {
         let storedType = CodableTestType(a: "some", b: [1, 2, 3])
-        
+
         let setPreference = {
             let value = TestPreferences()
             value.codable = storedType
         }
-        
+
         setPreference()
-        
+
         let value = TestPreferences()
-        
+
         XCTAssertEqual(value.codable, storedType)
         XCTAssertNotNil(UserDefaults.testDefaults.data(forKey: .key3))
     }
-    
+
     func testStorePlistValueOnVolatileStorage() {
         let setPreference = {
             let value = TestPreferences()
             value.volatileVar = "Hello"
         }
-        
+
         setPreference()
-        
+
         let value = TestPreferences()
-        
+
         XCTAssertNil(value.volatileVar)
     }
-    
+
     func testStoreCodableValueOnVolatileStorage() {
         let storedType = CodableTestType(a: "some", b: [1, 2, 3])
-        
+
         let setPreference = {
             let value = TestPreferences()
             value.volatileCodable = storedType
         }
-        
+
         setPreference()
-        
+
         let value = TestPreferences()
-        
+
         XCTAssertNil(value.volatileCodable)
         XCTAssertNil(UserDefaults.testDefaults.data(forKey: .key4))
     }
-    
+
     func testStorePlistArray() {
         let setPreference = {
             let value = TestPreferences()
             value.plistArray = [1, 2, 3]
         }
-        
+
         setPreference()
-        
+
         let value = TestPreferences()
-        
+
         XCTAssertEqual(value.plistArray, [1, 2, 3])
         XCTAssertEqual(UserDefaults.testDefaults.array(forKey: .key5) as? [Int], [1, 2, 3])
         XCTAssertNil(UserDefaults.testDefaults.data(forKey: .key5), "Hello")
     }
-    
+
     func testAssignNilToPlistType() {
         let setPreference = {
             let value = TestPreferences()
             value.plist = "Hello"
         }
-        
+
         setPreference()
-        
+
         let value = TestPreferences()
         value.plist = nil
-        
+
         XCTAssertNil(value.plist)
         XCTAssertNil(UserDefaults.testDefaults.string(forKey: .key2))
     }
-    
+
     func testAssignNilToCodableType() {
         let storedType = CodableTestType(a: "some", b: [1, 2, 3])
-        
+
         let setPreference = {
             let value = TestPreferences()
             value.codable = storedType
         }
-        
+
         setPreference()
-        
+
         let value = TestPreferences()
         value.codable = nil
 
         XCTAssertNil(value.codable)
         XCTAssertNil(UserDefaults.testDefaults.data(forKey: .key3))
     }
-    
+
     func testLocalOverRemoteValue() {
         @UserPreference(key: "testKey", defaultValue: "", storageType: .userDefaults(.testDefaults)) var preference
         XCTAssertEqual(preference, "")
-        
+
         _preference.remoteValue = "remote"
         XCTAssertEqual(preference, "remote")
-        
+
         preference = "local"
         XCTAssertEqual(preference, "local")
     }
-    
+
     func testRemoteOverLocalValue() {
         @UserPreference(key: "testKey", defaultValue: "", storageType: .userDefaults(.testDefaults), mode: .remoteOverLocal) var preference
         XCTAssertEqual(preference, "")
-        
+
         _preference.remoteValue = "remote"
         XCTAssertEqual(preference, "remote")
-        
+
         preference = "local"
         XCTAssertEqual(preference, "remote")
         XCTAssertTrue(_preference.isLockedToRemote)
@@ -150,16 +150,16 @@ final class UserPreferenceTests: XCTestCase {
 private struct TestPreferences {
     @UserPreference(key: .key1, storageType: .volatile)
     var volatileVar: String?
-    
+
     @UserPreference(key: .key2, storageType: .userDefaults(.testDefaults))
     var plist: String?
-    
+
     @UserPreference(key: .key3, storageType: .userDefaults(.testDefaults))
     var codable: CodableTestType?
-    
+
     @UserPreference(key: .key4, storageType: .volatile)
     var volatileCodable: CodableTestType?
-    
+
     @UserPreference(key: .key5, storageType: .userDefaults(.testDefaults))
     var plistArray: [Int]?
 }
@@ -175,7 +175,7 @@ private extension String {
     static let key3 = "foo.codable"
     static let key4 = "foo.volatile.codable"
     static let key5 = "foo.plist.array"
-    static let userDefaultsSuiteName = "io.ketal.unitests"
+    static let userDefaultsSuiteName = "io.element.elementx.unitests"
 }
 
 private extension UserDefaults {

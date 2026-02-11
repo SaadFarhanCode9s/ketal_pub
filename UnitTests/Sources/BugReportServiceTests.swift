@@ -7,8 +7,8 @@
 //
 
 import Combine
-@testable import ketal
 import Foundation
+@testable import ketal
 import XCTest
 
 class BugReportServiceTests: XCTestCase {
@@ -19,13 +19,13 @@ class BugReportServiceTests: XCTestCase {
         AppSettings.resetAllSettings()
         appSettings = AppSettings()
         appSettings.bugReportRageshakeURL.reset()
-        
+
         let bugReportServiceMock = BugReportServiceMock()
         bugReportServiceMock.underlyingCrashedLastRun = false
         bugReportServiceMock.submitBugReportProgressListenerReturnValue = .success(SubmitBugReportResponse(reportURL: "https://www.example.com/123"))
         bugReportService = bugReportServiceMock
     }
-    
+
     override func tearDown() {
         appSettings.bugReportRageshakeURL.reset()
     }
@@ -49,7 +49,7 @@ class BugReportServiceTests: XCTestCase {
         let reportURL = try XCTUnwrap(response.reportURL)
         XCTAssertFalse(reportURL.isEmpty)
     }
-    
+
     func testInitialStateWithRealService() {
         let urlPublisher: CurrentValueSubject<RageshakeConfiguration, Never> = .init(.url("https://example.com/submit"))
         let service = BugReportService(rageshakeURLPublisher: urlPublisher.asCurrentValuePublisher(),
@@ -61,7 +61,7 @@ class BugReportServiceTests: XCTestCase {
         XCTAssertTrue(service.isEnabled)
         XCTAssertFalse(service.crashedLastRun)
     }
-    
+
     func testInitialStateWithRealServiceAndDisabled() {
         let urlPublisher: CurrentValueSubject<RageshakeConfiguration, Never> = .init(.disabled)
         let service = BugReportService(rageshakeURLPublisher: urlPublisher.asCurrentValuePublisher(),
@@ -73,7 +73,7 @@ class BugReportServiceTests: XCTestCase {
         XCTAssertFalse(service.isEnabled)
         XCTAssertFalse(service.crashedLastRun)
     }
-    
+
     @MainActor func testSubmitBugReportWithRealService() async throws {
         let urlPublisher: CurrentValueSubject<RageshakeConfiguration, Never> = .init(.url("https://example.com/submit"))
         let service = BugReportService(rageshakeURLPublisher: urlPublisher.asCurrentValuePublisher(),
@@ -94,16 +94,16 @@ class BugReportServiceTests: XCTestCase {
                                   files: [])
         let progressSubject = CurrentValueSubject<Double, Never>(0.0)
         let response = try await service.submitBugReport(bugReport, progressListener: progressSubject).get()
-        
+
         XCTAssertEqual(response.reportURL, "https://example.com/123")
     }
-    
+
     @MainActor func testConfigurations() async throws {
         guard case let .url(initialURL) = appSettings.bugReportRageshakeURL.publisher.value else {
             XCTFail("Unexpected initial configuration.")
             return
         }
-        
+
         let service = BugReportService(rageshakeURLPublisher: appSettings.bugReportRageshakeURL.publisher,
                                        applicationID: "mock_app_id",
                                        sdkGitSHA: "1234",
@@ -111,10 +111,10 @@ class BugReportServiceTests: XCTestCase {
                                        session: .mock,
                                        appHooks: AppHooks())
         XCTAssertTrue(service.isEnabled)
-        
+
         appSettings.bugReportRageshakeURL.applyRemoteValue(.disabled)
         XCTAssertFalse(service.isEnabled)
-        
+
         appSettings.bugReportRageshakeURL.applyRemoteValue(.url("https://bugs.server.net/submit"))
         XCTAssertTrue(service.isEnabled)
 
@@ -129,36 +129,36 @@ class BugReportServiceTests: XCTestCase {
                                   files: [])
         let progressSubject = CurrentValueSubject<Double, Never>(0.0)
         let customConfigurationResponse = try await service.submitBugReport(bugReport, progressListener: progressSubject).get()
-        
+
         XCTAssertEqual(customConfigurationResponse.reportURL, "https://bugs.server.net/123")
-        
+
         appSettings.bugReportRageshakeURL.reset()
         XCTAssertTrue(service.isEnabled)
-        
+
         let defaultConfigurationResponse = try await service.submitBugReport(bugReport, progressListener: progressSubject).get()
-        
+
         XCTAssertEqual(defaultConfigurationResponse.reportURL, initialURL.absoluteString.replacingOccurrences(of: "submit", with: "123"))
     }
-    
+
     func testLogsMaxSize() {
         // Given a new set of logs
         var logs = BugReportService.Logs(maxFileSize: 1000)
         XCTAssertEqual(logs.zippedSize, 0)
         XCTAssertEqual(logs.originalSize, 0)
         XCTAssertTrue(logs.files.isEmpty)
-        
+
         // When adding new files within the size limit
         logs.appendFile(at: .homeDirectory, zippedSize: 250, originalSize: 1000)
         logs.appendFile(at: .picturesDirectory, zippedSize: 500, originalSize: 2000)
-        
+
         // Then the logs should be included
         XCTAssertEqual(logs.zippedSize, 750)
         XCTAssertEqual(logs.originalSize, 3000)
         XCTAssertEqual(logs.files, [.homeDirectory, .picturesDirectory])
-        
+
         // When adding a new file larger that will exceed the size limit
         logs.appendFile(at: .homeDirectory, zippedSize: 500, originalSize: 2000)
-        
+
         // Then the files shouldn't be included.
         XCTAssertEqual(logs.zippedSize, 750)
         XCTAssertEqual(logs.originalSize, 3000)
@@ -171,7 +171,7 @@ private class MockURLProtocol: URLProtocol {
         guard let url = request.url else { return }
         let reportURL = url.deletingLastPathComponent().appending(path: "123")
         let response = "{\"report_url\":\"\(reportURL.absoluteString)\"}"
-        
+
         if let data = response.data(using: .utf8),
            let urlResponse = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
             client?.urlProtocol(self, didReceive: urlResponse, cacheStoragePolicy: .allowedInMemoryOnly)

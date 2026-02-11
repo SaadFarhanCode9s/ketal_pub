@@ -20,7 +20,7 @@ extension View {
 private struct ProgressCursorModifier<CursorView: View>: ViewModifier {
     let progress: CGFloat
     @ViewBuilder var cursorView: () -> CursorView
-    
+
     func body(content: Content) -> some View {
         GeometryReader { geometry in
             content

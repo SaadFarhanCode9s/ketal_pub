@@ -20,7 +20,7 @@ extension View {
 struct ShimmerModifier: ViewModifier {
     /// A boolean which is toggled to trigger the animation.
     @State private var animationTrigger = false
-    
+
     /// The start and end points of a gradient.
     private struct GradientPoints {
         /// The start point of the gradient.
@@ -28,23 +28,23 @@ struct ShimmerModifier: ViewModifier {
         /// The end point of the gradient.
         let end: UnitPoint
     }
-    
+
     /// The initial points used by the gradient before animation occurs.
     private let initialPoints = GradientPoints(start: UnitPoint(x: -5, y: 0), end: UnitPoint(x: 0, y: 0))
     /// The final points used by the gradient once the animation has completed.
     private let finalPoints = GradientPoints(start: UnitPoint(x: 1, y: 0), end: UnitPoint(x: 5, y: 0))
-    
+
     /// The colour that causes a highlight to be shown.
     private let highlightColor = Color.white.opacity(0.5)
     /// The colour that causes the view to remain unchanged.
     private let regularColor = Color.white
-    
+
     /// A slow linear animation which auto-repeats after a delay.
     private let animation: Animation = .linear(duration: 1.75)
         .delay(0.5)
         .repeatForever(autoreverses: false)
         .disabledDuringTests()
-    
+
     func body(content: Content) -> some View {
         content
             .mask { gradient }
@@ -53,7 +53,7 @@ struct ShimmerModifier: ViewModifier {
                 animationTrigger.toggle()
             }
     }
-    
+
     /// The gradient used to create the shimmer.
     var gradient: LinearGradient {
         LinearGradient(stops: [.init(color: regularColor, location: 0),

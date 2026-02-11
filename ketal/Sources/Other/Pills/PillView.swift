@@ -13,22 +13,22 @@ struct PillView: View {
     @ObservedObject var context: PillContext
     /// callback triggerd by changes in the display text
     let didChangeText: () -> Void
-    
+
     var textColor: Color {
         context.viewState.isOwnMention ? .compound.textBadgeAccent : .compound.textPrimary
     }
-    
+
     var backgroundColor: Color {
         context.viewState.isOwnMention ? .compound.bgBadgeAccent : .compound.bgBadgeDefault
     }
-        
+
     var body: some View {
         mainContent
             .onChange(of: context.viewState.displayText) {
                 didChangeText()
             }
     }
-    
+
     private var mainContent: some View {
         Text(context.viewState.displayText)
             .font(.compound.bodyLGSemibold)
@@ -43,7 +43,7 @@ struct PillView: View {
 
 struct PillView_Previews: PreviewProvider, TestablePreview {
     static let mockMediaProvider = MediaProviderMock(configuration: .init())
-    
+
     static var previews: some View {
         PillView(context: PillContext.mock(viewState: .mention(isOwnMention: false,
                                                                displayText: PillUtilities.userPillDisplayText(username: "User",

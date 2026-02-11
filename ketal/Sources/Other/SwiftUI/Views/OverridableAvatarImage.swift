@@ -14,10 +14,10 @@ struct OverridableAvatarImage: View {
     let url: URL?
     let name: String?
     let contentID: String
-    let shape: LoadableAvatarImage.Shape
+    let isSpace: Bool
     let avatarSize: Avatars.Size
     let mediaProvider: MediaProviderProtocol?
-    
+
     var body: some View {
         if let overrideURL {
             AsyncImage(url: overrideURL) { image in
@@ -28,12 +28,12 @@ struct OverridableAvatarImage: View {
                 ProgressView()
             }
             .scaledFrame(size: avatarSize.value)
-            .avatarShape(shape, size: avatarSize.value)
+            .clipAvatar(isSpace: isSpace, size: avatarSize.value)
         } else {
             LoadableAvatarImage(url: url,
                                 name: name,
                                 contentID: contentID,
-                                shape: shape,
+                                isSpace: isSpace,
                                 avatarSize: avatarSize,
                                 mediaProvider: mediaProvider)
         }

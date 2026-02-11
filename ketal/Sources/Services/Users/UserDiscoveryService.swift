@@ -10,7 +10,7 @@ import Foundation
 
 final class UserDiscoveryService: UserDiscoveryServiceProtocol {
     private let clientProxy: ClientProxyProtocol
-    
+
     init(clientProxy: ClientProxyProtocol) {
         self.clientProxy = clientProxy
     }
@@ -34,7 +34,7 @@ final class UserDiscoveryService: UserDiscoveryServiceProtocol {
 
     private func merge(queriedProfile: UserProfileProxy?, searchResults: SearchUsersResultsProxy) -> [UserProfileProxy] {
         let searchResults = searchResults.results
-        
+
         guard let queriedProfile else {
             return searchResults
         }
@@ -45,14 +45,14 @@ final class UserDiscoveryService: UserDiscoveryServiceProtocol {
 
         return [queriedProfile] + filteredSearchResult
     }
-    
+
     private func profileIfPossible(with searchQuery: String) async -> UserProfileProxy? {
         guard searchQuery.isMatrixIdentifier, searchQuery != clientProxy.userID else {
             return nil
         }
-        
+
         let getProfileResult = try? await clientProxy.profile(for: searchQuery).get()
-        
+
         // fallback to a "local profile" if the profile api fails
         return getProfileResult ?? .init(userID: searchQuery)
     }

@@ -16,15 +16,15 @@ struct RoomPermissionsSetting: Identifiable {
     var id: KeyPath<RoomPermissions, Int64> {
         keyPath
     }
-    
+
     /// The title of this setting.
     let title: String
-    
+
     /// The selected role of this setting.
     var value: Int64
-    
+
     let ownPowerLevel: RoomPowerLevel
-    
+
     var roleValue: RoomRole {
         get {
             RoomRole(powerLevelValue: value)
@@ -32,7 +32,7 @@ struct RoomPermissionsSetting: Identifiable {
             value = newValue.powerLevelValue
         }
     }
-        
+
     /// The `RoomPermissions` property that this setting is for.
     let keyPath: KeyPath<RoomPermissions, Int64>
     /// The `RoomPowerLevelChanges` property that this setting is saved into.
@@ -52,7 +52,7 @@ struct RoomPermissionsSetting: Identifiable {
         default: fatalError("Unexpected key path: \(keyPath)")
         }
     }
-    
+
     /// Can the setting be edited
     var isDisabled: Bool {
         switch ownPowerLevel {
@@ -62,7 +62,7 @@ struct RoomPermissionsSetting: Identifiable {
             false
         }
     }
-    
+
     /// All of the available roles that this setting can be configured with.
     var availableValues: [(title: String, tag: RoomRole)] {
         if isDisabled {

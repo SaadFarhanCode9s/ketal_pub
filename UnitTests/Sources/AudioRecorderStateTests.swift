@@ -7,20 +7,20 @@
 //
 
 import Combine
-@testable import ketal
 import Foundation
+@testable import ketal
 import XCTest
 
 @MainActor
 class AudioRecorderStateTests: XCTestCase {
     private var audioRecorderState: AudioRecorderState!
     private var audioRecorderMock: AudioRecorderMock!
-    
+
     private var audioRecorderActionsSubject: PassthroughSubject<AudioRecorderAction, Never>!
     private var audioRecorderActions: AnyPublisher<AudioRecorderAction, Never> {
         audioRecorderActionsSubject.eraseToAnyPublisher()
     }
-        
+
     private func buildAudioRecorderMock() -> AudioRecorderMock {
         let audioRecorderMock = AudioRecorderMock()
         audioRecorderMock.isRecording = false
@@ -29,18 +29,18 @@ class AudioRecorderStateTests: XCTestCase {
         audioRecorderMock.averagePowerReturnValue = 0
         return audioRecorderMock
     }
-    
+
     override func setUp() async throws {
         audioRecorderActionsSubject = .init()
         audioRecorderState = AudioRecorderState()
         audioRecorderMock = buildAudioRecorderMock()
     }
-    
+
     func testAttach() {
         audioRecorderState.attachAudioRecorder(audioRecorderMock)
         XCTAssertEqual(audioRecorderState.recordingState, .stopped)
     }
-    
+
     func testDetach() async {
         audioRecorderState.attachAudioRecorder(audioRecorderMock)
         audioRecorderMock.isRecording = true
@@ -48,13 +48,13 @@ class AudioRecorderStateTests: XCTestCase {
         XCTAssert(audioRecorderMock.stopRecordingCalled)
         XCTAssertEqual(audioRecorderState.recordingState, .stopped)
     }
-    
+
     func testReportError() {
         XCTAssertEqual(audioRecorderState.recordingState, .stopped)
         audioRecorderState.reportError()
         XCTAssertEqual(audioRecorderState.recordingState, .error)
     }
-    
+
     func testHandlingAudioRecorderActionDidStartRecording() async throws {
         audioRecorderState.attachAudioRecorder(audioRecorderMock)
 
@@ -66,7 +66,7 @@ class AudioRecorderStateTests: XCTestCase {
                 return false
             }
         }
-        
+
         audioRecorderActionsSubject.send(.didStartRecording)
         try await deferred.fulfill()
         XCTAssertEqual(audioRecorderState.recordingState, .recording)
@@ -83,10 +83,10 @@ class AudioRecorderStateTests: XCTestCase {
                 return false
             }
         }
-        
+
         audioRecorderActionsSubject.send(.didStopRecording)
         try await deferred.fulfill()
-        
+
         // The state is expected to be .readyToPlay
         XCTAssertEqual(audioRecorderState.recordingState, .stopped)
     }

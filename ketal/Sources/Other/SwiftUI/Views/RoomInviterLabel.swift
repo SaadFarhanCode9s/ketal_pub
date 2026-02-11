@@ -12,20 +12,20 @@ struct RoomInviterDetails: Equatable {
     let id: String
     let displayName: String?
     let avatarURL: URL?
-    
+
     let attributedInviteText: AttributedString
-    
+
     init(member: RoomMemberProxyProtocol) {
         id = member.userID
         displayName = member.displayName
         avatarURL = member.avatarURL
-        
+
         let nameOrLocalPart = if let displayName = member.displayName {
             displayName
         } else {
             String(member.userID.dropFirst().prefix { $0 != ":" })
         }
-        
+
         // Pre-compute the attributed string.
         let placeholder = "{displayname}"
         var string = AttributedString(L10n.screenInvitesInvitedYou(placeholder, id))
@@ -40,9 +40,9 @@ struct RoomInviterDetails: Equatable {
 struct RoomInviterLabel: View {
     let inviter: RoomInviterDetails
     var shouldHideAvatar = false
-    
+
     let mediaProvider: MediaProviderProtocol?
-    
+
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             LoadableAvatarImage(url: shouldHideAvatar ? nil : inviter.avatarURL,
@@ -52,7 +52,7 @@ struct RoomInviterLabel: View {
                                 mediaProvider: mediaProvider)
                 .alignmentGuide(.firstTextBaseline) { $0[.bottom] * 0.8 }
                 .accessibilityHidden(true)
-            
+
             Text(inviter.attributedInviteText)
         }
     }

@@ -11,7 +11,7 @@ import MatrixRustSDK
 
 enum LogLevel: String, Codable, Hashable {
     case error, warn, info, debug, trace
-    
+
     var title: String {
         switch self {
         case .error:
@@ -26,7 +26,7 @@ enum LogLevel: String, Codable, Hashable {
             return "Trace"
         }
     }
-    
+
     var rustLogLevel: MatrixRustSDK.LogLevel {
         switch self {
         case .error:

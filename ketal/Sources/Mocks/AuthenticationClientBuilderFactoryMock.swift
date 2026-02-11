@@ -41,10 +41,10 @@ extension AuthenticationClientFactoryMock {
                                                              elementWellKnown: "{\"version\":1,\"enforce_element_pro\":true}"))
         ]
     }
-    
+
     convenience init(configuration: Configuration) {
         self.init()
-        
+
         makeClientHomeserverAddressSessionDirectoriesPassphraseClientSessionDelegateAppSettingsAppHooksClosure = { address, _, _, _, _, _ in
             guard let client = configuration.homeserverClients[address] else {
                 throw ClientBuildError.ServerUnreachable(message: "Not a known homeserver.")

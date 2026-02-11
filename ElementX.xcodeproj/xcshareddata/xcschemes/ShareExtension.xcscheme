@@ -19,7 +19,7 @@
                BlueprintIdentifier = "19F0C845D67E9BEA4BE7133E"
                BuildableName = "ShareExtension.appex"
                BlueprintName = "ShareExtension"
-               ReferencedContainer = "container:ketal.xcodeproj">
+               ReferencedContainer = "container:ElementX.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,7 +36,7 @@
             BlueprintIdentifier = "19F0C845D67E9BEA4BE7133E"
             BuildableName = "ShareExtension.appex"
             BlueprintName = "ShareExtension"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -63,7 +63,7 @@
             BlueprintIdentifier = "19F0C845D67E9BEA4BE7133E"
             BuildableName = "ShareExtension.appex"
             BlueprintName = "ShareExtension"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -82,7 +82,7 @@
             BlueprintIdentifier = "19F0C845D67E9BEA4BE7133E"
             BuildableName = "ShareExtension.appex"
             BlueprintName = "ShareExtension"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>

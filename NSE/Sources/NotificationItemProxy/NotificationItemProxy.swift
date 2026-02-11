@@ -36,7 +36,7 @@ struct NotificationItemProxy: NotificationItemProxyProtocol {
     var roomDisplayName: String {
         notificationItem.roomInfo.displayName
     }
-    
+
     var isRoomSpace: Bool {
         notificationItem.roomInfo.isSpace
     }
@@ -44,7 +44,7 @@ struct NotificationItemProxy: NotificationItemProxyProtocol {
     var isRoomDirect: Bool {
         notificationItem.roomInfo.isDirect
     }
-    
+
     var isRoomPrivate: Bool {
         switch notificationItem.roomInfo.joinRule {
         case .invite, .knock, .restricted, .knockRestricted:
@@ -61,7 +61,7 @@ struct NotificationItemProxy: NotificationItemProxyProtocol {
     var isNoisy: Bool {
         notificationItem.isNoisy ?? false
     }
-    
+
     var hasMention: Bool {
         notificationItem.hasMention ?? false
     }
@@ -81,7 +81,7 @@ struct NotificationItemProxy: NotificationItemProxyProtocol {
         }
         return nil
     }
-    
+
     var threadRootEventID: String? {
         notificationItem.threadId
     }
@@ -105,7 +105,7 @@ struct EmptyNotificationItemProxy: NotificationItemProxyProtocol {
     var senderDisplayName: String? {
         nil
     }
-    
+
     var roomDisplayName: String {
         ""
     }
@@ -117,11 +117,11 @@ struct EmptyNotificationItemProxy: NotificationItemProxyProtocol {
     var isRoomSpace: Bool {
         false
     }
-    
+
     var isRoomDirect: Bool {
         false
     }
-    
+
     var isRoomPrivate: Bool {
         false
     }
@@ -137,11 +137,11 @@ struct EmptyNotificationItemProxy: NotificationItemProxyProtocol {
     var roomJoinedMembers: Int {
         0
     }
-    
+
     var hasMention: Bool {
         false
     }
-    
+
     var threadRootEventID: String? {
         nil
     }

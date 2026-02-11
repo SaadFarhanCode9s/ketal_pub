@@ -92,7 +92,7 @@ enum RoomTimelineItemFixtures {
                                             formattedBody: AttributedStringBuilder(mentionBuilder: MentionBuilder())
                                                 .fromHTML("Hol' up <blockquote>New home office set up!</blockquote>That's amazing! Congrats 🥳")))
     ]
-    
+
     /// A small chunk of events, containing 2 text items.
     static var smallChunk: [RoomTimelineItemProtocol] {
         [TextRoomTimelineItem(text: "Hey there 👋",
@@ -122,19 +122,19 @@ enum RoomTimelineItemFixtures {
                                    ReadReceipt(userID: "c4", formattedTimestamp: nil),
                                    ReadReceipt(userID: "d4", formattedTimestamp: nil)])]
     }
-    
+
     /// A chunk of events that contains a single text item.
     static var singleMessageChunk: [RoomTimelineItemProtocol] {
         [TextRoomTimelineItem(text: "Tap tap tap 🎙️. Is this thing on?",
                               senderDisplayName: "Helena")]
     }
-    
+
     /// A single text item.
     static var incomingMessage: RoomTimelineItemProtocol {
         TextRoomTimelineItem(text: "Hello, World!",
                              senderDisplayName: "Bob")
     }
-    
+
     /// A large chunk of events, containing 40 text items which should fill an iPad
     /// with enough items so that it won't perform another back pagination.
     static var largeChunk: [RoomTimelineItemProtocol] {
@@ -233,7 +233,7 @@ enum RoomTimelineItemFixtures {
     static var outgoingPolls: [RoomTimelineItemProtocol] {
         [PollRoomTimelineItem.mock(poll: .disclosed(createdByAccountOwner: true), isOutgoing: true)]
     }
-    
+
     static var permalinkChunk: [RoomTimelineItemProtocol] {
         (1...20).map { index in
             TextRoomTimelineItem(id: .event(uniqueID: .init("\(index)"), eventOrTransactionID: .eventID("$\(index)")),
@@ -241,7 +241,7 @@ enum RoomTimelineItemFixtures {
                                  senderDisplayName: index > 10 ? "Alice" : "Bob")
         }
     }
-    
+
     static var mediaChunk: [RoomTimelineItemProtocol] {
         [
             AudioRoomTimelineItem(isOutgoing: false, caption: "Listen to this!"),
@@ -256,7 +256,7 @@ enum RoomTimelineItemFixtures {
             VoiceMessageRoomTimelineItem(isOutgoing: true)
         ]
     }
-    
+
     static var separator: SeparatorRoomTimelineItem {
         SeparatorRoomTimelineItem(id: .virtual(uniqueID: .init(UUID().uuidString)),
                                   timestamp: .now)
@@ -273,7 +273,7 @@ private extension TextRoomTimelineItem {
                   sender: .init(id: "", displayName: senderDisplayName),
                   content: .init(body: text))
     }
-    
+
     func withReadReceipts(_ receipts: [ReadReceipt]) -> TextRoomTimelineItem {
         var newSelf = self
         newSelf.properties.orderedReadReceipts = receipts

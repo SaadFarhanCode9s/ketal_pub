@@ -1,16 +1,16 @@
 /*
  Copyright (c) 2018 Wolt Enterprises
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,7 @@ extension UIImage {
     public func blurHash(numberOfComponents components: (Int, Int)) -> String? {
         let pixelWidth = Int(round(size.width * scale))
         let pixelHeight = Int(round(size.height * scale))
-        
+
         let context = CGContext(data: nil,
                                 width: pixelWidth,
                                 height: pixelHeight,
@@ -38,11 +38,11 @@ extension UIImage {
                                 bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
         context.scaleBy(x: scale, y: -scale)
         context.translateBy(x: 0, y: -size.height)
-        
+
         UIGraphicsPushContext(context)
         draw(at: .zero)
         UIGraphicsPopContext()
-        
+
         guard let cgImage = context.makeImage(),
               let dataProvider = cgImage.dataProvider,
               let data = dataProvider.data,
@@ -50,11 +50,11 @@ extension UIImage {
             assertionFailure("Unexpected error!")
             return nil
         }
-        
+
         let width = cgImage.width
         let height = cgImage.height
         let bytesPerRow = cgImage.bytesPerRow
-        
+
         var factors: [(Float, Float, Float)] = []
         for y in 0..<components.1 {
             for x in 0..<components.0 {
@@ -65,15 +65,15 @@ extension UIImage {
                 factors.append(factor)
             }
         }
-        
+
         let dc = factors.first!
         let ac = factors.dropFirst()
-        
+
         var hash = ""
-        
+
         let sizeFlag = (components.0 - 1) + (components.1 - 1) * 9
         hash += sizeFlag.encode83(length: 1)
-        
+
         let maximumValue: Float
         if ac.count > 0 {
             let actualMaximumValue = ac.map { max(abs($0.0), abs($0.1), abs($0.2)) }.max()!
@@ -84,23 +84,23 @@ extension UIImage {
             maximumValue = 1
             hash += 0.encode83(length: 1)
         }
-        
+
         hash += encodeDC(dc).encode83(length: 4)
-        
+
         for factor in ac {
             hash += encodeAC(factor, maximumValue: maximumValue).encode83(length: 2)
         }
-        
+
         return hash
     }
-    
+
     private func multiplyBasisFunction(pixels: UnsafePointer<UInt8>, width: Int, height: Int, bytesPerRow: Int, bytesPerPixel: Int, pixelOffset: Int, basisFunction: (Float, Float) -> Float) -> (Float, Float, Float) {
         var r: Float = 0
         var g: Float = 0
         var b: Float = 0
-        
+
         let buffer = UnsafeBufferPointer(start: pixels, count: height * bytesPerRow)
-        
+
         for x in 0..<width {
             for y in 0..<height {
                 let basis = basisFunction(Float(x), Float(y))
@@ -109,9 +109,9 @@ extension UIImage {
                 b += basis * sRGBToLinear(buffer[bytesPerPixel * x + pixelOffset + 2 + y * bytesPerRow])
             }
         }
-        
+
         let scale = 1 / Float(width * height)
-        
+
         return (r * scale, g * scale, b * scale)
     }
 }
@@ -127,7 +127,7 @@ private func encodeAC(_ value: (Float, Float, Float), maximumValue: Float) -> In
     let quantR = Int(max(0, min(18, floor(signPow(value.0 / maximumValue, 0.5) * 9 + 9.5))))
     let quantG = Int(max(0, min(18, floor(signPow(value.1 / maximumValue, 0.5) * 9 + 9.5))))
     let quantB = Int(max(0, min(18, floor(signPow(value.2 / maximumValue, 0.5) * 9 + 9.5))))
-    
+
     return quantR * 19 * 19 + quantG * 19 + quantB
 }
 

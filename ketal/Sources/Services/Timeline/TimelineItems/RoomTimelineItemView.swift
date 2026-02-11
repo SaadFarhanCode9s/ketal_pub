@@ -12,7 +12,7 @@ import SwiftUI
 struct RoomTimelineItemView: View {
     @Environment(\.timelineContext) var context
     @ObservedObject var viewState: RoomTimelineItemViewState
-    
+
     var body: some View {
         timelineView
             .animation(.elementDefault, value: viewState.groupStyle)
@@ -77,7 +77,7 @@ struct RoomTimelineItemView: View {
             CallNotificationRoomTimelineView(timelineItem: item)
         }
     }
-    
+
     private func linkMetadataForItem(_ item: TextRoomTimelineItem) -> OrderedDictionary<URL, LinkMetadataProviderItem> {
         var linkMetadata = OrderedDictionary<URL, LinkMetadataProviderItem>()
         for url in item.links.prefix(TextRoomTimelineView.maxLinkPreviewsToRender) {

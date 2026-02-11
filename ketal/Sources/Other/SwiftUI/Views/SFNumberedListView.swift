@@ -12,7 +12,7 @@ import SwiftUI
 /// The view can only display a max 9 items as of right now
 struct SFNumberedListView: View {
     let items: [AttributedString]
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             ForEach(0..<items.count, id: \.self) { index in
@@ -29,7 +29,7 @@ struct SFNumberedListView: View {
             }
         }
     }
-    
+
     private func getSymbol(for index: Int) -> SFSymbol {
         switch index {
         case 0:
@@ -64,7 +64,7 @@ struct SFNumberedListView_Previews: PreviewProvider, TestablePreview {
         }
         return results
     }()
-    
+
     static var previews: some View {
         SFNumberedListView(items: items)
             .padding()

@@ -21,10 +21,10 @@ struct RoomMessageEventStringBuilder {
         /// No prefix
         case notification
     }
-    
+
     let attributedStringBuilder: AttributedStringBuilderProtocol
     let destination: Destination
-    
+
     func buildAttributedString(for messageType: MessageType, senderDisplayName: String, isOutgoing: Bool) -> AttributedString {
         let message: AttributedString
         switch messageType {
@@ -77,29 +77,29 @@ struct RoomMessageEventStringBuilder {
             return message
         }
     }
-    
+
     private func buildMessage(for destination: Destination, caption: String?, type: String) -> AttributedString {
         guard let caption else {
             return AttributedString(type)
         }
-        
+
         if destination == .pinnedEvent {
             return prefix(AttributedString(caption), with: type)
         } else {
             return AttributedString("\(type) - \(caption)")
         }
     }
-    
+
     private func prefix(_ eventSummary: AttributedString, with textToBold: String) -> AttributedString {
         let attributedEventSummary = AttributedString(eventSummary.string.trimmingCharacters(in: .whitespacesAndNewlines))
-        
+
         var attributedPrefix = AttributedString(textToBold + ":")
         attributedPrefix.bold()
-        
+
         // Don't include the message body in the markdown otherwise it makes tappable links.
         return attributedPrefix + " " + attributedEventSummary
     }
-    
+
     private func attributedMessageFrom(formattedBody: FormattedBody?) -> AttributedString? {
         formattedBody.flatMap { attributedStringBuilder.fromHTML($0.body) }
     }

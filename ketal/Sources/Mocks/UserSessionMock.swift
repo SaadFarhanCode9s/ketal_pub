@@ -16,11 +16,11 @@ struct UserSessionMockConfiguration {
 extension UserSessionMock {
     convenience init(_ configuration: UserSessionMockConfiguration) {
         self.init()
-        
+
         clientProxy = configuration.clientProxy
         mediaProvider = MediaProviderMock(configuration: .init())
         voiceMessageMediaManager = VoiceMessageMediaManagerMock()
-        
+
         sessionSecurityStatePublisher = CurrentValueSubject<SessionSecurityState, Never>(.init(verificationState: .verified, recoveryState: .enabled)).asCurrentValuePublisher()
     }
 }

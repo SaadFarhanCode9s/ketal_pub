@@ -16,12 +16,12 @@ final class PillTextAttachment: NSTextAttachment {
         self.init(data: encodedData, ofType: InfoPlistReader.main.pillsUTType)
         pillData = attachmentData
     }
-    
+
     private(set) var pillData: PillTextAttachmentData!
-    
+
     override func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
         var rect = super.attachmentBounds(for: textContainer, proposedLineFragment: lineFrag, glyphPosition: position, characterIndex: charIndex)
-        
+
         let fontData = pillData.fontData
         // Align the pill text vertically with the surrounding text.
         rect.origin.y = fontData.descender + (fontData.lineHeight - rect.height) / 2.0

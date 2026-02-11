@@ -19,17 +19,17 @@ protocol TimelineControllerFactoryProtocol {
                                  initialFocussedEventID: String?,
                                  timelineItemFactory: RoomTimelineItemFactoryProtocol,
                                  mediaProvider: MediaProviderProtocol) -> TimelineControllerProtocol
-    
+
     func buildThreadTimelineController(threadRootEventID: String,
                                        initialFocussedEventID: String?,
                                        roomProxy: JoinedRoomProxyProtocol,
                                        timelineItemFactory: RoomTimelineItemFactoryProtocol,
                                        mediaProvider: MediaProviderProtocol) async -> Result<TimelineControllerProtocol, TimelineFactoryControllerError>
-    
+
     func buildPinnedEventsTimelineController(roomProxy: JoinedRoomProxyProtocol,
                                              timelineItemFactory: RoomTimelineItemFactoryProtocol,
                                              mediaProvider: MediaProviderProtocol) async -> Result<TimelineControllerProtocol, TimelineFactoryControllerError>
-    
+
     func buildMessageFilteredTimelineController(focus: TimelineFocus,
                                                 allowedMessageTypes: [TimelineAllowedMessageType],
                                                 presentation: TimelineKind.MediaPresentation,
@@ -37,6 +37,3 @@ protocol TimelineControllerFactoryProtocol {
                                                 timelineItemFactory: RoomTimelineItemFactoryProtocol,
                                                 mediaProvider: MediaProviderProtocol) async -> Result<TimelineControllerProtocol, TimelineFactoryControllerError>
 }
-
-// sourcery: AutoMockable
-extension TimelineControllerFactoryProtocol { }

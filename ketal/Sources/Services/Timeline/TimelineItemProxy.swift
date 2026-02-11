@@ -14,7 +14,7 @@ enum TimelineItemProxy {
     case event(EventTimelineItemProxy)
     case virtual(MatrixRustSDK.VirtualTimelineItem, uniqueID: TimelineItemIdentifier.UniqueID)
     case unknown(MatrixRustSDK.TimelineItem)
-    
+
     init(item: MatrixRustSDK.TimelineItem) {
         if let eventItem = item.asEvent() {
             self = .event(EventTimelineItemProxy(item: eventItem, uniqueID: .init(rustValue: item.uniqueId())))
@@ -24,7 +24,7 @@ enum TimelineItemProxy {
             self = .unknown(item)
         }
     }
-    
+
     var isEvent: Bool {
         switch self {
         case .event:
@@ -40,7 +40,7 @@ enum TimelineItemDeliveryStatus: Hashable {
     case sending
     case sent
     case sendingFailed(TimelineItemSendFailure)
-    
+
     var isSendingFailed: Bool {
         switch self {
         case .sending, .sent: false
@@ -54,7 +54,7 @@ enum TimelineItemSendFailure: Hashable {
     enum VerifiedUser: Hashable {
         case hasUnsignedDevice(devices: [String: [String]])
         case changedIdentity(users: [String])
-        
+
         var affectedUserIDs: [String] {
             switch self {
             case .hasUnsignedDevice(let devices): Array(devices.keys)
@@ -62,7 +62,7 @@ enum TimelineItemSendFailure: Hashable {
             }
         }
     }
-    
+
     case verifiedUser(VerifiedUser)
     case unknown
 }
@@ -71,18 +71,18 @@ enum TimelineItemSendFailure: Hashable {
 class EventTimelineItemProxy {
     let item: MatrixRustSDK.EventTimelineItem
     let id: TimelineItemIdentifier
-    
+
     init(item: MatrixRustSDK.EventTimelineItem, uniqueID: TimelineItemIdentifier.UniqueID) {
         self.item = item
-        
+
         id = .event(uniqueID: uniqueID, eventOrTransactionID: .init(rustValue: item.eventOrTransactionId))
     }
-    
+
     lazy var deliveryStatus: TimelineItemDeliveryStatus? = {
         guard let localSendState = item.localSendState else {
             return nil
         }
-        
+
         switch localSendState {
         case .sendingFailed(let error, let isRecoverable):
             switch error {
@@ -99,37 +99,30 @@ class EventTimelineItemProxy {
             return .sent
         }
     }()
-    
+
     lazy var canBeRepliedTo = item.canBeRepliedTo
-            
+
     lazy var content = item.content
 
     lazy var isOwn = item.isOwn
 
     lazy var isEditable = item.isEditable
-    
+
     lazy var sender = TimelineItemSender(senderID: item.sender, senderProfile: item.senderProfile)
-    
-    lazy var forwarder: TimelineItemKeyForwarder? = {
-        guard let forwarderID = item.forwarder, let forwarderProfile = item.forwarderProfile else {
-            return nil
-        }
-        return TimelineItemKeyForwarder(forwarderID: forwarderID, forwarderProfile: forwarderProfile)
-    }()
-    
+
     lazy var timestamp = Date(timeIntervalSince1970: TimeInterval(item.timestamp / 1000))
-    
+
     lazy var debugInfo: TimelineItemDebugInfo = {
         let debugInfo = item.lazyProvider.debugInfo()
         return TimelineItemDebugInfo(model: debugInfo.model, originalJSON: debugInfo.originalJson, latestEditJSON: debugInfo.latestEditJson)
     }()
-    
+
     lazy var shieldState = item.lazyProvider.getShields(strict: false)
-    
+
     lazy var sendHandle = item.lazyProvider.getSendHandle()
-    
+
     lazy var shouldBoost = item.lazyProvider.containsOnlyEmojis()
-    
+
     lazy var readReceipts = item.readReceipts
 }
 
@@ -138,30 +131,30 @@ struct TimelineItemDebugInfo: Identifiable, CustomStringConvertible {
     let model: String
     let originalJSON: String?
     let latestEditJSON: String?
-    
+
     init(model: String, originalJSON: String?, latestEditJSON: String?) {
         self.model = model
-        
+
         self.originalJSON = Self.prettyJsonFormattedString(from: originalJSON)
         self.latestEditJSON = Self.prettyJsonFormattedString(from: latestEditJSON)
     }
-    
+
     var description: String {
         var description = model
-        
+
         if let originalJSON {
             description += "\n\n\(originalJSON)"
         }
-        
+
         if let latestEditJSON {
             description += "\n\n\(latestEditJSON)"
         }
-        
+
         return description
     }
-    
+
     // MARK: - Private
-    
+
     private static func prettyJsonFormattedString(from string: String?) -> String? {
         guard let string,
               let data = string.data(using: .utf8),
@@ -169,7 +162,7 @@ struct TimelineItemDebugInfo: Identifiable, CustomStringConvertible {
               let jsonData = try? JSONSerialization.data(withJSONObject: jsonDictionary, options: [.prettyPrinted]) else {
             return nil
         }
-        
+
         return String(data: jsonData, encoding: .utf8)
     }
 }
@@ -178,10 +171,10 @@ struct SendHandleProxy: Hashable {
     enum Error: Swift.Error {
         case sdkError(Swift.Error)
     }
-    
+
     let itemID: TimelineItemIdentifier
     let underlyingHandle: SendHandle
-    
+
     func resend() async -> Result<Void, Error> {
         do {
             try await underlyingHandle.tryResend()
@@ -190,7 +183,7 @@ struct SendHandleProxy: Hashable {
             return .failure(.sdkError(error))
         }
     }
-    
+
     // MARK: - Hashable
 
     static func == (lhs: SendHandleProxy, rhs: SendHandleProxy) -> Bool {
@@ -200,7 +193,7 @@ struct SendHandleProxy: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(itemID)
     }
-    
+
     static var mock: SendHandleProxy {
         .init(itemID: .event(uniqueID: .init(UUID().uuidString),
                              eventOrTransactionID: .eventID(UUID().uuidString)),
@@ -215,20 +208,20 @@ struct VideoInfoProxy: Hashable {
     private(set) var aspectRatio: CGFloat?
     private(set) var mimeType: String?
     private(set) var fileSize: UInt?
-    
+
     init(source: MediaSource, duration: TimeInterval, width: UInt64?, height: UInt64?, mimeType: String?, fileSize: UInt?) {
         self.source = MediaSourceProxy(source: source, mimeType: mimeType)
         self.duration = duration
-        
+
         let mediaInfo = MediaInfoProxy(width: width, height: height, mimeType: mimeType)
         size = mediaInfo.size
         aspectRatio = mediaInfo.aspectRatio
         self.mimeType = mediaInfo.mimeType
         self.fileSize = fileSize
     }
-    
+
     // MARK: - Mocks
-    
+
     private init(source: MediaSourceProxy, duration: TimeInterval, size: CGSize?, aspectRatio: CGFloat?, mimeType: String?, fileSize: UInt?) {
         self.source = source
         self.duration = duration
@@ -237,12 +230,12 @@ struct VideoInfoProxy: Hashable {
         self.mimeType = mimeType
         self.fileSize = fileSize
     }
-    
+
     static var mockVideo: VideoInfoProxy {
         guard let mediaSource = try? MediaSourceProxy(url: .mockMXCVideo, mimeType: nil) else {
             fatalError("Invalid mock media source URL")
         }
-        
+
         return .init(source: mediaSource,
                      duration: 100,
                      size: .init(width: 1920, height: 1080),
@@ -258,31 +251,31 @@ struct ImageInfoProxy: Hashable {
     private(set) var aspectRatio: CGFloat?
     private(set) var mimeType: String?
     private(set) var fileSize: UInt?
-    
+
     init?(source: MediaSource?, width: UInt64?, height: UInt64?, mimeType: String?, fileSize: UInt?) {
         guard let source else {
             return nil
         }
-        
+
         self.init(source: .init(source: source, mimeType: mimeType), width: width, height: height, mimeType: mimeType, fileSize: fileSize)
     }
-    
+
     init(source: MediaSource, width: UInt64?, height: UInt64?, mimeType: String?, fileSize: UInt?) {
         self.init(source: .init(source: source, mimeType: mimeType), width: width, height: height, mimeType: mimeType, fileSize: fileSize)
     }
-    
+
     init(source: MediaSourceProxy, width: UInt64?, height: UInt64?, mimeType: String?, fileSize: UInt?) {
         self.source = source
-        
+
         let mediaInfo = MediaInfoProxy(width: width, height: height, mimeType: mimeType)
         size = mediaInfo.size
         aspectRatio = mediaInfo.aspectRatio
         self.mimeType = mediaInfo.mimeType
         self.fileSize = fileSize
     }
-    
+
     // MARK: - Mocks
-    
+
     private init(source: MediaSourceProxy, size: CGSize?, aspectRatio: CGFloat?, fileSize: UInt?) {
         self.source = source
         self.size = size
@@ -290,28 +283,28 @@ struct ImageInfoProxy: Hashable {
         mimeType = source.mimeType
         self.fileSize = fileSize
     }
-    
+
     static var mockImage: ImageInfoProxy {
         guard let mediaSource = try? MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpg") else {
             fatalError("Invalid mock media source URL")
         }
-        
+
         return .init(source: mediaSource, size: .init(width: 2730, height: 2048), aspectRatio: 4 / 3, fileSize: 717_000)
     }
-    
+
     static var mockThumbnail: ImageInfoProxy {
         guard let mediaSource = try? MediaSourceProxy(url: .mockMXCImage, mimeType: "image/jpg") else {
             fatalError("Invalid mock media source URL")
         }
-        
+
         return .init(source: mediaSource, size: .init(width: 800, height: 600), aspectRatio: 4 / 3, fileSize: 84000)
     }
-    
+
     static var mockVideoThumbnail: ImageInfoProxy {
         guard let mediaSource = try? MediaSourceProxy(url: .mockMXCVideo, mimeType: "image/jpg") else {
             fatalError("Invalid mock media source URL")
         }
-        
+
         return .init(source: mediaSource, size: .init(width: 800, height: 450), aspectRatio: 16 / 9, fileSize: 98000)
     }
 }
@@ -320,16 +313,16 @@ private struct MediaInfoProxy: Hashable {
     private(set) var size: CGSize?
     private(set) var mimeType: String?
     private(set) var aspectRatio: CGFloat?
-    
+
     init(width: UInt64?, height: UInt64?, mimeType: String?) {
         if let width, let height {
             size = .init(width: CGFloat(width), height: CGFloat(height))
-            
+
             if width > 0, height > 0 {
                 aspectRatio = CGFloat(width) / CGFloat(height)
             }
         }
-        
+
         self.mimeType = mimeType
     }
 }

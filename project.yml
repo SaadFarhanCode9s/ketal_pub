@@ -63,34 +63,26 @@ include:
 - path: IntegrationTests/SupportingFiles/target.yml
 - path: AccessibilityTests/SupportingFiles/target.yml
 packages:
-  # Element/Matrix dependencies
   MatrixRustSDK:
     url: https://github.com/element-hq/matrix-rust-components-swift
     exactVersion: 26.02.10
-    # path: ../matrix-rust-sdk
   Compound:
     path: compound-ios
   AnalyticsEvents:
     url: https://github.com/matrix-org/matrix-analytics-events
     minorVersion: 0.30.0
-    # path: ../matrix-analytics-events
   EmbeddedElementCall:
     url: https://github.com/element-hq/element-call-swift
     exactVersion: 0.16.3
   Emojibase:
     url: https://github.com/matrix-org/emojibase-bindings
     minorVersion: 1.5.0
-    # path: ../emojibase-bindings
   SwiftOGG:
     url: https://github.com/element-hq/swift-ogg
     minorVersion: 0.0.3
-    # path: ../swift-ogg
   WysiwygComposer:
     url: https://github.com/element-hq/matrix-rich-text-editor-swift
     exactVersion: 2.41.0
-    # path: ../matrix-rich-text-editor/platforms/ios/lib/WysiwygComposer
-  
-  # External dependencies
   Algorithms:
     url: https://github.com/apple/swift-algorithms
     minorVersion: 1.2.1
@@ -138,7 +130,7 @@ packages:
     minorVersion: 3.37.1
   Sentry:
     url: https://github.com/getsentry/sentry-cocoa
-    minorVersion: 9.2.0
+    minorVersion: 9.1.0
   SnapshotTesting:
     url: https://github.com/pointfreeco/swift-snapshot-testing
     minorVersion: 1.18.7
@@ -151,7 +143,6 @@ packages:
   Version:
     url: https://github.com/mxcl/Version
     minorVersion: 2.2.0
-
 aggregateTargets:
   Periphery:
     buildScripts:

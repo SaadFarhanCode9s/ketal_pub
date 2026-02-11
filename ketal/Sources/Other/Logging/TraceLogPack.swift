@@ -11,7 +11,7 @@ import MatrixRustSDK
 
 enum TraceLogPack: Codable, CaseIterable {
     case eventCache, sendQueue, timeline, notificationClient, syncProfiling, latestEvents
-    
+
     var title: String {
         switch self {
         case .eventCache: "Event cache"
@@ -36,7 +36,7 @@ extension TraceLogPack {
         case .latestEvents: self = .latestEvents
         }
     }
-    
+
     var rustLogPack: MatrixRustSDK.TraceLogPacks {
         switch self {
         case .eventCache: .eventCache

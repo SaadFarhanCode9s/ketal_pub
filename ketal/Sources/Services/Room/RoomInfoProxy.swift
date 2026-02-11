@@ -11,7 +11,7 @@ import MatrixRustSDK
 
 struct RoomInfoProxy: RoomInfoProxyProtocol {
     let roomInfo: RoomInfo
-    
+
     var id: String {
         roomInfo.id
     }
@@ -45,7 +45,7 @@ struct RoomInfoProxy: RoomInfoProxyProtocol {
     var isEncrypted: Bool {
         roomInfo.encryptionState == .encrypted
     }
-    
+
     var isDirect: Bool {
         roomInfo.isDirect
     }
@@ -53,7 +53,7 @@ struct RoomInfoProxy: RoomInfoProxyProtocol {
     var isSpace: Bool {
         roomInfo.isSpace
     }
-    
+
     var successor: SuccessorRoom? {
         roomInfo.successorRoom
     }
@@ -135,13 +135,13 @@ struct RoomInfoProxy: RoomInfoProxyProtocol {
     }
 
     var joinRule: JoinRule? {
-        roomInfo.joinRule.map(JoinRule.init)
+        roomInfo.joinRule
     }
 
     var historyVisibility: RoomHistoryVisibility {
         roomInfo.historyVisibility
     }
-    
+
     var powerLevels: RoomPowerLevelsProxyProtocol? {
         RoomPowerLevelsProxy(roomInfo.powerLevels)
     }
@@ -149,9 +149,9 @@ struct RoomInfoProxy: RoomInfoProxyProtocol {
 
 struct RoomPreviewInfoProxy: BaseRoomInfoProxyProtocol {
     let roomPreviewInfo: RoomPreviewInfo
-    
+
     let successor: SuccessorRoom? = nil
-    
+
     var id: String {
         roomPreviewInfo.roomId
     }
@@ -191,9 +191,9 @@ struct RoomPreviewInfoProxy: BaseRoomInfoProxyProtocol {
     var joinedMembersCount: Int {
         Int(roomPreviewInfo.numJoinedMembers)
     }
-    
+
     var joinRule: JoinRule? {
-        roomPreviewInfo.joinRule.map(JoinRule.init)
+        roomPreviewInfo.joinRule
     }
 
     var membership: Membership? {

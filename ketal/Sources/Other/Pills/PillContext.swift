@@ -12,10 +12,10 @@ import Foundation
 @MainActor
 final class PillContext: ObservableObject {
     @Published var viewState: PillViewState = .undefined
-    
+
     let data: PillTextAttachmentData
     var cancellable: AnyCancellable?
-    
+
     init(timelineContext: TimelineViewModel.Context, data: PillTextAttachmentData) {
         self.data = data
         timelineContext.viewState.pillContextUpdater?(self)
@@ -43,7 +43,7 @@ enum PillViewState: Equatable {
     case mention(isOwnMention: Bool, displayText: String)
     case reference(displayText: String)
     case undefined
-    
+
     var isOwnMention: Bool {
         switch self {
         case .mention(let isOwnMention, _):
@@ -52,7 +52,7 @@ enum PillViewState: Equatable {
             return false
         }
     }
-    
+
     var displayText: String {
         switch self {
         case .mention(_, let displayText), .reference(let displayText):
@@ -61,7 +61,7 @@ enum PillViewState: Equatable {
             return ""
         }
     }
-    
+
     var isUndefined: Bool {
         switch self {
         case .undefined:

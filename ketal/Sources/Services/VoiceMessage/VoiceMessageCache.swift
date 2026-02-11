@@ -13,18 +13,18 @@ class VoiceMessageCache: VoiceMessageCacheProtocol {
     private var temporaryFilesFolderURL: URL {
         FileManager.default.temporaryDirectory.appendingPathComponent("media/voice-message")
     }
-    
+
     var urlForRecording: URL {
         // Make sure the directory exist
         setupTemporaryFilesFolder()
         return temporaryFilesFolderURL.appendingPathComponent("voice-message-recording").appendingPathExtension(preferredFileExtension)
     }
-    
+
     func fileURL(for mediaSource: MediaSourceProxy) -> URL? {
         let url = cacheURL(for: mediaSource)
         return FileManager.default.fileExists(atPath: url.path()) ? url : nil
     }
-    
+
     func cache(mediaSource: MediaSourceProxy, using fileURL: URL, move: Bool = false) -> Result<URL, VoiceMessageCacheError> {
         guard fileURL.pathExtension == preferredFileExtension else {
             return .failure(.invalidFileExtension)
@@ -38,7 +38,7 @@ class VoiceMessageCache: VoiceMessageCacheProtocol {
         }
         return .success(url)
     }
-        
+
     func clearCache() {
         if FileManager.default.fileExists(atPath: temporaryFilesFolderURL.path) {
             do {
@@ -48,9 +48,9 @@ class VoiceMessageCache: VoiceMessageCacheProtocol {
             }
         }
     }
-    
+
     // MARK: - Private
-    
+
     private func setupTemporaryFilesFolder() {
         do {
             try FileManager.default.createDirectoryIfNeeded(at: temporaryFilesFolderURL, withIntermediateDirectories: true)
@@ -58,7 +58,7 @@ class VoiceMessageCache: VoiceMessageCacheProtocol {
             MXLog.error("Failed to setup audio cache manager.")
         }
     }
-    
+
     private func cacheFile(source: URL, destination: URL, move: Bool) throws {
         setupTemporaryFilesFolder()
         try? FileManager.default.removeItem(at: destination)
@@ -69,7 +69,7 @@ class VoiceMessageCache: VoiceMessageCacheProtocol {
         }
         try (destination as NSURL).setResourceValue(URLFileProtection.complete, forKey: .fileProtectionKey)
     }
-    
+
     private func cacheURL(for mediaSource: MediaSourceProxy) -> URL {
         temporaryFilesFolderURL.appendingPathComponent(mediaSource.url.lastPathComponent).appendingPathExtension(preferredFileExtension)
     }

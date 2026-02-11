@@ -25,9 +25,9 @@ struct RoomPowerLevelsProxyMockConfiguration {
 extension RoomPowerLevelsProxyMock {
     convenience init(configuration: RoomPowerLevelsProxyMockConfiguration) {
         self.init()
-        
+
         underlyingValues = RoomPowerLevelsValues.mock
-                
+
         canOwnUserSendMessageReturnValue = configuration.canUserSendMessage
         canOwnUserSendStateEventReturnValue = configuration.canUserSendState
         canOwnUserInviteReturnValue = configuration.canUserInvite
@@ -39,7 +39,7 @@ extension RoomPowerLevelsProxyMock {
         canOwnUserPinOrUnpinReturnValue = configuration.canUserPin
         canOwnUserJoinCallReturnValue = configuration.canUserJoinCall
         canOwnUserEditRolesAndPermissionsReturnValue = configuration.canUserEditRoomsAndPermissions
-        
+
         canUserUserIDSendMessageReturnValue = .success(configuration.canUserSendMessage)
         canUserUserIDSendStateEventReturnValue = .success(configuration.canUserSendState)
         canUserInviteUserIDReturnValue = .success(configuration.canUserInvite)

@@ -11,7 +11,7 @@ import Foundation
 struct SessionDirectories: Hashable, Codable {
     let dataDirectory: URL
     let cacheDirectory: URL
-    
+
     var dataPath: String {
         dataDirectory.path(percentEncoded: false)
     }
@@ -19,9 +19,9 @@ struct SessionDirectories: Hashable, Codable {
     var cachePath: String {
         cacheDirectory.path(percentEncoded: false)
     }
-    
+
     // MARK: Data Management
-    
+
     /// Removes the directories from disk if they have been created.
     func delete() {
         do {
@@ -39,7 +39,7 @@ struct SessionDirectories: Hashable, Codable {
             MXLog.failure("Failed deleting the session caches: \(error)")
         }
     }
-    
+
     /// Deletes the Rust state store and event cache data, leaving the crypto store and both
     /// session directories in place along with any other data that may have been written in them.
     func deleteTransientUserData() {
@@ -56,7 +56,7 @@ struct SessionDirectories: Hashable, Codable {
             MXLog.failure("Failed clearing event cache store: \(error)")
         }
     }
-    
+
     /// Check that mission critical files (the crypto db) are still in the right place when restoring a session
     /// iOS might decide to move the app with its user defaults and keychain but without
     /// some of the files stored in the shared container e.g. after a device transfer, offloading etc.
@@ -64,7 +64,7 @@ struct SessionDirectories: Hashable, Codable {
     func isNonTransientUserDataValid() -> Bool {
         FileManager.default.fileExists(atPath: dataPath.appending("/matrix-sdk-crypto.sqlite3"))
     }
-    
+
     private func deleteFiles(at url: URL, with prefix: String) throws {
         let sessionDirectoryContents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
         for url in sessionDirectoryContents where url.lastPathComponent.hasPrefix(prefix) {
@@ -80,7 +80,7 @@ extension SessionDirectories {
         dataDirectory = .sessionsBaseDirectory.appending(component: sessionDirectoryName)
         cacheDirectory = .sessionCachesBaseDirectory.appending(component: sessionDirectoryName)
     }
-    
+
     /// Creates the session directories for a user who has a single session directory stored without a separate caches directory.
     init(dataDirectory: URL) {
         self.dataDirectory = dataDirectory

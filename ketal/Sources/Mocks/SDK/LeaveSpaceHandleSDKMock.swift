@@ -14,34 +14,33 @@ extension LeaveSpaceHandleSDKMock {
     struct Configuration {
         var rooms: [LeaveSpaceRoom] = .mockRooms
     }
-    
+
     convenience init(_ configuration: Configuration) {
         self.init()
-        
+
         roomsClosure = { configuration.rooms }
     }
 }
 
 extension [LeaveSpaceRoom] {
-    static func mockRoomsWithSpace(spaceServiceRoom: SpaceServiceRoom, isLastOwner: Bool, areCreatorsPrivileged: Bool) -> [LeaveSpaceRoom] {
-        mockRooms + mockSingleSpace(spaceServiceRoom: spaceServiceRoom, isLastOwner: isLastOwner, areCreatorsPrivileged: areCreatorsPrivileged)
+    static func mockRoomsWithSpace(spaceServiceRoom: SpaceServiceRoomProtocol, isLastAdmin: Bool) -> [LeaveSpaceRoom] {
+        mockRooms + mockSingleSpace(spaceServiceRoom: spaceServiceRoom, isLastAdmin: isLastAdmin)
     }
-    
-    static func mockSingleSpace(spaceServiceRoom: SpaceServiceRoom, isLastOwner: Bool, areCreatorsPrivileged: Bool) -> [LeaveSpaceRoom] {
+
+    static func mockSingleSpace(spaceServiceRoom: SpaceServiceRoomProtocol, isLastAdmin: Bool) -> [LeaveSpaceRoom] {
         [LeaveSpaceRoom(spaceRoom: SpaceRoom(id: spaceServiceRoom.id,
                                              name: spaceServiceRoom.name,
                                              avatarURL: spaceServiceRoom.avatarURL,
                                              isSpace: true,
                                              memberCount: UInt64(spaceServiceRoom.joinedMembersCount),
                                              joinRule: spaceServiceRoom.joinRule),
-                        isLastOwner: isLastOwner,
-                        areCreatorsPrivileged: areCreatorsPrivileged)]
+                        isLastAdmin: isLastAdmin)]
     }
-    
-    static var mockNeedNewOwnerRooms: [LeaveSpaceRoom] {
-        mockRooms.filter { $0.isLastOwner && $0.spaceRoom.numJoinedMembers > 1 }
+
+    static var mockAdminRooms: [LeaveSpaceRoom] {
+        mockRooms.filter(\.isLastAdmin)
     }
-    
+
     static var mockRooms: [LeaveSpaceRoom] {
         [
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "1",
@@ -50,81 +49,70 @@ extension [LeaveSpaceRoom] {
                                                 isSpace: false,
                                                 memberCount: 10,
                                                 joinRule: .public),
-                           isLastOwner: false,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: false),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "2",
                                                 name: "Sound",
                                                 isSpace: false,
                                                 memberCount: 20,
-                                                joinRule: .invite),
-                           isLastOwner: false,
-                           areCreatorsPrivileged: false),
+                                                joinRule: .private),
+                           isLastAdmin: false),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "3",
                                                 name: "Set & Costume",
                                                 isSpace: false,
                                                 memberCount: 25,
                                                 joinRule: .restricted(rules: [])),
-                           isLastOwner: false,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: false),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "4",
                                                 name: "The Theatre",
                                                 isSpace: true,
                                                 memberCount: 100,
-                                                joinRule: .invite,
+                                                joinRule: .private,
                                                 childrenCount: 20),
-                           isLastOwner: false,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: false),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "5",
                                                 name: "Bookings",
                                                 isSpace: false,
                                                 memberCount: 200,
-                                                joinRule: .invite,
+                                                joinRule: .private,
                                                 childrenCount: 0),
-                           isLastOwner: true,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: true),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "6",
                                                 name: "Events",
                                                 isSpace: false,
                                                 memberCount: 65,
                                                 joinRule: .restricted(rules: []),
                                                 childrenCount: 0),
-                           isLastOwner: true,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: true),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "7",
                                                 name: "Mario Kart",
                                                 isSpace: false,
                                                 memberCount: 123,
                                                 joinRule: .public),
-                           isLastOwner: false,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: false),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "8",
                                                 name: "Tetris",
                                                 isSpace: false,
                                                 memberCount: 95,
                                                 joinRule: .public),
-                           isLastOwner: false,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: false),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "9",
                                                 name: "Minecraft",
                                                 isSpace: false,
                                                 memberCount: 39,
                                                 joinRule: .public),
-                           isLastOwner: false,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: false),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "10",
                                                 name: "Lemmings",
                                                 isSpace: false,
                                                 memberCount: 67,
                                                 joinRule: .public),
-                           isLastOwner: true,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: true),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "11",
                                                 name: "Rayman",
                                                 isSpace: false,
                                                 memberCount: 23,
                                                 joinRule: .public),
-                           isLastOwner: false,
-                           areCreatorsPrivileged: false),
+                           isLastAdmin: false),
             LeaveSpaceRoom(spaceRoom: SpaceRoom(id: "12",
                                                 name: "Gaming",
                                                 avatarURL: .mockMXCAvatar,
@@ -132,8 +120,7 @@ extension [LeaveSpaceRoom] {
                                                 memberCount: 835,
                                                 joinRule: .public,
                                                 childrenCount: 15),
-                           isLastOwner: true,
-                           areCreatorsPrivileged: false)
+                           isLastAdmin: true)
         ]
     }
 }
@@ -160,7 +147,7 @@ private extension SpaceRoom {
                   avatarUrl: avatarURL?.absoluteString,
                   roomType: isSpace ? .space : .room,
                   numJoinedMembers: memberCount,
-                  joinRule: joinRule?.rustValue,
+                  joinRule: joinRule,
                   worldReadable: true,
                   guestCanJoin: false,
                   isDirect: isDirect,

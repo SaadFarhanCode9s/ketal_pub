@@ -15,61 +15,61 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
     let audioRecorder: AudioRecorderProtocol
     private let voiceMessageCache: VoiceMessageCacheProtocol
     private let mediaPlayerProvider: MediaPlayerProviderProtocol
-    
+
     private let actionsSubject: PassthroughSubject<VoiceMessageRecorderAction, Never> = .init()
     var actions: AnyPublisher<VoiceMessageRecorderAction, Never> {
         actionsSubject.eraseToAnyPublisher()
     }
 
     private let mp4accMimeType = "audio/m4a"
-    
+
     var isRecording: Bool {
         audioRecorder.isRecording
     }
-    
+
     var recordingURL: URL? {
         audioRecorder.audioFileURL
     }
-    
+
     var recordingDuration: TimeInterval {
         audioRecorder.currentTime
     }
-    
+
     private var recordingCancelled = false
 
     private(set) var previewAudioPlayerState: AudioPlayerState?
     private(set) var previewAudioPlayer: AudioPlayerProtocol?
     private var cancellables = Set<AnyCancellable>()
-        
+
     init(audioRecorder: AudioRecorderProtocol = AudioRecorder(),
          mediaPlayerProvider: MediaPlayerProviderProtocol,
          voiceMessageCache: VoiceMessageCacheProtocol = VoiceMessageCache()) {
         self.audioRecorder = audioRecorder
         self.mediaPlayerProvider = mediaPlayerProvider
         self.voiceMessageCache = voiceMessageCache
-        
+
         addObservers()
     }
-    
+
     deinit {
         removeObservers()
     }
-    
+
     // MARK: - Recording
-    
+
     func startRecording() async {
         await stopPlayback()
         previewAudioPlayer?.reset()
         recordingCancelled = false
-        
+
         await audioRecorder.record(audioFileURL: voiceMessageCache.urlForRecording)
     }
-    
+
     func stopRecording() async {
         recordingCancelled = false
         await audioRecorder.stopRecording()
     }
-    
+
     func cancelRecording() async {
         MXLog.info("Cancel recording.")
         recordingCancelled = true
@@ -78,7 +78,7 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
         previewAudioPlayerState = nil
         previewAudioPlayer?.reset()
     }
-    
+
     func deleteRecording() async {
         MXLog.info("Delete recording.")
         await stopPlayback()
@@ -88,33 +88,33 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
     }
 
     // MARK: - Preview
-    
+
     func startPlayback() async -> Result<Void, VoiceMessageRecorderError> {
         guard let previewAudioPlayerState, let url = audioRecorder.audioFileURL else {
             return .failure(.previewNotAvailable)
         }
-        
+
         guard let audioPlayer = previewAudioPlayer else {
             return .failure(.previewNotAvailable)
         }
-        
+
         if await !previewAudioPlayerState.isAttached {
             await previewAudioPlayerState.attachAudioPlayer(audioPlayer)
         }
-        
+
         if audioPlayer.playbackURL == url {
             audioPlayer.play()
             return .success(())
         }
-        
+
         audioPlayer.load(sourceURL: url, playbackURL: url, autoplay: true)
         return .success(())
     }
-    
+
     func pausePlayback() {
         previewAudioPlayer?.pause()
     }
-    
+
     func stopPlayback() async {
         guard let previewAudioPlayerState else {
             return
@@ -122,11 +122,11 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
         await previewAudioPlayerState.detachAudioPlayer()
         previewAudioPlayer?.stop()
     }
-    
+
     func seekPlayback(to progress: Double) async {
         await previewAudioPlayerState?.updateState(progress: progress)
     }
-    
+
     func buildRecordingWaveform() async -> Result<[Float], VoiceMessageRecorderError> {
         guard let url = audioRecorder.audioFileURL else {
             return .failure(.missingRecordingFile)
@@ -144,13 +144,13 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
         }
         return .success(waveformData)
     }
-    
+
     func sendVoiceMessage(timelineController: TimelineControllerProtocol,
                           audioConverter: AudioConverterProtocol) async -> Result<Void, VoiceMessageRecorderError> {
         guard let url = audioRecorder.audioFileURL else {
             return .failure(VoiceMessageRecorderError.missingRecordingFile)
         }
-        
+
         // convert the file
         let sourceFilename = url.deletingPathExtension().lastPathComponent
         let oggFile = URL.temporaryDirectory.appendingPathComponent(sourceFilename).appendingPathExtension("ogg")
@@ -177,21 +177,21 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
         guard case .success(let waveform) = await buildRecordingWaveform() else {
             return .failure(.failedSendingVoiceMessage)
         }
-        
+
         let result = await timelineController.sendVoiceMessage(url: oggFile,
                                                                audioInfo: audioInfo,
                                                                waveform: waveform) { _ in }
-        
+
         if case .failure(let error) = result {
             MXLog.error("Failed to send the voice message. \(error)")
             return .failure(.failedSendingVoiceMessage)
         }
-        
+
         return .success(())
     }
-        
+
     // MARK: - Private
-    
+
     private func addObservers() {
         audioRecorder.actions
             .sink { [weak self] action in
@@ -200,11 +200,11 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
             }
             .store(in: &cancellables)
     }
-    
+
     private func removeObservers() {
         cancellables.removeAll()
     }
-    
+
     private func handleAudioRecorderAction(_ action: AudioRecorderAction) {
         switch action {
         case .didStartRecording:
@@ -231,7 +231,7 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
             actionsSubject.send(.didFailWithError(error: .audioRecorderError(error)))
         }
     }
-    
+
     private func finalizeRecording() async -> Result<Void, VoiceMessageRecorderError> {
         MXLog.info("finalize audio recording")
         guard audioRecorder.audioFileURL != nil, audioRecorder.currentTime > 0 else {
@@ -244,7 +244,7 @@ class VoiceMessageRecorder: VoiceMessageRecorderProtocol {
         // Build the preview audio player
         let audioPlayer = await mediaPlayerProvider.player
         previewAudioPlayer = audioPlayer
-        
+
         return .success(())
     }
 }

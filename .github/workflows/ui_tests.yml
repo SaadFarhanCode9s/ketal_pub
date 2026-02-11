@@ -65,7 +65,7 @@ jobs:
       - name: Collect coverage
         # Skip if not successful and in forks
         if: ${{ success() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        run: xcresultparser -q -o cobertura -t ketal -p $(pwd) fastlane/test_output/UITests.xcresult > fastlane/test_output/ui-cobertura.xml
+        run: xcresultparser -q -o cobertura -t ElementX -p $(pwd) fastlane/test_output/UITests.xcresult > fastlane/test_output/ui-cobertura.xml
 
       - name: Upload coverage to Codecov
         # Skip if not successful and in forks

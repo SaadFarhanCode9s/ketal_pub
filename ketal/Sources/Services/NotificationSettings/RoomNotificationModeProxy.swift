@@ -26,7 +26,7 @@ extension RoomNotificationModeProxy {
             return .mute
         }
     }
-    
+
     var roomNotificationMode: RoomNotificationMode {
         switch self {
         case .allMessages:

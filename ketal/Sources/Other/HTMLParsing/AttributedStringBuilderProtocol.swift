@@ -9,21 +9,15 @@
 import Foundation
 
 struct AttributedStringBuilderComponent: Hashable, Identifiable {
-    enum ComponentType {
-        case plainText
-        case blockquote
-        case codeBlock
-    }
-    
     let id: String
     let attributedString: AttributedString
-    let type: ComponentType
+    let isBlockquote: Bool
 }
 
 protocol AttributedStringBuilderProtocol {
     func fromPlain(_ string: String?) -> AttributedString?
-    
+
     func fromHTML(_ htmlString: String?) -> AttributedString?
-    
+
     func addMatrixEntityPermalinkAttributesTo(_ attributedString: NSMutableAttributedString)
 }

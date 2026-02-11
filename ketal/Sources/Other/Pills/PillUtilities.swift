@@ -13,10 +13,10 @@ enum PillUtilities {
 
     /// Used by the WYSIWYG as the urlString value to identify @room mentions
     static let composerAtRoomURLString = "#"
-    
+
     /// Used only to mock the max width in previews since the real max width is calculated by the line fragment width
     static let mockMaxWidth: CGFloat = 235
-    
+
     private static let roomDecoration = "#"
     static func roomPillDisplayText(roomName: String?, rawRoomText: String) -> String {
         guard let roomName else {
@@ -24,7 +24,7 @@ enum PillUtilities {
         }
         return "\(roomDecoration)\(roomName)"
     }
-    
+
     private static let eventDecoration = "💬 > "
     static func eventPillDisplayText(roomName: String?, rawRoomText: String) -> String {
         guard let roomName else {
@@ -32,7 +32,7 @@ enum PillUtilities {
         }
         return "\(eventDecoration)\(roomDecoration)\(roomName)"
     }
-    
+
     private static let userDecoration = "@"
     static func userPillDisplayText(username: String?, userID: String) -> String {
         guard let username else {

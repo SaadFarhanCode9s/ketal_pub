@@ -42,24 +42,24 @@ extension View {
 
 private struct SearchControllerModifier: ViewModifier {
     @Binding var searchQuery: String
-    
+
     let placeholder: String?
     let hidesNavigationBar: Bool
     let showsCancelButton: Bool
     let disablesInteractiveDismiss: Bool
     let accessibilityFocusOnStart: Bool
-    
+
     /// Whether or not the user is currently searching. When ``automaticallyShowsCancelButton``
     /// is `false`, checking if this value is `false` is pretty much meaningless.
     @State private var isSearching = false
-    
+
     func body(content: Content) -> some View {
         let text: Text? = if let placeholder {
             Text(placeholder)
         } else {
             nil
         }
-        
+
         if #available(iOS 26, *) {
             content
                 .searchable(text: $searchQuery, placement: .navigationBarDrawer(displayMode: .always), prompt: text)
@@ -100,15 +100,15 @@ private struct SearchControllerModifier: ViewModifier {
 
 private struct SearchController: UIViewControllerRepresentable {
     @Binding var searchQuery: String
-    
+
     let placeholder: String?
     let hidesNavigationBar: Bool
     let showsCancelButton: Bool
     let hidesSearchBarWhenScrolling: Bool
     let accessibilityFocusOnStart: Bool
-    
+
     @Binding var isSearching: Bool
-    
+
     func makeUIViewController(context: Context) -> SearchInjectionViewController {
         let controller = SearchInjectionViewController(searchController: context.coordinator.searchController,
                                                        hidesSearchBarWhenScrolling: hidesSearchBarWhenScrolling)
@@ -119,81 +119,81 @@ private struct SearchController: UIViewControllerRepresentable {
         }
         return controller
     }
-    
+
     func updateUIViewController(_ viewController: SearchInjectionViewController, context: Context) {
         let searchController = viewController.searchController
         searchController.searchBar.text = searchQuery
         searchController.hidesNavigationBarDuringPresentation = hidesNavigationBar
         searchController.automaticallyShowsCancelButton = showsCancelButton
-        
+
         if searchController.isActive, !isSearching {
             DispatchQueue.main.async { searchController.isActive = false }
         } else if !searchController.isActive, isSearching {
             DispatchQueue.main.async { searchController.isActive = true }
         }
-        
+
         if let placeholder { // Blindly setting nil clears the default placeholder.
             searchController.searchBar.placeholder = placeholder
         }
-        
+
         viewController.hidesSearchBarWhenScrolling = hidesSearchBarWhenScrolling
     }
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(searchQuery: $searchQuery, isSearching: $isSearching)
     }
-    
+
     class Coordinator: NSObject, UISearchBarDelegate, UISearchControllerDelegate {
         let searchController = UISearchController()
         private let searchQuery: Binding<String>
         private let isSearching: Binding<Bool>
-        
+
         init(searchQuery: Binding<String>, isSearching: Binding<Bool>) {
             self.searchQuery = searchQuery
             self.isSearching = isSearching
-            
+
             super.init()
-            
+
             searchController.delegate = self
             searchController.searchBar.delegate = self
         }
-        
+
         func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
             searchQuery.wrappedValue = searchText
         }
-        
+
         func didPresentSearchController(_ searchController: UISearchController) {
             isSearching.wrappedValue = true
         }
-        
+
         func willDismissSearchController(_ searchController: UISearchController) {
             // Clear any search results when the user taps cancel.
             searchQuery.wrappedValue = ""
         }
-        
+
         func didDismissSearchController(_ searchController: UISearchController) {
             isSearching.wrappedValue = false
         }
     }
-    
+
     class SearchInjectionViewController: UIViewController {
         let searchController: UISearchController
         var hidesSearchBarWhenScrolling: Bool
-        
+
         init(searchController: UISearchController, hidesSearchBarWhenScrolling: Bool) {
             self.searchController = searchController
             self.hidesSearchBarWhenScrolling = hidesSearchBarWhenScrolling
-            
+
             super.init(nibName: nil, bundle: nil)
-            
+
             view.alpha = 0
         }
-        
+
         @available(*, unavailable)
         required init?(coder: NSCoder) {
             fatalError()
         }
-        
+
         override func willMove(toParent parent: UIViewController?) {
             parent?.navigationItem.searchController = searchController
             parent?.navigationItem.preferredSearchBarPlacement = .stacked
@@ -208,7 +208,7 @@ extension View {
     func isSearching(_ isSearching: Binding<Bool>) -> some View {
         modifier(IsSearchingModifier(isSearching: isSearching))
     }
-    
+
     /// Automatically focusses the view's search field if a hardware keyboard is connected.
     func focusSearchIfHardwareKeyboardAvailable() -> some View {
         modifier(FocusSearchIfHardwareKeyboardAvailableModifier())
@@ -218,7 +218,7 @@ extension View {
 private struct IsSearchingModifier: ViewModifier {
     @Environment(\.isSearching) private var isSearchingEnv
     @Binding var isSearching: Bool
-    
+
     func body(content: Content) -> some View {
         content
             .onChange(of: isSearchingEnv) { isSearching = $1 }
@@ -227,13 +227,13 @@ private struct IsSearchingModifier: ViewModifier {
 
 private struct FocusSearchIfHardwareKeyboardAvailableModifier: ViewModifier {
     @FocusState private var isFocused
-    
+
     func body(content: Content) -> some View {
         content
             .searchFocused($isFocused)
             .onAppear(perform: focusIfHardwareKeyboardAvailable)
     }
-    
+
     func focusIfHardwareKeyboardAvailable() {
         // The simulator always detects the hardware keyboard as connected
         #if !targetEnvironment(simulator)

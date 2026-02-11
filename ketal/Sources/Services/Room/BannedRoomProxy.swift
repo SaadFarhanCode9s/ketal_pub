@@ -11,18 +11,18 @@ import MatrixRustSDK
 
 class BannedRoomProxy: BannedRoomProxyProtocol {
     private let room: Room
-    
+
     lazy var id = room.id()
     lazy var ownUserID = room.ownUserId()
-    
+
     let info: BaseRoomInfoProxyProtocol
-        
+
     init(room: Room) async throws {
         self.room = room
-        
+
         info = try await RoomInfoProxy(roomInfo: room.roomInfo())
     }
-    
+
     func forgetRoom() async -> Result<Void, RoomProxyError> {
         do {
             return try await .success(room.forget())

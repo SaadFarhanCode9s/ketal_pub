@@ -13,16 +13,16 @@ import WysiwygComposer
 
 protocol PillAttachmentViewProviderDelegate: AnyObject {
     var timelineContext: TimelineViewModel.Context? { get }
-    
+
     func registerPillView(_ pillView: UIView)
     func invalidateTextAttachmentsDisplay()
 }
 
 final class PillAttachmentViewProvider: NSTextAttachmentViewProvider, NSSecureCoding {
     private weak var delegate: PillAttachmentViewProviderDelegate?
-    
+
     // MARK: - Override
-    
+
     override init(textAttachment: NSTextAttachment, parentView: UIView?, textLayoutManager: NSTextLayoutManager?, location: NSTextLocation) {
         super.init(textAttachment: textAttachment, parentView: parentView, textLayoutManager: textLayoutManager, location: location)
 
@@ -30,7 +30,7 @@ final class PillAttachmentViewProvider: NSTextAttachmentViewProvider, NSSecureCo
         delegate = parentView?.superview as? PillAttachmentViewProviderDelegate
         tracksTextAttachmentViewBounds = true
     }
-    
+
     @MainActor
     override func loadView() {
         super.loadView()
@@ -40,7 +40,7 @@ final class PillAttachmentViewProvider: NSTextAttachmentViewProvider, NSSecureCo
             MXLog.failure("Attachment is missing data or not of expected class")
             return
         }
-        
+
         let context: PillContext
         if ProcessInfo.isXcodePreview || ProcessInfo.isRunningTests {
             // The mock viewModel simulates the loading logic for testing purposes
@@ -51,7 +51,7 @@ final class PillAttachmentViewProvider: NSTextAttachmentViewProvider, NSSecureCo
             MXLog.failure("Missing room context")
             return
         }
-        
+
         let view = PillView(context: context) { [weak self] in
             self?.delegate?.invalidateTextAttachmentsDisplay()
         }
@@ -62,18 +62,18 @@ final class PillAttachmentViewProvider: NSTextAttachmentViewProvider, NSSecureCo
         self.view = controller.view
         delegate?.registerPillView(controller.view)
     }
-    
+
     // MARK: - NSSecureCoding
-    
+
     // Fixes crashes when inserting mention pills in the composer on Mac
     // https://github.com/element-hq/element-x-ios/issues/2070
-    
+
     // periphery:ignore - read comment above
     static var supportsSecureCoding = false
-    
+
     // periphery:ignore - read comment above
     func encode(with coder: NSCoder) { }
-    
+
     // periphery:ignore - read comment above
     init?(coder: NSCoder) {
         fatalError("Not implemented")
@@ -86,7 +86,7 @@ final class ComposerMentionDisplayHelper: MentionDisplayHelper {
     init(timelineContext: TimelineViewModel.Context) {
         self.timelineContext = timelineContext
     }
-    
+
     @MainActor
     static var mock: Self {
         Self(timelineContext: TimelineViewModel.mock.context)
@@ -97,6 +97,6 @@ extension WysiwygTextView: PillAttachmentViewProviderDelegate {
     var timelineContext: TimelineViewModel.Context? {
         (mentionDisplayHelper as? ComposerMentionDisplayHelper)?.timelineContext
     }
-    
+
     func invalidateTextAttachmentsDisplay() { }
 }

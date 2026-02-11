@@ -15,10 +15,10 @@ struct VideoRoomTimelineItemContent: Hashable {
     var formattedCaption: AttributedString?
     /// The original textual representation of the formatted caption directly from the event (usually HTML code)
     var formattedCaptionHTMLString: String?
-    
+
     let videoInfo: VideoInfoProxy
     let thumbnailInfo: ImageInfoProxy?
-    
+
     var blurhash: String?
     var contentType: UTType?
 }

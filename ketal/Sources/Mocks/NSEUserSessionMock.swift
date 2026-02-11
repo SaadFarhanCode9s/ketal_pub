@@ -16,7 +16,7 @@ struct NSEUserSessionMockConfiguration {
 extension NSEUserSessionMock {
     convenience init(_ configuration: NSEUserSessionMockConfiguration) {
         self.init()
-        
+
         underlyingInviteAvatarsVisibility = configuration.inviteAvatarsVisibility
         underlyingMediaPreviewVisibility = configuration.mediaPreviewVisibility
         underlyingThreadsEnabled = configuration.threadsEnabled

@@ -20,11 +20,11 @@ class UITestsNotificationCenter: NotificationCenter, @unchecked Sendable {
     // periphery:ignore - retaining purpose
     private var client: UITestsSignalling.Client?
     private var signalCancellable: AnyCancellable?
-    
+
     /// Starts listening for signals to post notifications.
     func startListening() throws {
         let client = try UITestsSignalling.Client(mode: .app)
-        
+
         signalCancellable = client.signals.sink { [weak self] signal in
             Task {
                 do {
@@ -34,10 +34,10 @@ class UITestsNotificationCenter: NotificationCenter, @unchecked Sendable {
                 }
             }
         }
-        
+
         self.client = client
     }
-    
+
     /// Handles any notification signals, and drops anything else received.
     private func handleSignal(_ signal: UITestsSignal) async throws {
         switch signal {

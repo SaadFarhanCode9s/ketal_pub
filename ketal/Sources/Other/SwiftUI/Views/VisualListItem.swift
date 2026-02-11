@@ -29,7 +29,7 @@ struct VisualListItem<Icon: View>: View {
     let title: String
     let position: ListPosition
     let iconContent: () -> Icon
-    
+
     var body: some View {
         Label { Text(title) } icon: {
             iconContent()
@@ -65,7 +65,7 @@ struct VisualListItem_Previews: PreviewProvider, TestablePreview {
     static var testImage2: some View {
         Image(systemName: "square")
     }
-    
+
     static var previews: some View {
         VStack(alignment: .leading, spacing: 4) {
             VisualListItem(title: strings.point1, position: .top) {

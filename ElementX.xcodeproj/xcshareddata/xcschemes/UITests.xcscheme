@@ -18,7 +18,7 @@
                BlueprintIdentifier = "0E28CD62691FDBC63147D5E3"
                BuildableName = "UITests.xctest"
                BlueprintName = "UITests"
-               ReferencedContainer = "container:ketal.xcodeproj">
+               ReferencedContainer = "container:ElementX.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -41,7 +41,7 @@
             BlueprintIdentifier = "0E28CD62691FDBC63147D5E3"
             BuildableName = "UITests.xctest"
             BlueprintName = "UITests"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -65,7 +65,7 @@
             BlueprintIdentifier = "0E28CD62691FDBC63147D5E3"
             BuildableName = "UITests.xctest"
             BlueprintName = "UITests"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <CommandLineArguments>
@@ -85,7 +85,7 @@
             BlueprintIdentifier = "0E28CD62691FDBC63147D5E3"
             BuildableName = "UITests.xctest"
             BlueprintName = "UITests"
-            ReferencedContainer = "container:ketal.xcodeproj">
+            ReferencedContainer = "container:ElementX.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

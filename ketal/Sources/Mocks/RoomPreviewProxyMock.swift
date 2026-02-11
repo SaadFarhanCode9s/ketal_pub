@@ -23,51 +23,51 @@ extension RoomPreviewProxyMock {
         var joinRule: JoinRule
         var isDirect = false
     }
-    
+
     static var joinable: RoomPreviewProxyMock {
         .init(.init(membership: nil, joinRule: .public))
     }
-    
+
     static var restricted: RoomPreviewProxyMock {
         .init(.init(membership: nil, joinRule: .restricted(rules: [])))
     }
-    
+
     static var inviteRequired: RoomPreviewProxyMock {
         .init(.init(membership: nil, joinRule: .invite))
     }
-    
+
     static func invited(roomID: String? = nil) -> RoomPreviewProxyMock {
         if let roomID {
             return .init(.init(roomID: roomID, membership: .invited, joinRule: .invite))
         }
-        
+
         return .init(.init(membership: .invited, joinRule: .invite))
     }
-    
+
     static func inviteDM(roomID: String? = nil) -> RoomPreviewProxyMock {
         if let roomID {
             return .init(.init(roomID: roomID, topic: nil, numJoinedMembers: 1, membership: .invited, joinRule: .invite, isDirect: true))
         }
-        
+
         return .init(.init(topic: nil, numJoinedMembers: 1, membership: .invited, joinRule: .invite, isDirect: true))
     }
-    
+
     static var knockable: RoomPreviewProxyMock {
         .init(.init(membership: nil, joinRule: .knock))
     }
-    
+
     static var knockableRestricted: RoomPreviewProxyMock {
         .init(.init(membership: nil, joinRule: .knockRestricted(rules: [])))
     }
-    
+
     static var knocked: RoomPreviewProxyMock {
         .init(.init(membership: .knocked, joinRule: .knock))
     }
-    
+
     static var banned: RoomPreviewProxyMock {
         .init(.init(membership: .banned, joinRule: .public))
     }
-    
+
     convenience init(_ configuration: RoomPreviewProxyMock.Configuration) {
         self.init()
         underlyingInfo = .init(roomPreviewInfo: .init(roomId: configuration.roomID,
@@ -80,25 +80,25 @@ extension RoomPreviewProxyMock {
                                                       roomType: configuration.roomType,
                                                       isHistoryWorldReadable: nil,
                                                       membership: configuration.membership,
-                                                      joinRule: configuration.joinRule.rustValue,
+                                                      joinRule: configuration.joinRule,
                                                       isDirect: configuration.isDirect,
                                                       heroes: nil))
-        
+
         let roomMembershipDetails = RoomMembershipDetailsProxyMock()
-        
+
         let mockMember = RoomMemberProxyMock()
         mockMember.userID = "@bob:matrix.org"
         mockMember.displayName = "Billy Bob"
         mockMember.avatarURL = .mockMXCUserAvatar
         mockMember.membershipChangeReason = "Ain't nobody need no reason"
-        
+
         roomMembershipDetails.senderRoomMember = mockMember
         roomMembershipDetails.ownRoomMember = mockMember
-        
+
         underlyingOwnMembershipDetails = roomMembershipDetails
     }
-    
-    convenience init(spaceServiceRoom: SpaceServiceRoom) {
+
+    convenience init(spaceServiceRoom: SpaceServiceRoomProtocol) {
         self.init(Configuration(roomID: spaceServiceRoom.id,
                                 canonicalAlias: spaceServiceRoom.canonicalAlias ?? "",
                                 name: spaceServiceRoom.name,

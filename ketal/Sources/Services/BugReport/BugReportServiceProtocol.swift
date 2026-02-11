@@ -24,7 +24,7 @@ struct BugReport: Equatable {
 
 struct SubmitBugReportResponse: Decodable {
     var reportURL: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case reportURL = "report_url"
     }
@@ -34,7 +34,7 @@ enum BugReportServiceError: LocalizedError {
     case uploadFailure(Error)
     case serverError(URLResponse, String)
     case httpError(HTTPURLResponse, String)
-    
+
     var errorDescription: String? {
         switch self {
         case .uploadFailure(let error):
@@ -51,9 +51,9 @@ enum BugReportServiceError: LocalizedError {
 protocol BugReportServiceProtocol: AnyObject {
     var isEnabled: Bool { get }
     var crashedLastRun: Bool { get }
-    
+
     var lastCrashEventID: String? { get set }
-    
+
     func submitBugReport(_ bugReport: BugReport,
                          progressListener: CurrentValueSubject<Double, Never>) async -> Result<SubmitBugReportResponse, BugReportServiceError>
 }

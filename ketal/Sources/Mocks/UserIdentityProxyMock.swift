@@ -10,10 +10,10 @@ extension UserIdentityProxyMock {
     struct Configuration {
         var verificationState: UserIdentityVerificationState = .notVerified
     }
-    
+
     convenience init(configuration: Configuration) {
         self.init()
-        
+
         underlyingVerificationState = configuration.verificationState
     }
 }

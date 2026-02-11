@@ -14,11 +14,11 @@ struct LocationRoomTimelineItem: EventBasedMessageTimelineItemProtocol, Equatabl
     let isOutgoing: Bool
     let isEditable: Bool
     let canBeRepliedTo: Bool
-    
+
     let sender: TimelineItemSender
 
     let content: LocationRoomTimelineItemContent
-    
+
     var properties = RoomTimelineItemProperties()
 
     var body: String {

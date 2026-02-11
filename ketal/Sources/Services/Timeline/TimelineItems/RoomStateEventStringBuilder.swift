@@ -12,7 +12,7 @@ import UIKit
 struct RoomStateEventStringBuilder {
     let userID: String
     var shouldDisambiguateDisplayNames = true
-    
+
     func buildString(for change: MembershipChange?,
                      reason: String?,
                      memberUserID: String,
@@ -23,7 +23,7 @@ struct RoomStateEventStringBuilder {
             MXLog.verbose("Filtering timeline item for membership change that is nil")
             return nil
         }
-        
+
         let senderIsYou = isOutgoing
         let memberIsYou = memberUserID == userID
         let member = memberDisplayName ?? memberUserID
@@ -32,7 +32,7 @@ struct RoomStateEventStringBuilder {
         } else {
             sender.displayName ?? sender.id
         }
-        
+
         switch change {
         case .joined:
             return memberIsYou ? L10n.stateEventRoomJoinByYou : L10n.stateEventRoomJoin(senderDisplayName)
@@ -58,7 +58,7 @@ struct RoomStateEventStringBuilder {
             if senderIsYou {
                 return L10n.stateEventRoomInviteByYou(member)
             } else if memberIsYou {
-                return buildInvitedYouString(senderDisplayName)
+                return L10n.stateEventRoomInviteYou(senderDisplayName)
             } else {
                 return L10n.stateEventRoomInvite(senderDisplayName, member)
             }
@@ -87,17 +87,13 @@ struct RoomStateEventStringBuilder {
             return nil
         }
     }
-    
-    func buildInvitedYouString(_ senderDisplayName: String) -> String {
-        L10n.stateEventRoomInviteYou(senderDisplayName)
-    }
-    
+
     func buildProfileChangeString(displayName: String?, previousDisplayName: String?,
                                   avatarURLString: String?, previousAvatarURLString: String?,
                                   member: String, memberIsYou: Bool) -> String? {
         let displayNameChanged = displayName != previousDisplayName
         let avatarChanged = avatarURLString != previousAvatarURLString
-        
+
         switch (displayNameChanged, avatarChanged, memberIsYou) {
         case (true, false, false):
             if let displayName, let previousDisplayName {
@@ -136,14 +132,14 @@ struct RoomStateEventStringBuilder {
             return nil
         }
     }
-    
+
     func buildString(for state: OtherState, sender: TimelineItemSender, isOutgoing: Bool) -> String? {
         let displayName = if shouldDisambiguateDisplayNames {
             sender.disambiguatedDisplayName ?? sender.id
         } else {
             sender.displayName ?? sender.id
         }
-        
+
         switch state {
         case .roomAvatar(let url):
             switch (url, isOutgoing) {
@@ -176,7 +172,7 @@ struct RoomStateEventStringBuilder {
                 MXLog.error("roomThirdPartyInvite undisplayable due to missing name.")
                 return nil
             }
-            
+
             if isOutgoing {
                 return L10n.stateEventRoomThirdPartyInviteByYou(displayName)
             } else {
@@ -221,7 +217,7 @@ struct RoomStateEventStringBuilder {
         case .custom: // Won't provide actionable information to the user.
             break
         }
-        
+
         MXLog.verbose("Filtering timeline item for state: \(state)")
         return nil
     }

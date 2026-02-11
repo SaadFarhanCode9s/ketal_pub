@@ -27,55 +27,56 @@ class AnalyticsService {
     /// The analytics client to send events with.
     private let client: AnalyticsClientProtocol
     private let appSettings: AppSettings
-    
+
     /// A signpost client for performance testing the app. This client doesn't respect the
     /// `isRunning` state or behave any differently when `start`/`reset` are called.
     let signpost = Signposter()
-    
+
     init(client: AnalyticsClientProtocol, appSettings: AppSettings) {
         self.client = client
         self.appSettings = appSettings
     }
-    
+
     /// Whether to show the user the analytics opt in prompt.
     var shouldShowAnalyticsPrompt: Bool {
         // Only show the prompt once, and when analytics are enabled in BuildSettings.
-        appSettings.analyticsConsentState == .unknown && appSettings.canPromptForAnalytics
+        // appSettings.analyticsConsentState == .unknown && appSettings.canPromptForAnalytics
+        false
     }
-    
+
     var isEnabled: Bool {
         appSettings.analyticsConsentState == .optedIn
     }
-    
+
     /// Opts in to analytics tracking with the supplied user session.
     func optIn() {
         appSettings.analyticsConsentState = .optedIn
         startIfEnabled()
     }
-    
+
     /// Stops analytics tracking and calls `reset` to clear any IDs and event queues.
     func optOut() {
         appSettings.analyticsConsentState = .optedOut
-        
+
         // The order is important here. PostHog ignores the reset if stopped.
         reset()
         client.stop()
 
         MXLog.info("Stopped.")
     }
-    
+
     /// Starts the analytics client if the user has opted in, otherwise does nothing.
     func startIfEnabled() {
         guard isEnabled, !client.isRunning, let configuration = appSettings.analyticsConfiguration else { return }
-        
+
         client.start(analyticsConfiguration: configuration)
 
         // Sanity check in case something went wrong.
         guard client.isRunning else { return }
-        
+
         MXLog.info("Started.")
     }
-    
+
     /// Resets the any IDs and event queues in the analytics client. This method should
     /// be called on sign-out to maintain opt-in status, whilst ensuring the next
     /// account used isn't associated with the previous one.
@@ -84,15 +85,15 @@ class AnalyticsService {
         client.reset()
         MXLog.info("Reset.")
     }
-    
+
     /// Reset the consent state for analytics
     func resetConsentState() {
         MXLog.warning("Resetting consent state for analytics.")
         appSettings.analyticsConsentState = .unknown
     }
-    
+
     // MARK: - Private
-    
+
     /// Capture an event in the `client`.
     /// - Parameter event: The event to capture.
     private func capture(event: AnalyticsEventProtocol) {
@@ -112,11 +113,11 @@ extension AnalyticsService {
         let event = AnalyticsEvent.MobileScreen(durationMs: milliseconds, screenName: screen)
         client.screen(event)
     }
-    
+
     func trackInteraction(index: Int? = nil, name: AnalyticsEvent.Interaction.Name) {
         capture(event: AnalyticsEvent.Interaction(index: index, interactionType: .Touch, name: name))
     }
-    
+
     /// Track the presentation of a screen
     /// - Parameter context: To provide additional context or description for the error
     /// - Parameter domain: The domain to which the error belongs to.
@@ -144,13 +145,13 @@ extension AnalyticsService {
                                             userTrustsOwnIdentity: userTrustsOwnIdentity,
                                             wasVisibleToUser: wasVisibleToUser))
     }
-    
+
     /// Track the creation of a room
     /// - Parameter isDM: true if the created room is a direct message, false otherwise
     func trackCreatedRoom(isDM: Bool) {
         capture(event: AnalyticsEvent.CreatedRoom(isDM: isDM))
     }
-    
+
     /// Track the composer
     /// - Parameters:
     ///   - inThread: whether the composer is used in a Thread
@@ -169,7 +170,7 @@ extension AnalyticsService {
                                                messageType: messageType,
                                                startsThread: startsThread))
     }
-    
+
     /// Track the presentation of a room
     /// - Parameters:
     ///   - isDM: whether the room is a direct message
@@ -177,7 +178,7 @@ extension AnalyticsService {
     func trackViewRoom(isDM: Bool, isSpace: Bool) {
         capture(event: AnalyticsEvent.ViewRoom(activeSpace: nil, isDM: isDM, isSpace: isSpace, trigger: nil, viaKeyboard: nil))
     }
-    
+
     /// Track the action of joining a room
     /// - Parameters:
     ///   - isDM: whether the room is a direct message
@@ -210,16 +211,16 @@ extension AnalyticsService {
     func trackPollEnd() {
         capture(event: AnalyticsEvent.PollEnd(doNotUse: nil))
     }
-    
+
     /// Track a room moderation action.
     func trackRoomModeration(action: AnalyticsEvent.RoomModeration.Action, role: RoomRole?) {
         let role = role.map(AnalyticsEvent.RoomModeration.Role.init)
         capture(event: AnalyticsEvent.RoomModeration(action: action, role: role))
     }
-    
+
     func trackSessionSecurityState(_ state: SessionSecurityState) {
         let analyticsVerificationState: AnalyticsEvent.CryptoSessionStateChange.VerificationState
-        
+
         switch state.verificationState {
         case .unknown:
             return
@@ -228,9 +229,9 @@ extension AnalyticsService {
         case .unverified:
             analyticsVerificationState = .NotVerified
         }
-        
+
         let analyticsRecoveryState: AnalyticsEvent.CryptoSessionStateChange.RecoveryState
-        
+
         switch state.recoveryState {
         case .enabled:
             analyticsRecoveryState = .Enabled
@@ -247,11 +248,11 @@ extension AnalyticsService {
         let event = AnalyticsEvent.CryptoSessionStateChange(recoveryState: analyticsRecoveryState, verificationState: analyticsVerificationState)
         client.capture(event)
     }
-    
+
     func updateUserProperties(_ userProperties: AnalyticsEvent.UserProperties) {
         client.updateUserProperties(userProperties)
     }
-    
+
     func trackPinUnpinEvent(_ event: AnalyticsEvent.PinUnpinAction) {
         capture(event: event)
     }

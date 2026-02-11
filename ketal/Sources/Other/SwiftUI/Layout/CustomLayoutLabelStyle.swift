@@ -18,20 +18,20 @@ extension LabelStyle where Self == CustomLayoutLabelStyle {
 struct CustomLayoutLabelStyle: LabelStyle {
     let spacing: CGFloat
     var alignment: VerticalAlignment
-    
+
     enum IconLayout {
         case leading
         case trailing
     }
-    
+
     var iconLayout: IconLayout
-    
+
     fileprivate init(spacing: CGFloat, alignment: VerticalAlignment, iconLayout: IconLayout) {
         self.spacing = spacing
         self.alignment = alignment
         self.iconLayout = iconLayout
     }
-    
+
     func makeBody(configuration: Configuration) -> some View {
         HStack(alignment: alignment, spacing: spacing) {
             switch iconLayout {

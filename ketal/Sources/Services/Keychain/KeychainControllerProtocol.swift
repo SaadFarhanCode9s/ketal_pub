@@ -17,14 +17,14 @@ struct KeychainCredentials {
 // sourcery: AutoMockable
 protocol KeychainControllerProtocol: ClientSessionDelegate {
     // MARK: Restoration Tokens
-    
+
     func setRestorationToken(_ restorationToken: RestorationToken, forUsername: String)
     func restorationTokens() -> [KeychainCredentials]
     func removeRestorationTokenForUsername(_ username: String)
     func removeAllRestorationTokens()
-    
+
     // MARK: App Secrets
-    
+
     /// Whether or not an App Lock PIN code has been set.
     func containsPINCode() throws -> Bool
     /// Sets a new PIN code for App Lock.

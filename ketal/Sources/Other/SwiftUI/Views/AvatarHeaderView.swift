@@ -14,23 +14,23 @@ struct AvatarHeaderView<Footer: View>: View {
         case room(RoomAvatar)
         case user(UserProfileProxy)
     }
-    
+
     private enum Badge: Hashable {
         case encrypted(Bool)
         case `public`
         case verified
     }
-    
+
     private let avatarInfo: AvatarInfo
     private let title: String
     private let subtitle: String?
     private let badges: [Badge]
-    
+
     private let avatarSize: Avatars.Size
     private let mediaProvider: MediaProviderProtocol?
     private var onAvatarTap: ((URL) -> Void)?
     @ViewBuilder private var footer: () -> Footer
-    
+
     init(room: RoomDetails,
          avatarSize: Avatars.Size,
          mediaProvider: MediaProviderProtocol? = nil,
@@ -38,7 +38,7 @@ struct AvatarHeaderView<Footer: View>: View {
          @ViewBuilder footer: @escaping () -> Footer) {
         avatarInfo = .room(room.avatar)
         title = room.name ?? room.id
-        
+
         if let roomAlias = room.canonicalAlias {
             subtitle = roomAlias
         } else if room.isDirect, case let .heroes(heroes) = room.avatar, heroes.count == 1 {
@@ -46,12 +46,12 @@ struct AvatarHeaderView<Footer: View>: View {
         } else {
             subtitle = nil
         }
-        
+
         self.avatarSize = avatarSize
         self.mediaProvider = mediaProvider
         self.onAvatarTap = onAvatarTap
         self.footer = footer
-        
+
         var badges = [Badge]()
         badges.append(.encrypted(room.isEncrypted))
         if room.isPublic {
@@ -59,7 +59,7 @@ struct AvatarHeaderView<Footer: View>: View {
         }
         self.badges = badges
     }
-    
+
     init(accountOwner: RoomMemberDetails,
          dmRecipient: RoomMemberDetails,
          mediaProvider: MediaProviderProtocol? = nil,
@@ -69,7 +69,7 @@ struct AvatarHeaderView<Footer: View>: View {
         avatarInfo = .room(.heroes([dmRecipientProfile, UserProfileProxy(member: accountOwner)]))
         title = dmRecipientProfile.displayName ?? dmRecipientProfile.userID
         subtitle = dmRecipientProfile.displayName == nil ? nil : dmRecipientProfile.userID
-        
+
         avatarSize = .user(on: .dmDetails)
         self.mediaProvider = mediaProvider
         self.onAvatarTap = onAvatarTap
@@ -77,7 +77,7 @@ struct AvatarHeaderView<Footer: View>: View {
         // In EL-X a DM is by definition always encrypted
         badges = [.encrypted(true)]
     }
-    
+
     init(member: RoomMemberDetails,
          isVerified: Bool = false,
          avatarSize: Avatars.Size,
@@ -85,7 +85,7 @@ struct AvatarHeaderView<Footer: View>: View {
          onAvatarTap: ((URL) -> Void)? = nil,
          @ViewBuilder footer: @escaping () -> Footer) {
         let profile = UserProfileProxy(member: member)
-        
+
         self.init(user: profile,
                   isVerified: isVerified,
                   avatarSize: avatarSize,
@@ -93,7 +93,7 @@ struct AvatarHeaderView<Footer: View>: View {
                   onAvatarTap: onAvatarTap,
                   footer: footer)
     }
-    
+
     init(user: UserProfileProxy,
          isVerified: Bool,
          avatarSize: Avatars.Size,
@@ -103,14 +103,14 @@ struct AvatarHeaderView<Footer: View>: View {
         avatarInfo = .user(user)
         title = user.displayName ?? user.userID
         subtitle = user.displayName == nil ? nil : user.userID
-        
+
         self.avatarSize = avatarSize
         self.mediaProvider = mediaProvider
         self.onAvatarTap = onAvatarTap
         self.footer = footer
         badges = isVerified ? [.verified] : []
     }
-    
+
     /// Initialises the view by using the sender,
     /// only to be used when a room member has not been loaded yet.
     init(sender: TimelineItemSender,
@@ -119,7 +119,7 @@ struct AvatarHeaderView<Footer: View>: View {
          onAvatarTap: ((URL) -> Void)? = nil,
          @ViewBuilder footer: @escaping () -> Footer) {
         let profile = UserProfileProxy(sender: sender)
-        
+
         self.init(user: profile,
                   isVerified: false,
                   avatarSize: avatarSize,
@@ -127,7 +127,7 @@ struct AvatarHeaderView<Footer: View>: View {
                   onAvatarTap: onAvatarTap,
                   footer: footer)
     }
-    
+
     private var badgesStack: some View {
         HStack(spacing: 8) {
             ForEach(badges, id: \.self) { badge in
@@ -152,7 +152,7 @@ struct AvatarHeaderView<Footer: View>: View {
             }
         }
     }
-    
+
     private var avatarAccessibilityLabel: String {
         guard onAvatarTap != nil else {
             return L10n.a11yAvatar
@@ -164,7 +164,7 @@ struct AvatarHeaderView<Footer: View>: View {
             return userProfileProxy.avatarURL != nil ? L10n.a11yViewAvatar : L10n.a11yAvatar
         }
     }
-    
+
     @ViewBuilder
     private var avatar: some View {
         switch avatarInfo {
@@ -174,7 +174,7 @@ struct AvatarHeaderView<Footer: View>: View {
                             mediaProvider: mediaProvider,
                             onAvatarTap: onAvatarTap)
                 .accessibilityLabel(avatarAccessibilityLabel)
-            
+
         case .user(let userProfile):
             LoadableAvatarImage(url: userProfile.avatarURL,
                                 name: userProfile.displayName,
@@ -185,20 +185,20 @@ struct AvatarHeaderView<Footer: View>: View {
                 .accessibilityLabel(avatarAccessibilityLabel)
         }
     }
-    
+
     var body: some View {
         VStack(spacing: 8.0) {
             avatar
-            
+
             Spacer()
                 .frame(height: 9)
-            
+
             Text(title)
                 .foregroundColor(.compound.textPrimary)
                 .font(.compound.headingMDBold)
                 .multilineTextAlignment(.center)
                 .textSelection(.enabled)
-            
+
             if let subtitle {
                 Text(subtitle)
                     .foregroundColor(.compound.textSecondary)
@@ -206,11 +206,11 @@ struct AvatarHeaderView<Footer: View>: View {
                     .multilineTextAlignment(.center)
                     .textSelection(.enabled)
             }
-            
+
             if !badges.isEmpty {
                 badgesStack
             }
-            
+
             footer()
         }
         .frame(maxWidth: .infinity, alignment: .center)
@@ -246,7 +246,7 @@ struct AvatarHeaderView_Previews: PreviewProvider, TestablePreview {
             }
         }
         .previewDisplayName("Room")
-        
+
         Form {
             AvatarHeaderView(accountOwner: RoomMemberDetails(withProxy: RoomMemberProxyMock.mockMe), dmRecipient: RoomMemberDetails(withProxy: RoomMemberProxyMock.mockAlice),
                              mediaProvider: MediaProviderMock(configuration: .init())) {
@@ -260,17 +260,17 @@ struct AvatarHeaderView_Previews: PreviewProvider, TestablePreview {
             }
         }
         .previewDisplayName("DM")
-        
+
         VStack(spacing: 16) {
             AvatarHeaderView(member: RoomMemberDetails(withProxy: RoomMemberProxyMock.mockAlice),
                              avatarSize: .room(on: .details),
                              mediaProvider: MediaProviderMock(configuration: .init())) { Text("") }
-            
+
             AvatarHeaderView(member: RoomMemberDetails(withProxy: RoomMemberProxyMock.mockBob),
                              isVerified: true,
                              avatarSize: .room(on: .details),
                              mediaProvider: MediaProviderMock(configuration: .init())) { Text("") }
-            
+
             AvatarHeaderView(member: RoomMemberDetails(withProxy: RoomMemberProxyMock.mockBanned[3]),
                              avatarSize: .room(on: .details),
                              mediaProvider: MediaProviderMock(configuration: .init())) { Text("") }

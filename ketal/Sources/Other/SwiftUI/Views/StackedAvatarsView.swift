@@ -21,7 +21,7 @@ struct StackedAvatarsView: View {
     let avatars: [StackedAvatarInfo]
     let avatarSize: Avatars.Size
     let mediaProvider: MediaProviderProtocol?
-    
+
     var body: some View {
         HStack(spacing: -overlap) {
             ForEach(0..<avatars.count, id: \.self) { index in

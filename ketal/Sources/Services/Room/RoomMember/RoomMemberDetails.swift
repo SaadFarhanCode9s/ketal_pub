@@ -14,7 +14,7 @@ struct RoomMemberDetails: Identifiable, Hashable {
     let name: String?
     let avatarURL: URL?
     let permalink: URL?
-    
+
     var isInvited: Bool
     var isIgnored: Bool
     var isBanned: Bool
@@ -22,7 +22,7 @@ struct RoomMemberDetails: Identifiable, Hashable {
 
     let role: RoomRole
     let powerLevel: RoomPowerLevel
-    
+
     func matches(searchQuery: String) -> Bool {
         guard !searchQuery.isEmpty else { return true }
         return id.localizedStandardContains(searchQuery) || name?.localizedStandardContains(searchQuery) == true

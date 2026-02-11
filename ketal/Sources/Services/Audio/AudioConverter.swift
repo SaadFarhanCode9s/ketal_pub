@@ -28,7 +28,7 @@ struct AudioConverter: AudioConverterProtocol {
             throw AudioConverterError.conversionFailed(error)
         }
     }
-    
+
     func convertToMPEG4AAC(sourceURL: URL, destinationURL: URL) throws {
         do {
             try OGGConverter.convertOpusOGGToM4aFile(src: sourceURL, dest: destinationURL)

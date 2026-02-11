@@ -24,10 +24,10 @@ class RoomPermissionsTests: XCTestCase {
                                                 roomAvatar: 0,
                                                 roomTopic: 0,
                                                 spaceChild: 100)
-        
+
         // When creating room permissions from them.
         let permissions = RoomPermissions(powerLevels: powerLevels)
-        
+
         // Then the permissions should be created with values mapped to the correct role.
         XCTAssertEqual(permissions.ban, RoomRole.administrator.powerLevelValue)
         XCTAssertEqual(permissions.invite, RoomRole.administrator.powerLevelValue)

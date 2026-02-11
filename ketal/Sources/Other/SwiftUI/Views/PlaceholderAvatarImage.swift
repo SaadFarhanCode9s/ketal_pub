@@ -14,12 +14,12 @@ struct PlaceholderAvatarImage: View {
 
     private let textForImage: String
     private let contentID: String
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .center) {
                 backgroundColor
-                
+
                 // This text's frame doesn't look right when redacted
                 if redactionReasons != .placeholder {
                     Text(textForImage)
@@ -46,7 +46,7 @@ struct PlaceholderAvatarImage: View {
 
         return avatarColor?.background ?? .compound.iconPrimary
     }
-    
+
     private var avatarColor: DecorativeColor? {
         Color.compound.decorativeColor(for: contentID)
     }
@@ -58,15 +58,15 @@ struct PlaceholderAvatarImage_Previews: PreviewProvider, TestablePreview {
             PlaceholderAvatarImage(name: "Xavier", contentID: "@userid1:matrix.org")
                 .clipShape(Circle())
                 .frame(width: 150, height: 100)
-            
+
             PlaceholderAvatarImage(name: "@*~AmazingName~*@", contentID: "@userid2:matrix.org")
                 .clipShape(Circle())
                 .frame(width: 150, height: 100)
-            
+
             PlaceholderAvatarImage(name: nil, contentID: "@userid3:matrix.org")
                 .clipShape(Circle())
                 .frame(width: 150, height: 100)
-            
+
             PlaceholderAvatarImage(name: nil, contentID: "@fooserid:matrix.org")
                 .clipShape(Circle())
                 .frame(width: 30, height: 30)

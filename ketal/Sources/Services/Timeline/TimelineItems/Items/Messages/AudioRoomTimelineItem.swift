@@ -15,17 +15,17 @@ struct AudioRoomTimelineItem: EventBasedMessageTimelineItemProtocol, Equatable {
     let isEditable: Bool
     let canBeRepliedTo: Bool
     var shouldBoost = false
-    
+
     let sender: TimelineItemSender
-    
+
     let content: AudioRoomTimelineItemContent
 
     var properties = RoomTimelineItemProperties()
-    
+
     var body: String {
         content.caption ?? content.filename
     }
-    
+
     var contentType: EventBasedMessageTimelineItemContentType {
         .audio(content)
     }

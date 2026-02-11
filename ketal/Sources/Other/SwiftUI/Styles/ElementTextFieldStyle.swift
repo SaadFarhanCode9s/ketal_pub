@@ -20,7 +20,7 @@ extension TextFieldStyle where Self == ElementTextFieldStyle {
                               state: state,
                               accessibilityIdentifier: accessibilityIdentifier)
     }
-    
+
     @_disfavoredOverload
     static func element(labelText: Text? = nil,
                         footerText: Text? = nil,
@@ -34,60 +34,60 @@ extension TextFieldStyle where Self == ElementTextFieldStyle {
 }
 
 /// The text field style used in authentication screens.
-struct ElementTextFieldStyle: @MainActor TextFieldStyle {
+struct ElementTextFieldStyle: @preconcurrency TextFieldStyle {
     enum State {
         case success
         case error
         case `default`
     }
-    
+
     @Environment(\.isEnabled) private var isEnabled
-    
+
     @FocusState private var isFocused: Bool
     let labelText: Text?
     let footerText: Text?
     let state: State
     let accessibilityIdentifier: String?
-    
+
     private var isError: Bool {
         state == .error
     }
-    
+
     /// The color of the text field's border.
     private var borderColor: Color {
         isError ? .compound.textCriticalPrimary : .compound._borderTextFieldFocused
     }
-    
+
     /// The width of the text field's border.
     private var borderWidth: CGFloat {
         isFocused || isError ? 1.0 : 0
     }
-    
+
     private var accentColor: Color {
         isError ? .compound.textCriticalPrimary : .compound.iconAccentTertiary
     }
-    
+
     /// The color of the text inside the text field.
     private var textColor: Color {
         isEnabled ? .compound.textPrimary : .compound.textDisabled
     }
-    
+
     /// The color of the text field's background.
     private var backgroundColor: Color {
         isError ? .compound.bgCriticalSubtleHovered :
             .compound.bgSubtleSecondary.opacity(isEnabled ? 1 : 0.5)
     }
-    
+
     /// The color of the placeholder text inside the text field.
     private var placeholderColor: UIColor {
         .compound.textSecondary
     }
-    
+
     /// The color of the label above the text field.
     private var labelColor: Color {
         isEnabled ? .compound.textPrimary : .compound.textDisabled
     }
-    
+
     /// The color of the footer label below the text field.
     private var footerTextColor: Color {
         switch state {
@@ -99,7 +99,7 @@ struct ElementTextFieldStyle: @MainActor TextFieldStyle {
             .compound.textSuccessPrimary
         }
     }
-    
+
     private var footerIconColor: Color {
         switch state {
         // Doesn't matter we don't render it
@@ -111,7 +111,7 @@ struct ElementTextFieldStyle: @MainActor TextFieldStyle {
             .compound.iconSuccessPrimary
         }
     }
-    
+
     /// Creates the text field style configured as required.
     /// - Parameters:
     ///   - labelText: The text shown in the label above the field.
@@ -123,17 +123,17 @@ struct ElementTextFieldStyle: @MainActor TextFieldStyle {
         self.state = state
         self.accessibilityIdentifier = accessibilityIdentifier
     }
-    
+
     @MainActor
     func _body(configuration: TextField<_Label>) -> some View {
         let rectangle = RoundedRectangle(cornerRadius: 14.0)
-        
+
         return VStack(alignment: .leading, spacing: 8) {
             labelText
                 .font(.compound.bodySMSemibold)
                 .foregroundColor(labelColor)
                 .padding(.horizontal, 16)
-            
+
             configuration
                 .focused($isFocused)
                 .font(.compound.bodyLG)
@@ -156,7 +156,7 @@ struct ElementTextFieldStyle: @MainActor TextFieldStyle {
                                                                          attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
                     textField.accessibilityIdentifier = accessibilityIdentifier
                 }
-            
+
             if let footerText {
                 Label {
                     footerText
@@ -195,7 +195,7 @@ struct ElementTextFieldStyle_Previews: PreviewProvider, TestablePreview {
                 .disabled(true)
             TextField("Placeholder", text: .constant("Web"))
                 .textFieldStyle(.element(state: .error))
-            
+
             // Text field with labels
             TextField("Placeholder", text: .constant(""))
                 .textFieldStyle(.element(labelText: "Label", footerText: "Footer"))

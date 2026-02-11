@@ -16,7 +16,7 @@ enum MatrixEntityRegex: String {
     case uri
     case allUsers
     case legacyRoomID
-    
+
     var rawValue: String {
         switch self {
         case .homeserver:
@@ -33,7 +33,7 @@ enum MatrixEntityRegex: String {
             return PillUtilities.atRoom
         }
     }
-    
+
     // swiftlint:disable force_try
     static let homeserverRegex = try! NSRegularExpression(pattern: MatrixEntityRegex.homeserver.rawValue, options: .caseInsensitive)
     static let userIdentifierRegex = try! NSRegularExpression(pattern: MatrixEntityRegex.userID.rawValue, options: .caseInsensitive)
@@ -43,52 +43,52 @@ enum MatrixEntityRegex: String {
     static let linkRegex = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
     static let legacyRoomIDRegex = try! NSRegularExpression(pattern: MatrixEntityRegex.legacyRoomID.rawValue, options: .caseInsensitive)
     // swiftlint:enable force_try
-    
+
     static func isMatrixHomeserver(_ homeserver: String) -> Bool {
         guard let match = homeserverRegex.firstMatch(in: homeserver) else {
             return false
         }
-        
+
         return match.range.length == homeserver.count
     }
-    
+
     static func isMatrixUserIdentifier(_ identifier: String) -> Bool {
         guard let match = userIdentifierRegex.firstMatch(in: identifier) else {
             return false
         }
-        
+
         return match.range.length == identifier.count
     }
-    
+
     static func isMatrixRoomAlias(_ alias: String) -> Bool {
         guard let match = roomAliasRegex.firstMatch(in: alias) else {
             return false
         }
-        
+
         return match.range.length == alias.count
     }
-    
+
     static func isLegacyMatrixRoomID(_ roomID: String) -> Bool {
         guard let match = legacyRoomIDRegex.firstMatch(in: roomID) else {
             return false
         }
-        
+
         return match.range.length == roomID.count
     }
-    
+
     static func isMatrixURI(_ uri: String) -> Bool {
         guard let match = uriRegex.firstMatch(in: uri) else {
             return false
         }
-        
+
         return match.range.length == uri.count
     }
-    
+
     static func containsMatrixAllUsers(_ string: String) -> Bool {
         guard allUsersRegex.firstMatch(in: string) != nil else {
             return false
         }
-        
+
         return true
     }
 }

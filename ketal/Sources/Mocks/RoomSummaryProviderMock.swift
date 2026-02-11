@@ -22,11 +22,11 @@ struct RoomSummaryProviderMockConfiguration {
 extension RoomSummaryProviderMock {
     convenience init(_ configuration: RoomSummaryProviderMockConfiguration) {
         self.init()
-        
+
         let initialRooms: [RoomSummary]
         let roomListSubject: CurrentValueSubject<[RoomSummary], Never>
         let stateSubject: CurrentValueSubject<RoomSummaryProviderState, Never>
-        
+
         switch configuration.state {
         case .loading:
             initialRooms = []
@@ -37,30 +37,30 @@ extension RoomSummaryProviderMock {
             roomListSubject = .init(initialRooms)
             stateSubject = .init(.loaded(totalNumberOfRooms: UInt(rooms.count)))
         }
-        
+
         roomListPublisher = roomListSubject.asCurrentValuePublisher()
         statePublisher = stateSubject.asCurrentValuePublisher()
-        
+
         setFilterClosure = { [initialRooms, roomListSubject] filter in
             switch filter {
             case let .search(query):
                 var rooms = initialRooms
-                
+
                 if !query.isEmpty {
                     rooms = rooms.filter { $0.name.localizedCaseInsensitiveContains(query) }
                 }
-                
+
                 roomListSubject.send(rooms)
-            case let .rooms(_, filters), let .all(filters):
+            case let .all(filters):
                 var rooms = initialRooms
-                
+
                 if filters.count > 1 {
                     // for testing purpose chaining more than one filter will always return an empty state
                     rooms = []
                 } else if let filter = filters.first {
                     rooms = rooms.filter { filter == .people ? $0.isDirect : !$0.isDirect }
                 }
-                
+
                 roomListSubject.send(rooms)
             case .excludeAll:
                 roomListSubject.send([])
@@ -277,7 +277,7 @@ extension Array where Element == RoomSummary {
                     isFavourite: false,
                     isTombstoned: false)
     ]
-    
+
     static let mockRoomsWithNotificationsState: [Element] = {
         var result: [Element] = []
 
@@ -291,23 +291,23 @@ extension Array where Element == RoomSummary {
                     for hasUnreadNotifications in [false, true] {
                         // Incrementing id value for each combination
                         let id = result.count + 1
-                        
+
                         let room = RoomSummary(room: RoomSDKMock(),
                                                id: "\(id)",
                                                settingsMode: mode,
                                                hasUnreadMessages: hasUnreadMessages,
                                                hasUnreadMentions: hasUnreadMentions,
                                                hasUnreadNotifications: hasUnreadNotifications)
-                        
+
                         result.append(room)
                     }
                 }
             }
         }
-        
+
         return result
     }()
-    
+
     static let mockInvites: [Element] = [
         RoomSummary(room: RoomSDKMock(),
                     id: "someAwesomeRoomId1",
@@ -354,7 +354,7 @@ extension Array where Element == RoomSummary {
                     isFavourite: false,
                     isTombstoned: false)
     ]
-    
+
     static let mockSpaceInvites: [Element] = [
         RoomSummary(room: RoomSDKMock(),
                     id: "!space1:matrix.org",

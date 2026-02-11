@@ -19,12 +19,12 @@ struct InfoPlistReader {
         static let utExportedTypeDeclarationsKey = "UTExportedTypeDeclarations"
         static let utTypeIdentifierKey = "UTTypeIdentifier"
         static let utDescriptionKey = "UTTypeDescription"
-        
+
         static let bundleURLTypes = "CFBundleURLTypes"
         static let bundleURLName = "CFBundleURLName"
         static let bundleURLSchemes = "CFBundleURLSchemes"
     }
-    
+
     private enum Values {
         static let mentionPills = "Mention Pills"
     }
@@ -52,7 +52,7 @@ struct InfoPlistReader {
     var baseBundleIdentifier: String {
         infoPlistValue(forKey: Keys.baseBundleIdentifier)
     }
-    
+
     /// Keychain access group identifier set in Info.plist of the target
     var keychainAccessGroupIdentifier: String {
         infoPlistValue(forKey: Keys.keychainAccessGroupIdentifier)
@@ -82,22 +82,22 @@ struct InfoPlistReader {
     var bundleDisplayName: String {
         infoPlistValue(forKey: Keys.bundleDisplayName)
     }
-    
+
     /// The name of the non-X app when it becomes production ready.
     var productionAppName: String {
         infoPlistValue(forKey: Keys.productionAppName)
     }
-    
+
     // MARK: - Custom App Scheme
-    
+
     var appScheme: String {
         customSchemeForName("Application")
     }
-    
+
     var elementCallScheme: String {
         customSchemeForName("Element Call")
     }
-    
+
     // MARK: - Mention Pills
 
     /// Mention Pills UTType
@@ -107,32 +107,32 @@ struct InfoPlistReader {
               let utType = mentionPills[Keys.utTypeIdentifierKey] as? String else {
             fatalError("Add properly \(Values.mentionPills) exported type into your target's Info.plist")
         }
-        
+
         // The pills type is formed from the baseBundleIdentifier, however weirdly, if a fork sets that with a value
         // that includes one or more uppercase characters, pill rendering breaks. If we lowercase the type identifier
         // the bug is fixed, even though the value used in the fork's Info.plist no longer matches the value returned.
         // Maybe in the future the fork should set their own PILLS_UT_TYPE_IDENTIFIER, but for now this works 🤷‍♂️🤷‍♂️🤷‍♂️
         return utType.lowercased()
     }
-    
+
     // MARK: - Private
-    
+
     private func infoPlistValue<T>(forKey key: String) -> T {
         guard let result = bundle.object(forInfoDictionaryKey: key) as? T else {
             fatalError("Add \(key) into your target's Info.plst")
         }
         return result
     }
-    
+
     private func customSchemeForName(_ name: String) -> String {
         let urlTypes: [[String: Any]] = infoPlistValue(forKey: Keys.bundleURLTypes)
-        
+
         guard let urlType = urlTypes.first(where: { $0[Keys.bundleURLName] as? String == name }),
               let urlSchemes = urlType[Keys.bundleURLSchemes] as? [String],
               let scheme = urlSchemes.first else {
             fatalError("Invalid custom application scheme configuration")
         }
-        
+
         return scheme
     }
 }

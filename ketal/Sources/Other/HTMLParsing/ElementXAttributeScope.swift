@@ -45,7 +45,7 @@ enum EventOnRoomIDAttribute: AttributedStringKey {
         let roomID: String
         let eventID: String
     }
-    
+
     static let name = "MXEventOnRoomIDAttribute"
 }
 
@@ -54,7 +54,7 @@ enum EventOnRoomAliasAttribute: AttributedStringKey {
         let alias: String
         let eventID: String
     }
-    
+
     static let name = "MXEventOnRoomAliasAttribute"
 }
 
@@ -68,16 +68,11 @@ enum CodeBlockAttribute: AttributedStringKey {
     static let name = "MXCodeBlockAttribute"
 }
 
-enum InlineCodeAttribute: AttributedStringKey {
-    typealias Value = Bool
-    static let name = "MXInlineCodeAttribute"
-}
-
 // periphery: ignore - required to make NSAttributedString to AttributedString conversion even if not used directly
 extension AttributeScopes {
     struct ElementXAttributes: AttributeScope {
         let blockquote: BlockquoteAttribute
-        
+
         let userID: UserIDAttribute
         let userDisplayName: UserDisplayNameAttribute
         let roomDisplayName: RoomDisplayNameAttribute
@@ -85,16 +80,15 @@ extension AttributeScopes {
         let roomAlias: RoomAliasAttribute
         let eventOnRoomID: EventOnRoomIDAttribute
         let eventOnRoomAlias: EventOnRoomAliasAttribute
-        
+
         let allUsersMention: AllUsersMentionAttribute
-        
+
         let codeBlock: CodeBlockAttribute
-        let inlineCode: InlineCodeAttribute
-        
+
         let swiftUI: SwiftUIAttributes
         let uiKit: UIKitAttributes
     }
-    
+
     var elementX: ElementXAttributes.Type {
         ElementXAttributes.self
     }

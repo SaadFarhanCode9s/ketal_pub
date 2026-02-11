@@ -15,11 +15,11 @@ struct BadgeLabel: View {
         case info
         case `default`
     }
-    
+
     let title: String
     let icon: KeyPath<CompoundIcons, Image>
     let style: Style
-    
+
     var body: some View {
         Label(title,
               icon: icon,
@@ -27,10 +27,10 @@ struct BadgeLabel: View {
               relativeTo: .compound.bodySM)
             .labelStyle(LabelStyle(style: style))
     }
-    
+
     private struct LabelStyle: SwiftUI.LabelStyle {
         let style: Style
-        
+
         var titleColor: Color {
             switch style {
             case .accent: .compound.textBadgeAccent
@@ -38,7 +38,7 @@ struct BadgeLabel: View {
             case .default: .compound.textPrimary
             }
         }
-        
+
         var iconColor: Color {
             switch style {
             case .accent: .compound.iconAccentPrimary
@@ -46,7 +46,7 @@ struct BadgeLabel: View {
             case .default: .compound.iconPrimary
             }
         }
-        
+
         var backgroundColor: Color {
             switch style {
             case .accent: .compound.bgBadgeAccent
@@ -54,7 +54,7 @@ struct BadgeLabel: View {
             case .default: .compound.bgBadgeDefault
             }
         }
-        
+
         func makeBody(configuration: Configuration) -> some View {
             HStack(spacing: 4) {
                 configuration.icon

@@ -14,16 +14,16 @@ struct UserProfileListRow: View {
     let user: UserProfileProxy
     let membership: MembershipState?
     let mediaProvider: MediaProviderProtocol?
-    
+
     let kind: ListRow<LoadableAvatarImage, EmptyView, EmptyView, Bool>.Kind<EmptyView, Bool>
-    
+
     var isUnknownProfile: Bool {
         !user.isVerified && membership == nil
     }
-    
+
     private var subtitle: String? {
         guard !isUnknownProfile else { return L10n.commonInviteUnknownProfile }
-        
+
         if let membershipText = membership?.localizedDescription {
             return membershipText
         } else if user.displayName != nil {
@@ -32,7 +32,7 @@ struct UserProfileListRow: View {
             return nil
         }
     }
-    
+
     var body: some View {
         ListRow(label: .avatar(title: user.displayName ?? user.userID,
                                description: subtitle,
@@ -40,7 +40,7 @@ struct UserProfileListRow: View {
                                role: isUnknownProfile ? .error : nil),
                 kind: kind)
     }
-    
+
     var avatar: LoadableAvatarImage {
         LoadableAvatarImage(url: user.avatarURL,
                             name: user.displayName,
@@ -65,23 +65,23 @@ private extension MembershipState {
 
 struct UserProfileCell_Previews: PreviewProvider, TestablePreview {
     static let action: () -> Void = { }
-    
+
     static var previews: some View {
         Form {
             UserProfileListRow(user: .mockAlice, membership: nil, mediaProvider: MediaProviderMock(configuration: .init()),
                                kind: .multiSelection(isSelected: true, action: action))
-            
+
             UserProfileListRow(user: .mockBob, membership: nil, mediaProvider: MediaProviderMock(configuration: .init()),
                                kind: .multiSelection(isSelected: false, action: action))
-            
+
             UserProfileListRow(user: .mockCharlie, membership: .join, mediaProvider: MediaProviderMock(configuration: .init()),
                                kind: .multiSelection(isSelected: true, action: action))
                 .disabled(true)
-            
+
             UserProfileListRow(user: .init(userID: "@someone:matrix.org"), membership: .join, mediaProvider: MediaProviderMock(configuration: .init()),
                                kind: .multiSelection(isSelected: false, action: action))
                 .disabled(true)
-            
+
             UserProfileListRow(user: .init(userID: "@someone:matrix.org"), membership: nil, mediaProvider: MediaProviderMock(configuration: .init()),
                                kind: .multiSelection(isSelected: false, action: action))
         }

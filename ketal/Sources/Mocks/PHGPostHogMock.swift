@@ -18,11 +18,11 @@ extension PHGPostHogMock {
 
 class MockPostHogFactory: PostHogFactory {
     var mock: PHGPostHogProtocol!
-    
+
     init(mock: PHGPostHogProtocol!) {
         self.mock = mock
     }
-    
+
     func createPostHog(config: PostHogConfig) -> PHGPostHogProtocol {
         mock
     }

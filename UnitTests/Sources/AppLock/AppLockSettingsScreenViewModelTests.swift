@@ -14,15 +14,15 @@ class AppLockSetupSettingsScreenViewModelTests: XCTestCase {
     var appLockService: AppLockServiceProtocol!
     var keychainController: KeychainControllerMock!
     var viewModel: AppLockSetupSettingsScreenViewModelProtocol!
-    
+
     var context: AppLockSetupSettingsScreenViewModelType.Context {
         viewModel.context
     }
-    
+
     override func setUpWithError() throws {
         keychainController = KeychainControllerMock()
         appLockService = AppLockService(keychainController: keychainController, appSettings: AppSettings())
-        
+
         viewModel = AppLockSetupSettingsScreenViewModel(appLockService: AppLockServiceMock.mock())
     }
 
@@ -31,13 +31,13 @@ class AppLockSetupSettingsScreenViewModelTests: XCTestCase {
         let pinCode = "2023"
         keychainController.pinCodeReturnValue = pinCode
         keychainController.containsPINCodeReturnValue = true
-        
+
         XCTAssertNil(context.alertInfo)
         XCTAssertTrue(appLockService.isEnabled)
-        
+
         // When disabling the PIN code lock.
         context.send(viewAction: .disable)
-        
+
         // Then an alert should be shown before disabling it.
         XCTAssertNotNil(context.alertInfo)
         XCTAssertTrue(appLockService.isEnabled)

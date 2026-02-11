@@ -18,66 +18,66 @@ class SessionVerificationUITests: XCTestCase {
         static let compareEmojis = 4
         static let acceptingEmojis = 5
         static let verificationComplete = 6
-        
+
         static let verificationCancelled = 7
     }
-    
+
     func testChallengeMatches() async throws {
         let app = Application.launch(.sessionVerification)
         try await app.assertScreenshot(step: Step.initialState)
-        
+
         app.buttons[A11yIdentifiers.sessionVerificationScreen.requestVerification].tap()
         try await app.assertScreenshot(step: Step.waitingForOtherDevice)
-        
+
         XCTAssert(app.buttons[A11yIdentifiers.sessionVerificationScreen.startSasVerification].waitForExistence(timeout: 10.0))
         try await app.assertScreenshot(step: Step.useEmojiComparisonPrompt)
-        
+
         app.buttons[A11yIdentifiers.sessionVerificationScreen.startSasVerification].tap()
         try await app.assertScreenshot(step: Step.waitingForEmojis)
-        
+
         XCTAssert(app.buttons[A11yIdentifiers.sessionVerificationScreen.acceptChallenge].waitForExistence(timeout: 10.0))
         try await app.assertScreenshot(step: Step.compareEmojis)
-        
+
         app.buttons[A11yIdentifiers.sessionVerificationScreen.acceptChallenge].tap()
         try await app.assertScreenshot(step: Step.acceptingEmojis)
-        
+
         XCTAssert(app.staticTexts[A11yIdentifiers.sessionVerificationScreen.verificationComplete].waitForExistence(timeout: 10.0))
         try await app.assertScreenshot(step: Step.verificationComplete)
     }
-    
+
     func testChallengeDoesNotMatch() async throws {
         let app = Application.launch(.sessionVerification)
         try await app.assertScreenshot(step: Step.initialState)
-        
+
         app.buttons[A11yIdentifiers.sessionVerificationScreen.requestVerification].tap()
         try await app.assertScreenshot(step: Step.waitingForOtherDevice)
-        
+
         XCTAssert(app.buttons[A11yIdentifiers.sessionVerificationScreen.startSasVerification].waitForExistence(timeout: 10.0))
         try await app.assertScreenshot(step: Step.useEmojiComparisonPrompt)
-        
+
         app.buttons[A11yIdentifiers.sessionVerificationScreen.startSasVerification].tap()
         try await app.assertScreenshot(step: Step.waitingForEmojis)
-        
+
         XCTAssert(app.buttons[A11yIdentifiers.sessionVerificationScreen.acceptChallenge].waitForExistence(timeout: 10.0))
         try await app.assertScreenshot(step: Step.compareEmojis)
-        
+
         app.buttons[A11yIdentifiers.sessionVerificationScreen.declineChallenge].tap()
         try await app.assertScreenshot(step: Step.verificationCancelled)
     }
-    
+
     func testSessionVerificationCancelation() async throws {
         let app = Application.launch(.sessionVerification)
         try await app.assertScreenshot(step: Step.initialState)
-        
+
         app.buttons[A11yIdentifiers.sessionVerificationScreen.requestVerification].tap()
         try await app.assertScreenshot(step: Step.waitingForOtherDevice)
-        
+
         XCTAssert(app.buttons[A11yIdentifiers.sessionVerificationScreen.startSasVerification].waitForExistence(timeout: 10.0))
         try await app.assertScreenshot(step: Step.useEmojiComparisonPrompt)
-        
+
         app.buttons[A11yIdentifiers.sessionVerificationScreen.startSasVerification].tap()
         try await app.assertScreenshot(step: Step.waitingForEmojis)
-        
+
         XCTAssert(app.buttons[A11yIdentifiers.sessionVerificationScreen.acceptChallenge].waitForExistence(timeout: 10.0))
         try await app.assertScreenshot(step: Step.compareEmojis)
     }

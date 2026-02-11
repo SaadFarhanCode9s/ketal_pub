@@ -12,14 +12,14 @@ import SwiftUI
 /// Small squared action button style for settings screens
 struct FormActionButtonStyle: ButtonStyle {
     let title: String
-    
+
     func makeBody(configuration: Configuration) -> some View {
         VStack(spacing: 4) {
             configuration.label
                 .buttonStyle(.plain)
                 .foregroundColor(.compound.iconSecondary)
                 .scaledFrame(size: 24)
-            
+
             Text(title)
                 .foregroundColor(.compound.textPrimary)
                 .font(.compound.bodyLG)

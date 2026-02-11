@@ -32,7 +32,7 @@ struct VoiceMessageButton: View {
         case .medium:
             _buttonSize = .init(wrappedValue: 36)
         }
-        
+
         self.state = state
         self.action = action
     }
@@ -64,7 +64,7 @@ struct VoiceMessageButton: View {
                 .offset(x: offset)
         }
     }
-    
+
     private var accessibilityLabel: String {
         switch state {
         case .loading:

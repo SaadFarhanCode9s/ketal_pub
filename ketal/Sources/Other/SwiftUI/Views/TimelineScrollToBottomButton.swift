@@ -11,7 +11,7 @@ import SwiftUI
 struct TimelineScrollToBottomButton: View {
     let isVisible: Bool
     let callback: () -> Void
-    
+
     var body: some View {
         Button { callback() } label: {
             Image(systemName: "chevron.down")

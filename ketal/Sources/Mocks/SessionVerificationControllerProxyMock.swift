@@ -22,7 +22,7 @@ extension SessionVerificationControllerProxyMock {
                               requestDelay: Duration = .seconds(1)) -> SessionVerificationControllerProxyMock {
         let mock = SessionVerificationControllerProxyMock()
         mock.underlyingActions = actions
-        
+
         mock.acknowledgeVerificationRequestDetailsReturnValue = .success(())
 
         mock.requestDeviceVerificationClosure = { [unowned mock] in
@@ -74,7 +74,7 @@ extension SessionVerificationControllerProxyMock {
 
             return .success(())
         }
-        
+
         return mock
     }
 }

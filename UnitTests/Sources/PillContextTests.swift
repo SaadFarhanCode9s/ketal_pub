@@ -29,19 +29,19 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .user(userID: id), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertEqual(context.viewState.displayText, id)
-        
+
         let name = "Mr. Test"
         let avatarURL = URL(string: "https://test.jpg")
         subject.send([RoomMemberProxyMock(with: .init(userID: id, displayName: name, avatarURL: avatarURL, membership: .join))])
         await Task.yield()
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertEqual(context.viewState.displayText, "@\(name)")
     }
-    
+
     func testOwnUser() {
         let id = "@test:matrix.org"
         let proxyMock = JoinedRoomProxyMock(.init(name: "Test", ownUserID: id))
@@ -59,10 +59,10 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .user(userID: id), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertTrue(context.viewState.isOwnMention)
     }
-    
+
     func testAllUsers() {
         let avatarURL = URL(string: "https://matrix.jpg")
         let id = "test_room"
@@ -82,11 +82,11 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .allUsers, font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertTrue(context.viewState.isOwnMention)
         XCTAssertEqual(context.viewState.displayText, PillUtilities.atRoom)
     }
-    
+
     func testRoomIDMention() {
         let proxyMock = JoinedRoomProxyMock(.init())
         let mockController = MockTimelineController()
@@ -105,12 +105,12 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .roomID("1"), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertFalse(context.viewState.isUndefined)
         XCTAssertEqual(context.viewState.displayText, "#Foundation 🔭🪐🌌")
     }
-    
+
     func testRoomIDMentionMissingRoom() {
         let proxyMock = JoinedRoomProxyMock(.init())
         let mockController = MockTimelineController()
@@ -127,12 +127,12 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .roomID("1"), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertFalse(context.viewState.isUndefined)
         XCTAssertEqual(context.viewState.displayText, "1")
     }
-    
+
     func testRoomAliasMention() {
         let proxyMock = JoinedRoomProxyMock(.init())
         let mockController = MockTimelineController()
@@ -153,12 +153,12 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .roomAlias("#foundation-and-empire:matrix.org"), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertFalse(context.viewState.isUndefined)
         XCTAssertEqual(context.viewState.displayText, "#Foundation and Empire")
     }
-    
+
     func testRoomAliasMentionMissingRoom() {
         let proxyMock = JoinedRoomProxyMock(.init())
         let mockController = MockTimelineController()
@@ -175,12 +175,12 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .roomAlias("#foundation-and-empire:matrix.org"), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertFalse(context.viewState.isUndefined)
         XCTAssertEqual(context.viewState.displayText, "#foundation-and-empire:matrix.org")
     }
-    
+
     func testEventOnRoomIDMention() {
         let proxyMock = JoinedRoomProxyMock(.init())
         let mockController = MockTimelineController()
@@ -199,12 +199,12 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .event(room: .roomID("1")), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertFalse(context.viewState.isUndefined)
         XCTAssertEqual(context.viewState.displayText, "💬 > #Foundation 🔭🪐🌌")
     }
-    
+
     func testEventOnRoomIDMentionMissingRoom() {
         let proxyMock = JoinedRoomProxyMock(.init())
         let mockController = MockTimelineController()
@@ -221,12 +221,12 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .event(room: .roomID("1")), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertFalse(context.viewState.isUndefined)
         XCTAssertEqual(context.viewState.displayText, "💬 > 1")
     }
-    
+
     func testEventOnRoomAliasMention() {
         let proxyMock = JoinedRoomProxyMock(.init())
         let mockController = MockTimelineController()
@@ -247,12 +247,12 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .event(room: .roomAlias("#foundation-and-empire:matrix.org")), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertFalse(context.viewState.isUndefined)
         XCTAssertEqual(context.viewState.displayText, "💬 > #Foundation and Empire")
     }
-    
+
     func testEventOnRoomAliasMentionMissingRoom() {
         let proxyMock = JoinedRoomProxyMock(.init())
         let mockController = MockTimelineController()
@@ -269,7 +269,7 @@ class PillContextTests: XCTestCase {
                                      linkMetadataProvider: LinkMetadataProvider(),
                                      timelineControllerFactory: TimelineControllerFactoryMock(.init()))
         let context = PillContext(timelineContext: mock.context, data: PillTextAttachmentData(type: .event(room: .roomAlias("#foundation-and-empire:matrix.org")), font: .preferredFont(forTextStyle: .body)))
-        
+
         XCTAssertFalse(context.viewState.isOwnMention)
         XCTAssertFalse(context.viewState.isUndefined)
         XCTAssertEqual(context.viewState.displayText, "💬 > #foundation-and-empire:matrix.org")

@@ -19,15 +19,15 @@ enum AudioRecorderRecordingState {
 @MainActor
 class AudioRecorderState: ObservableObject, Identifiable {
     let id = UUID()
-    
+
     @Published private(set) var recordingState: AudioRecorderRecordingState = .stopped
     @Published private(set) var duration = 0.0
     @Published private(set) var waveformSamples: [Float] = []
-    
+
     private weak var audioRecorder: AudioRecorderProtocol?
     private var cancellables: Set<AnyCancellable> = []
     private var displayLink: CADisplayLink?
-    
+
     func attachAudioRecorder(_ audioRecorder: AudioRecorderProtocol) {
         recordingState = .stopped
         self.audioRecorder = audioRecorder
@@ -37,7 +37,7 @@ class AudioRecorderState: ObservableObject, Identifiable {
             startPublishUpdates()
         }
     }
-    
+
     func detachAudioRecorder() async {
         if let audioRecorder, audioRecorder.isRecording {
             await audioRecorder.stopRecording()
@@ -48,13 +48,13 @@ class AudioRecorderState: ObservableObject, Identifiable {
         audioRecorder = nil
         recordingState = .stopped
     }
-    
+
     func reportError() {
         recordingState = .error
     }
-    
+
     // MARK: - Private
-    
+
     private func subscribeToAudioRecorder(_ audioRecorder: AudioRecorderProtocol) {
         audioRecorder.actions
             .receive(on: DispatchQueue.main)
@@ -66,7 +66,7 @@ class AudioRecorderState: ObservableObject, Identifiable {
             }
             .store(in: &cancellables)
     }
-    
+
     private func handleAudioRecorderAction(_ action: AudioRecorderAction) {
         switch action {
         case .didStartRecording:
@@ -80,7 +80,7 @@ class AudioRecorderState: ObservableObject, Identifiable {
             recordingState = .stopped
         }
     }
-    
+
     private func startPublishUpdates() {
         if displayLink != nil {
             stopPublishUpdates()
@@ -89,7 +89,7 @@ class AudioRecorderState: ObservableObject, Identifiable {
         displayLink?.preferredFrameRateRange = .init(minimum: 30, maximum: 60)
         displayLink?.add(to: .current, forMode: .common)
     }
-    
+
     // periphery:ignore:parameters displayLink - required for objc selector
     @objc private func publishUpdate(displayLink: CADisplayLink) {
         if let currentTime = audioRecorder?.currentTime {
@@ -99,7 +99,7 @@ class AudioRecorderState: ObservableObject, Identifiable {
             waveformSamples.append(1.0 - averagePower)
         }
     }
-    
+
     private func stopPublishUpdates() {
         displayLink?.invalidate()
         displayLink = nil

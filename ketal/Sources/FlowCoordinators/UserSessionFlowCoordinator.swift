@@ -27,15 +27,13 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
     private let appLockService: AppLockServiceProtocol
     private let flowParameters: CommonFlowParameters
     
-    private var userSession: UserSessionProtocol {
-        flowParameters.userSession
-    }
+    private var userSession: UserSessionProtocol { flowParameters.userSession }
     
     private let onboardingFlowCoordinator: OnboardingFlowCoordinator
     private let onboardingStackCoordinator: NavigationStackCoordinator
-    private let chatsTabFlowCoordinator: ChatsTabFlowCoordinator
+    private let chatsFlowCoordinator: ChatsFlowCoordinator
     private let chatsTabDetails: NavigationTabCoordinator<HomeTab>.TabDetails
-    private let spacesTabFlowCoordinator: SpacesTabFlowCoordinator
+    private let spaceExplorerFlowCoordinator: SpaceExplorerFlowCoordinator
     private let spacesTabDetails: NavigationTabCoordinator<HomeTab>.TabDetails
     
     // periphery:ignore - retaining purpose
@@ -80,15 +78,15 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
         navigationRootCoordinator.setRootCoordinator(navigationTabCoordinator)
         
         let chatsSplitCoordinator = NavigationSplitCoordinator(placeholderCoordinator: PlaceholderScreenCoordinator(hideBrandChrome: flowParameters.appSettings.hideBrandChrome))
-        chatsTabFlowCoordinator = ChatsTabFlowCoordinator(isNewLogin: isNewLogin,
-                                                          navigationSplitCoordinator: chatsSplitCoordinator,
-                                                          flowParameters: flowParameters)
+        chatsFlowCoordinator = ChatsFlowCoordinator(isNewLogin: isNewLogin,
+                                                    navigationSplitCoordinator: chatsSplitCoordinator,
+                                                    flowParameters: flowParameters)
         chatsTabDetails = .init(tag: HomeTab.chats, title: L10n.screenHomeTabChats, icon: \.chat, selectedIcon: \.chatSolid)
         chatsTabDetails.navigationSplitCoordinator = chatsSplitCoordinator
         
         let spacesSplitCoordinator = NavigationSplitCoordinator(placeholderCoordinator: PlaceholderScreenCoordinator(hideBrandChrome: flowParameters.appSettings.hideBrandChrome))
-        spacesTabFlowCoordinator = SpacesTabFlowCoordinator(navigationSplitCoordinator: spacesSplitCoordinator,
-                                                            flowParameters: flowParameters)
+        spaceExplorerFlowCoordinator = SpaceExplorerFlowCoordinator(navigationSplitCoordinator: spacesSplitCoordinator,
+                                                                    flowParameters: flowParameters)
         spacesTabDetails = .init(tag: HomeTab.spaces, title: L10n.screenHomeTabSpaces, icon: \.space, selectedIcon: \.spaceSolid)
         spacesTabDetails.navigationSplitCoordinator = spacesSplitCoordinator
         
@@ -114,7 +112,7 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
     }
     
     func stop() {
-        chatsTabFlowCoordinator.stop()
+        chatsFlowCoordinator.stop()
     }
     
     func handleAppRoute(_ appRoute: AppRoute, animated: Bool) {
@@ -135,7 +133,7 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
              .event, .eventOnRoomAlias, .childEvent, .childEventOnRoomAlias,
              .share, .transferOwnership, .thread:
             clearPresentedSheets(animated: animated) // Make sure the presented route is visible.
-            chatsTabFlowCoordinator.handleAppRoute(appRoute, animated: animated)
+            chatsFlowCoordinator.handleAppRoute(appRoute, animated: animated)
             if navigationTabCoordinator.selectedTab != .chats {
                 navigationTabCoordinator.selectedTab = .chats
             }
@@ -144,15 +142,15 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
     
     func clearRoute(animated: Bool) {
         clearPresentedSheets(animated: animated)
-        chatsTabFlowCoordinator.clearRoute(animated: animated)
+        chatsFlowCoordinator.clearRoute(animated: animated)
     }
     
-    /// Clearing routes is more complicated than it first seems. When passing routes
-    /// to the chats flow we can't clear all routes as e.g. childRoom/childEvent etc
-    /// expect to push into the existing stack. But we do need to hide any sheets that
-    /// might cover up the presented route. BUT! We probably shouldn't dismiss onboarding
-    /// or verification flows until they're complete… This needs more thought before we
-    /// codify it all into the state machine.
+    // Clearing routes is more complicated than it first seems. When passing routes
+    // to the chats flow we can't clear all routes as e.g. childRoom/childEvent etc
+    // expect to push into the existing stack. But we do need to hide any sheets that
+    // might cover up the presented route. BUT! We probably shouldn't dismiss onboarding
+    // or verification flows until they're complete… This needs more thought before we
+    // codify it all into the state machine.
     private func clearPresentedSheets(animated: Bool) {
         switch stateMachine.state {
         case .initial, .tabBar:
@@ -164,7 +162,7 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
     
     func isDisplayingRoomScreen(withRoomID roomID: String) -> Bool {
         guard navigationTabCoordinator.selectedTab == .chats else { return false }
-        return chatsTabFlowCoordinator.isDisplayingRoomScreen(withRoomID: roomID)
+        return chatsFlowCoordinator.isDisplayingRoomScreen(withRoomID: roomID)
     }
     
     // MARK: - Private
@@ -173,8 +171,8 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
         stateMachine.addRoutes(event: .start, transitions: [.initial => .tabBar]) { [weak self] _ in
             guard let self else { return }
             
-            chatsTabFlowCoordinator.start()
-            spacesTabFlowCoordinator.start()
+            chatsFlowCoordinator.start()
+            spaceExplorerFlowCoordinator.start()
             attemptStartingOnboarding()
         }
         
@@ -191,7 +189,7 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
     }
     
     private func setupObservers() {
-        chatsTabFlowCoordinator.actionsPublisher
+        chatsFlowCoordinator.actionsPublisher
             .sink { [weak self] action in
                 guard let self else { return }
                 switch action {
@@ -213,7 +211,7 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
             }
             .store(in: &cancellables)
         
-        spacesTabFlowCoordinator.actionsPublisher
+        spaceExplorerFlowCoordinator.actionsPublisher
             .sink { [weak self] action in
                 guard let self else { return }
                 switch action {
@@ -485,7 +483,7 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
         let secureBackupController = userSession.clientProxy.secureBackupController
         
         guard case let .success(isLastDevice) = await userSession.clientProxy.isOnlyDeviceLeft() else {
-            navigationRootCoordinator.alertInfo = .init(id: .init())
+            flowParameters.userIndicatorController.alertInfo = .init(id: .init())
             return
         }
         
@@ -495,26 +493,26 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
         }
         
         guard secureBackupController.recoveryState.value == .enabled else {
-            navigationRootCoordinator.alertInfo = .init(id: .init(),
-                                                        title: L10n.screenSignoutRecoveryDisabledTitle,
-                                                        message: L10n.screenSignoutRecoveryDisabledSubtitle,
-                                                        primaryButton: .init(title: L10n.screenSignoutConfirmationDialogSubmit, role: .destructive) { [weak self] in
-                                                            self?.actionsSubject.send(.logout)
-                                                        }, secondaryButton: .init(title: L10n.commonSettings, role: .cancel) { [weak self] in
-                                                            self?.chatsTabFlowCoordinator.handleAppRoute(.chatBackupSettings, animated: true)
-                                                        })
+            flowParameters.userIndicatorController.alertInfo = .init(id: .init(),
+                                                                     title: L10n.screenSignoutRecoveryDisabledTitle,
+                                                                     message: L10n.screenSignoutRecoveryDisabledSubtitle,
+                                                                     primaryButton: .init(title: L10n.screenSignoutConfirmationDialogSubmit, role: .destructive) { [weak self] in
+                                                                         self?.actionsSubject.send(.logout)
+                                                                     }, secondaryButton: .init(title: L10n.commonSettings, role: .cancel) { [weak self] in
+                                                                         self?.chatsFlowCoordinator.handleAppRoute(.chatBackupSettings, animated: true)
+                                                                     })
             return
         }
         
         guard secureBackupController.keyBackupState.value == .enabled else {
-            navigationRootCoordinator.alertInfo = .init(id: .init(),
-                                                        title: L10n.screenSignoutKeyBackupDisabledTitle,
-                                                        message: L10n.screenSignoutKeyBackupDisabledSubtitle,
-                                                        primaryButton: .init(title: L10n.screenSignoutConfirmationDialogSubmit, role: .destructive) { [weak self] in
-                                                            self?.actionsSubject.send(.logout)
-                                                        }, secondaryButton: .init(title: L10n.commonSettings, role: .cancel) { [weak self] in
-                                                            self?.chatsTabFlowCoordinator.handleAppRoute(.chatBackupSettings, animated: true)
-                                                        })
+            flowParameters.userIndicatorController.alertInfo = .init(id: .init(),
+                                                                     title: L10n.screenSignoutKeyBackupDisabledTitle,
+                                                                     message: L10n.screenSignoutKeyBackupDisabledSubtitle,
+                                                                     primaryButton: .init(title: L10n.screenSignoutConfirmationDialogSubmit, role: .destructive) { [weak self] in
+                                                                         self?.actionsSubject.send(.logout)
+                                                                     }, secondaryButton: .init(title: L10n.commonSettings, role: .cancel) { [weak self] in
+                                                                         self?.chatsFlowCoordinator.handleAppRoute(.chatBackupSettings, animated: true)
+                                                                     })
             return
         }
         
@@ -522,12 +520,12 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
     }
     
     private func logout() {
-        navigationRootCoordinator.alertInfo = .init(id: .init(),
-                                                    title: L10n.screenSignoutConfirmationDialogTitle,
-                                                    message: L10n.screenSignoutConfirmationDialogContent,
-                                                    primaryButton: .init(title: L10n.screenSignoutConfirmationDialogSubmit, role: .destructive) { [weak self] in
-                                                        self?.actionsSubject.send(.logout)
-                                                    })
+        flowParameters.userIndicatorController.alertInfo = .init(id: .init(),
+                                                                 title: L10n.screenSignoutConfirmationDialogTitle,
+                                                                 message: L10n.screenSignoutConfirmationDialogContent,
+                                                                 primaryButton: .init(title: L10n.screenSignoutConfirmationDialogSubmit, role: .destructive) { [weak self] in
+                                                                     self?.actionsSubject.send(.logout)
+                                                                 })
     }
     
     private func presentSecureBackupLogoutConfirmationScreen() {
@@ -542,7 +540,7 @@ class UserSessionFlowCoordinator: FlowCoordinatorProtocol {
                 case .cancel:
                     navigationTabCoordinator.setSheetCoordinator(nil)
                 case .settings:
-                    chatsTabFlowCoordinator.handleAppRoute(.chatBackupSettings, animated: true)
+                    chatsFlowCoordinator.handleAppRoute(.chatBackupSettings, animated: true)
                     navigationTabCoordinator.setSheetCoordinator(nil)
                 case .logout:
                     actionsSubject.send(.logout)

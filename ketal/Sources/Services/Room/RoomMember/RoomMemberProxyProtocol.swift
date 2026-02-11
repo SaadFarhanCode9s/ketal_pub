@@ -12,18 +12,18 @@ import MatrixRustSDK
 // sourcery: AutoMockable
 protocol RoomMemberProxyProtocol: AnyObject {
     var userID: String { get }
-    
+
     var displayName: String? { get }
     var disambiguatedDisplayName: String? { get }
-    
+
     var avatarURL: URL? { get }
-    
+
     var membership: MembershipState { get }
-    
+
     var membershipChangeReason: String? { get }
-    
+
     var isIgnored: Bool { get }
-    
+
     var powerLevel: RoomPowerLevel { get }
 }
 
@@ -32,11 +32,11 @@ extension RoomMemberProxyProtocol {
     var isActive: Bool {
         membership == .join || membership == .invite || membership == .knock
     }
-    
+
     var permalink: URL? {
         try? URL(string: matrixToUserPermalink(userId: userID))
     }
-    
+
     /// The name used for sorting the member alphabetically. This will be the displayname if,
     /// it exists otherwise it will be the userID with the leading `@` removed.
     var sortingName: String {

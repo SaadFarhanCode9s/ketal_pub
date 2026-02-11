@@ -12,7 +12,7 @@ import SwiftUI
 /// whilst limiting the width of the content to a readable size (which is customizable).
 private struct ReadableFrameModifier: ViewModifier {
     var maxWidth: CGFloat
-    
+
     func body(content: Content) -> some View {
         content
             .frame(maxWidth: maxWidth)

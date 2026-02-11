@@ -16,7 +16,7 @@ struct ElementCallServiceMockConfiguration {
 extension ElementCallServiceMock {
     convenience init(_ configuration: ElementCallServiceMockConfiguration) {
         self.init()
-
+        
         underlyingActions = PassthroughSubject().eraseToAnyPublisher()
         underlyingOngoingCallRoomIDPublisher = .init(.init(configuration.ongoingCallRoomID))
     }

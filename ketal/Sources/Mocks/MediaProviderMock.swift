@@ -10,16 +10,16 @@ import SwiftUI
 
 extension MediaProviderMock {
     struct Configuration { }
-
+    
     // swiftlint:disable:next cyclomatic_complexity
     convenience init(configuration: Configuration) {
         self.init()
-
+        
         imageFromSourceSizeClosure = { mediaSource, _ in
             guard mediaSource != nil else {
                 return nil
             }
-
+            
             if mediaSource?.url == .mockMXCImage {
                 if let url = Bundle.main.url(forResource: "preview_image", withExtension: "jpg"),
                    let data = try? Data(contentsOf: url) {
@@ -41,41 +41,41 @@ extension MediaProviderMock {
                     return UIImage(data: data)
                 }
             }
-
+            
             return UIImage(systemName: "photo")
         }
-
+        
         loadImageFromSourceSizeClosure = { _, _ in
             guard let image = UIImage(systemName: "photo") else {
                 fatalError()
             }
-
+            
             return .success(image)
         }
-
+        
         loadImageDataFromSourceClosure = { _ in
             guard let image = UIImage(systemName: "photo"),
                   let data = image.pngData() else {
                 fatalError()
             }
-
+            
             return .success(data)
         }
-
+        
         loadFileFromSourceFilenameClosure = { _, _ in
             guard let url = Bundle.main.url(forResource: "preview_image", withExtension: "jpg") else {
                 return .failure(.failedRetrievingFile)
             }
-
+            
             return .success(.unmanaged(url: url))
         }
-
+        
         loadImageRetryingOnReconnectionSizeClosure = { _, _ in
             Task {
                 guard let image = UIImage(systemName: "photo") else {
                     fatalError()
                 }
-
+                
                 return image
             }
         }

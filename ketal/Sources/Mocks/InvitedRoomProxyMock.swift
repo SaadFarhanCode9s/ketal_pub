@@ -27,7 +27,7 @@ extension InvitedRoomProxyMock {
         id = configuration.id
         inviter = configuration.inviter
         info = RoomInfoProxyMock(configuration)
-
+        
         rejectInvitationReturnValue = .success(())
     }
 }
@@ -35,16 +35,16 @@ extension InvitedRoomProxyMock {
 extension RoomInfoProxyMock {
     @MainActor convenience init(_ configuration: InvitedRoomProxyMockConfiguration) {
         self.init()
-
+        
         id = configuration.id
         isEncrypted = false
         creators = []
         displayName = configuration.name
         rawName = nil
         topic = nil
-
+        
         avatarURL = configuration.avatarURL
-
+        
         isDirect = false
         isSpace = configuration.isSpace
         successor = nil
@@ -69,7 +69,7 @@ extension RoomInfoProxyMock {
         pinnedEventIDs = []
         joinRule = .invite
         historyVisibility = .shared
-
+        
         powerLevels = RoomPowerLevelsProxyMock(configuration: .init())
     }
 }

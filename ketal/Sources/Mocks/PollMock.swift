@@ -59,7 +59,7 @@ extension Poll {
                        .mock(text: "USA 🇺🇸", votes: 2, allVotes: 10)],
              ended: true)
     }
-
+    
     static var emptyDisclosed: Self {
         mock(question: "What country do you like most?",
              pollKind: .disclosed,

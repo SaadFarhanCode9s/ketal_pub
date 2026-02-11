@@ -12,32 +12,32 @@ import MatrixRustSDK
 
 extension SpaceRoomListProxyMock {
     class Configuration {
-        var spaceServiceRoom: SpaceServiceRoomProtocol
-        var initialSpaceRooms: [SpaceServiceRoomProtocol]
+        var spaceServiceRoom: SpaceServiceRoom
+        var initialSpaceRooms: [SpaceServiceRoom]
         var paginationStateSubject: CurrentValueSubject<SpaceRoomListPaginationState, Never>
-        var paginationResponses: [[SpaceServiceRoomProtocol]]
-
-        init(spaceServiceRoom: SpaceServiceRoomProtocol,
-             initialSpaceRooms: [SpaceServiceRoomProtocol] = [],
+        var paginationResponses: [[SpaceServiceRoom]]
+        
+        init(spaceServiceRoom: SpaceServiceRoom,
+             initialSpaceRooms: [SpaceServiceRoom] = [],
              paginationStateSubject: CurrentValueSubject<SpaceRoomListPaginationState, Never> = .init(.idle(endReached: true)),
-             paginationResponses: [[SpaceServiceRoomProtocol]] = []) {
+             paginationResponses: [[SpaceServiceRoom]] = []) {
             self.spaceServiceRoom = spaceServiceRoom
             self.initialSpaceRooms = initialSpaceRooms
             self.paginationStateSubject = paginationStateSubject
             self.paginationResponses = paginationResponses
         }
     }
-
+    
     convenience init(_ configuration: Configuration) {
         self.init()
-
-        let spaceRoomsSubject: CurrentValueSubject<[SpaceServiceRoomProtocol], Never> = .init(configuration.initialSpaceRooms)
-
+        
+        let spaceRoomsSubject: CurrentValueSubject<[SpaceServiceRoom], Never> = .init(configuration.initialSpaceRooms)
+        
         id = configuration.spaceServiceRoom.id
         spaceServiceRoomPublisher = .init(configuration.spaceServiceRoom)
         spaceRoomsPublisher = spaceRoomsSubject.asCurrentValuePublisher()
         paginationStatePublisher = configuration.paginationStateSubject.asCurrentValuePublisher()
-
+        
         paginateClosure = {
             configuration.paginationStateSubject.send(.loading)
             try? await Task.sleep(for: .milliseconds(100))

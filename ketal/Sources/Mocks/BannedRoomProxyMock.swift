@@ -30,16 +30,16 @@ extension BannedRoomProxyMock {
 extension RoomInfoProxyMock {
     @MainActor convenience init(_ configuration: BannedRoomProxyMockConfiguration) {
         self.init()
-
+        
         id = configuration.id
         isEncrypted = false
         creators = []
         displayName = configuration.name
         rawName = nil
         topic = nil
-
+        
         avatarURL = configuration.avatarURL
-
+        
         isDirect = false
         isSpace = false
         successor = nil
@@ -64,7 +64,7 @@ extension RoomInfoProxyMock {
         pinnedEventIDs = []
         joinRule = .knock
         historyVisibility = .shared
-
+        
         powerLevels = RoomPowerLevelsProxyMock(configuration: .init())
     }
 }

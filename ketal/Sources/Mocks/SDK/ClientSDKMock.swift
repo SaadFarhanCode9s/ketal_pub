@@ -13,7 +13,7 @@ import MatrixRustSDKMocks
 extension ClientSDKMock {
     struct Configuration {
         // MARK: Authentication
-
+        
         var serverAddress = "matrix.org"
         var homeserverURL = "https://matrix-client.matrix.org"
         var slidingSyncVersion = SlidingSyncVersion.native
@@ -22,9 +22,9 @@ extension ClientSDKMock {
         var supportsPasswordLogin = true
         var elementWellKnown: String?
         var validCredentials = (username: "alice", password: "12345678")
-
+        
         // MARK: Session
-
+        
         var userID: String?
         var session = Session(accessToken: UUID().uuidString,
                               refreshToken: nil,
@@ -34,12 +34,12 @@ extension ClientSDKMock {
                               oidcData: nil,
                               slidingSyncVersion: .native)
     }
-
+    
     enum MockError: Error { case generic }
-
+    
     convenience init(configuration: Configuration) {
         self.init()
-
+        
         homeserverLoginDetailsReturnValue = HomeserverLoginDetailsSDKMock(configuration: configuration)
         slidingSyncVersionReturnValue = configuration.slidingSyncVersion
         userIdServerNameThrowableError = MockError.generic
@@ -52,7 +52,7 @@ extension ClientSDKMock {
                 throw MockError.generic // use the matrix error
             }
         }
-
+        
         userIdReturnValue = configuration.userID
         sessionReturnValue = configuration.session
         getUrlUrlClosure = { url in
@@ -69,7 +69,7 @@ extension ClientSDKMock {
 extension HomeserverLoginDetailsSDKMock {
     convenience init(configuration: ClientSDKMock.Configuration) {
         self.init()
-
+        
         slidingSyncVersionReturnValue = configuration.slidingSyncVersion
         supportsPasswordLoginReturnValue = configuration.supportsPasswordLogin
         supportsOidcLoginReturnValue = configuration.oidcLoginURL != nil
@@ -85,7 +85,7 @@ extension HomeserverLoginDetailsSDKMock {
 extension OAuthAuthorizationDataSDKMock {
     convenience init(configuration: ClientSDKMock.Configuration) {
         self.init()
-
+        
         loginUrlReturnValue = configuration.oidcLoginURL
     }
 }

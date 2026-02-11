@@ -20,7 +20,7 @@ struct NotificationItemProxyMockConfiguration {
         event.contentReturnValue = .messageLike(content: messageLikeContent)
         return .timeline(event: event)
     }()
-
+    
     var senderID: String = UUID().uuidString
     var roomID: String = UUID().uuidString
     var receiverID: String = UUID().uuidString

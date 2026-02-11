@@ -44,11 +44,11 @@ extension EventTimelineItem {
                   canBeRepliedTo: false,
                   lazyProvider: LazyTimelineItemProviderSDKMock())
     }
-
+    
     static var mockMessage: EventTimelineItem {
         let body = Lorem.sentences(Int.random(in: 1...5))
         let messageType = MessageType.text(content: .init(body: body, formatted: nil))
-
+        
         let content = TimelineItemContent.msgLike(content: .init(kind: .message(content: .init(msgType: messageType,
                                                                                                body: body,
                                                                                                isEdited: false,
@@ -57,10 +57,10 @@ extension EventTimelineItem {
                                                                  inReplyTo: nil,
                                                                  threadRoot: nil,
                                                                  threadSummary: nil))
-
+        
         return .init(configuration: .init(content: content))
     }
-
+    
     static func mockCallInvite(sender: String) -> EventTimelineItem {
         .init(configuration: .init(sender: sender, content: .callInvite))
     }

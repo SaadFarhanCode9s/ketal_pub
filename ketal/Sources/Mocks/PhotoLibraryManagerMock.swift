@@ -12,10 +12,10 @@ extension PhotoLibraryManagerMock {
     struct Configuration {
         var authorizationDenied = false
     }
-
+    
     convenience init(_ configuration: Configuration) {
         self.init()
-
+        
         addResourceAtReturnValue = configuration.authorizationDenied ? .failure(PhotoLibraryManagerError.notAuthorized) : .success(())
     }
 }

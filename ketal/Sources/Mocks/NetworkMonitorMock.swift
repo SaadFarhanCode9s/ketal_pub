@@ -12,7 +12,7 @@ import Foundation
 extension NetworkMonitorMock {
     static var `default`: NetworkMonitorMock {
         let mock = NetworkMonitorMock()
-        mock.underlyingReachabilityPublisher = .init(.reachable)
+        mock.underlyingReachabilityPublisher = .init(.init(.reachable))
         return mock
     }
 }

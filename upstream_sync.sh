@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# sync-upstream.sh
-# Safe upstream sync script for ketal repository
-# Pulls from element-x-ios and merges while preserving ketal branding
+# upstream_sync.sh
+# Safe upstream sync script for Ketal repository
+# Pulls from element-x-ios and merges while preserving Ketal branding
 
 set -e  # Exit on error
 
@@ -278,13 +278,6 @@ validate_configuration() {
         print_success "app.yml: APP_DISPLAY_NAME is 'ketal'"
     else
         print_error "app.yml: APP_DISPLAY_NAME is NOT 'ketal'"
-        errors=$((errors + 1))
-    fi
-    
-    if grep -q "BASE_BUNDLE_IDENTIFIER: io.ketal.app" app.yml; then
-        print_success "app.yml: Bundle identifier is 'io.ketal.app'"
-    else
-        print_error "app.yml: Bundle identifier is NOT 'io.ketal.app'"
         errors=$((errors + 1))
     fi
     

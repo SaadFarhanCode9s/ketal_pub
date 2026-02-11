@@ -170,6 +170,59 @@ merge_upstream() {
     fi
 }
 
+# Re-apply branding to configuration files
+reapply_branding() {
+    print_section "🎨 Re-applying Ketal Branding"
+    
+    # 1. project.yml
+    if [ -f project.yml ]; then
+        print_info "Branding project.yml..."
+        sed -i 's/name: ElementX/name: ketal/g' project.yml
+        sed -i 's/ORGANIZATIONNAME: Element/ORGANIZATIONNAME: ketal/g' project.yml
+        sed -i 's/- ElementX/- ketal/g' project.yml
+        sed -i 's/pattern: ElementX/pattern: ketal/g' project.yml
+        sed -i 's/APP_NAME: ElementX/APP_NAME: ketal/g' project.yml
+        sed -i 's/ElementX\/SupportingFiles/ketal\/SupportingFiles/g' project.yml
+    fi
+
+    # 2. app.yml
+    if [ -f app.yml ]; then
+        print_info "Branding app.yml..."
+        sed -i 's/APP_DISPLAY_NAME: ElementX/APP_DISPLAY_NAME: ketal/g' app.yml
+        sed -i 's/PRODUCTION_APP_NAME: ElementX/PRODUCTION_APP_NAME: ketal/g' app.yml
+        sed -i 's/APP_GROUP_IDENTIFIER: group.io.element.elementx/APP_GROUP_IDENTIFIER: group.io.ketal/g' app.yml
+        sed -i 's/BASE_BUNDLE_IDENTIFIER: io.element.elementx/BASE_BUNDLE_IDENTIFIER: io.ketal.app/g' app.yml
+        sed -i 's/DEVELOPMENT_TEAM: .*/DEVELOPMENT_TEAM: 7J4U792NQT/g' app.yml
+    fi
+    
+    # 3. localazy.json
+    if [ -f localazy.json ]; then
+        print_info "Branding localazy.json..."
+        sed -i 's/ElementX\/Resources/ketal\/Resources/g' localazy.json
+    fi
+
+    # 4. fastlane/Fastfile
+    if [ -f fastlane/Fastfile ]; then
+        print_info "Branding fastlane/Fastfile..."
+        sed -i 's/scheme: "ElementX"/scheme: "ketal"/g' fastlane/Fastfile
+        sed -i 's/target: "ElementX"/target: "ketal"/g' fastlane/Fastfile
+        sed -i 's/project: "ElementX.xcodeproj"/project: "ketal.xcodeproj"/g' fastlane/Fastfile
+    fi
+    
+    # 5. Handle directory moves/renames
+    if [ -d "ElementX" ]; then
+        print_info "Moving ElementX/ directory to ketal/..."
+        # If ketal already exists, we might need to be careful not to overwrite indiscriminately,
+        # but for a sync, we generally want branding + new content.
+        # Simplest approach: Sync content from ElementX to ketal, then remove ElementX
+        mkdir -p ketal
+        cp -R ElementX/* ketal/ 2>/dev/null || true
+        rm -rf ElementX
+    fi
+    
+    print_success "Branding re-applied successfully"
+}
+
 # Auto-resolve configuration file conflicts
 auto_resolve_conflicts() {
     print_section "🔧 Resolving Configuration Conflicts"
@@ -179,7 +232,7 @@ auto_resolve_conflicts() {
         return 0
     fi
     
-    # List of files to keep "ours" (ketal) version
+    # List of files to take UPSTREAM version (theirs) and then patch
     config_files=(
         "project.yml"
         "app.yml"
@@ -196,49 +249,54 @@ auto_resolve_conflicts() {
     )
     
     has_conflicts=false
-    auto_resolved=0
     
     for file in "${config_files[@]}"; do
-        if git status --porcelain | grep -q "^UU $file"; then
-            print_info "Auto-resolving: $file (keeping ketal version)"
-            git checkout --ours "$file"
+        # Check for conflicts (UU or AA)
+        if git status --porcelain | grep -qE "^(UU|AA)[[:space:]]+$file$"; then
+            print_info "Taking upstream version for: $file"
+            git checkout --theirs "$file" 2>/dev/null || true        
+            # If the file didn't exist in ours but exists in theirs, it might be in a different path (ElementX vs ketal)
+            # If 'ketal/...' failed, try 'ElementX/...' equivalent if we can predict it, 
+            # but usually git tracks this. 
+            
             git add "$file"
-            auto_resolved=$((auto_resolved + 1))
             has_conflicts=true
         fi
     done
     
-    # Handle test files with import statements
+    # Handle test files - for these we generally want upstream changes too
     print_info "Checking for test file import conflicts..."
-    test_files=$(git status --porcelain | grep "^UU.*Tests/" | awk '{print $2}' || true)
+    test_files=$(git status --porcelain | grep -E "^(UU|AA).*Tests/" | awk '{print $2}' || true)
     
     for test_file in $test_files; do
         if [ -f "$test_file" ]; then
-            # Keep our version which should have "@testable import ketal"
-            print_info "Auto-resolving test file: $test_file"
-            git checkout --ours "$test_file"
+            print_info "Taking upstream version for test file: $test_file"
+            git checkout --theirs "$test_file"
+            
+            # Post-processing: If imports need changing
+            sed -i 's/import ElementX/import ketal/g' "$test_file"
+            sed -i 's/@testable import ElementX/@testable import ketal/g' "$test_file"
+            
             git add "$test_file"
-            auto_resolved=$((auto_resolved + 1))
             has_conflicts=true
         fi
     done
-    
-    if [ $auto_resolved -gt 0 ]; then
-        print_success "Auto-resolved $auto_resolved configuration files"
-    fi
+
+    # Re-apply Branding
+    reapply_branding
     
     # Check for remaining conflicts
-    remaining_conflicts=$(git status --porcelain | grep "^UU" | wc -l)
+    remaining_conflicts=$(git status --porcelain | grep -E "^(UU|AA)" | wc -l)
     
     if [ "$remaining_conflicts" -gt 0 ]; then
         print_warning "Manual conflicts remaining: $remaining_conflicts files"
-        git status --porcelain | grep "^UU"
+        git status --porcelain | grep -E "^(UU|AA)"
         return 1
     fi
     
     # No remaining conflicts, commit the merge
     if [ "$has_conflicts" = true ]; then
-        git commit --no-edit -m "Merge upstream/$UPSTREAM_BRANCH - auto-resolved configuration conflicts"
+        git commit --no-edit -m "Merge upstream/$UPSTREAM_BRANCH - re-applied ketal branding"
         print_success "Merge committed successfully"
     fi
     
@@ -305,6 +363,49 @@ validate_configuration() {
     else
         print_error "Validation failed with $errors error(s)"
         return 1
+    fi
+}
+
+# Finalize sync: merge to main
+finalize_sync() {
+    print_section "🏁 Finalizing Sync"
+    
+    current_branch=$(git branch --show-current)
+    
+    print_info "Sync and validation successful on branch: $current_branch"
+    print_info "Do you want to merge these changes to 'main' and push to origin? (y/N)"
+    read -r response
+    
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        print_info "Switching to main..."
+        git checkout main
+        
+        print_info "Merging $current_branch into main..."
+        if git merge "$current_branch"; then
+            print_success "Merged successfully"
+            
+            print_info "Pushing to origin/main..."
+            if git push origin main; then
+                print_success "Pushed to origin successfully"
+                
+                print_info "Deleting temporary branch $current_branch..."
+                git branch -D "$current_branch"
+                
+                print_success "Cleanup complete"
+                print_success "🚀 Main branch is now up to date!"
+                exit 0
+            else
+                print_error "Failed to push to origin"
+                exit 1
+            fi
+        else
+            print_error "Failed to merge to main"
+            exit 1
+        fi
+    else
+        print_info "Skipping merge to main."
+        print_info "You are currently on branch: $current_branch"
+        return 0
     fi
 }
 
@@ -381,6 +482,10 @@ main() {
     print_info "  2. Build the project: xcodebuild -scheme ketal build"
     print_info "  3. Run tests (if available)"
     print_info "  4. If issues found, rollback: git reset --hard $backup_branch"
+    echo ""
+    
+    # Offer to finalize
+    finalize_sync
     echo ""
     print_info "If everything looks good, you can delete the backup branch:"
     print_info "  git branch -D $backup_branch"

@@ -156,7 +156,16 @@ merge_upstream() {
         print_success "Merge completed without conflicts!"
         return 0
     else
-        print_warning "Conflicts detected during merge"
+        # Check if it was an unrelated histories error
+        if git merge "upstream/$UPSTREAM_BRANCH" --no-edit -m "Merge upstream/$UPSTREAM_BRANCH into ketal" 2>&1 | grep -q "unrelated histories"; then
+            print_warning "Unrelated histories detected. Retrying with --allow-unrelated-histories..."
+            if git merge "upstream/$UPSTREAM_BRANCH" --allow-unrelated-histories --no-edit -m "Merge upstream/$UPSTREAM_BRANCH into ketal"; then
+                print_success "Merge completed (allowed unrelated histories)!"
+                return 0
+            fi
+        fi
+
+        print_warning "Conflicts detected during merge or merge failed"
         return 1
     fi
 }

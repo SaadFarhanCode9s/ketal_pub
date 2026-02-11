@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 import Combine
-@testable import ketal
+@testable import ElementX
 import XCTest
 
 final class UserSessionTests: XCTestCase { }

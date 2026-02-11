@@ -8,7 +8,7 @@
 
 import AsyncAlgorithms
 import Combine
-@testable import ketal
+@testable import ElementX
 import MatrixRustSDK
 import SwiftUI
 import XCTest

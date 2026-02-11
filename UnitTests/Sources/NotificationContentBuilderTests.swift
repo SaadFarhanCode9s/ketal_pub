@@ -6,7 +6,7 @@
 //
 
 import Dynamic
-@testable import ketal
+@testable import ElementX
 import MatrixRustSDK
 import XCTest
 

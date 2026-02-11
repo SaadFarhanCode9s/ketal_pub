@@ -6,8 +6,8 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
+@testable import ElementX
 import Foundation
-@testable import ketal
 import SwiftUI
 
 /// A mock of the SwiftUI `LayoutSubviews` struct

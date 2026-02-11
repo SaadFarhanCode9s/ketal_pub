@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ketal
+@testable import ElementX
 import XCTest
 
 @MainActor
@@ -25,8 +25,7 @@ class UserProfileScreenViewModelTests: XCTestCase {
                                                isPresentedModally: false,
                                                userSession: UserSessionMock(.init(clientProxy: clientProxy)),
                                                userIndicatorController: ServiceLocator.shared.userIndicatorController,
-                                               analytics: ServiceLocator.shared.analytics,
-                                               appSettings: ServiceLocator.shared.settings)
+                                               analytics: ServiceLocator.shared.analytics)
         
         let waitForMemberToLoad = deferFulfillment(context.observe(\.viewState.userProfile)) { $0 != nil }
         try await waitForMemberToLoad.fulfill()
@@ -45,8 +44,7 @@ class UserProfileScreenViewModelTests: XCTestCase {
                                                isPresentedModally: false,
                                                userSession: UserSessionMock(.init(clientProxy: clientProxy)),
                                                userIndicatorController: ServiceLocator.shared.userIndicatorController,
-                                               analytics: ServiceLocator.shared.analytics,
-                                               appSettings: ServiceLocator.shared.settings)
+                                               analytics: ServiceLocator.shared.analytics)
         
         let waitForMemberToLoad = deferFulfillment(context.observe(\.viewState.userProfile)) { $0 != nil }
         try await waitForMemberToLoad.fulfill()

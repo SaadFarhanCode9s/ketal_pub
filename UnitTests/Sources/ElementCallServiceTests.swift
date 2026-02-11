@@ -6,7 +6,7 @@
 //
 
 import Clocks
-@testable import ketal
+@testable import ElementX
 import PushKit
 import XCTest
 

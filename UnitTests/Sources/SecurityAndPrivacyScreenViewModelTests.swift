@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ketal
+@testable import ElementX
 import MatrixRustSDK
 import XCTest
 
@@ -425,7 +425,7 @@ class SecurityAndPrivacyScreenViewModelTests: XCTestCase {
     
     private func setupViewModel(joinedParentSpaces: [SpaceServiceRoom],
                                 topLevelSpaces: [SpaceServiceRoom] = [],
-                                joinRule: ketal.JoinRule) {
+                                joinRule: ElementX.JoinRule) {
         let appSettings = AppSettings()
         appSettings.spaceSettingsEnabled = true
         appSettings.knockingEnabled = true

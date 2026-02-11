@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ketal
+@testable import ElementX
 import XCTest
 
 @MainActor

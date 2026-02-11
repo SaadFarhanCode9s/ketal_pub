@@ -7,7 +7,7 @@
 //
 
 import CoreLocation
-@testable import ketal
+@testable import ElementX
 import XCTest
 
 final class MapTilerURLBuilderTests: XCTestCase {

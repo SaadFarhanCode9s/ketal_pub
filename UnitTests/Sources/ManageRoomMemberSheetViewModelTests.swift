@@ -15,7 +15,7 @@ class ManageRoomMemberSheetViewModelTests: XCTestCase {
     private var context: ManageRoomMemberSheetViewModel.Context! {
         viewModel.context
     }
-
+    
     func testKick() async throws {
         let testReason = "Kick Test"
         let roomProxy = JoinedRoomProxyMock(.init(members: [RoomMemberProxyMock.mockAdmin, RoomMemberProxyMock.mockAlice]))
@@ -26,27 +26,27 @@ class ManageRoomMemberSheetViewModelTests: XCTestCase {
             XCTAssertEqual(reason, testReason)
             return .success(())
         }
-
+        
         viewModel = ManageRoomMemberSheetViewModel(memberDetails: .memberDetails(roomMember: .init(withProxy: RoomMemberProxyMock.mockAlice)),
                                                    permissions: .init(canKick: true, canBan: true, ownPowerLevel: RoomMemberProxyMock.mockAdmin.powerLevel),
                                                    roomProxy: roomProxy,
                                                    userIndicatorController: UserIndicatorControllerMock(),
                                                    analyticsService: ServiceLocator.shared.analytics,
                                                    mediaProvider: MediaProviderMock(configuration: .init()))
-
+        
         let deferred = deferFulfillment(context.observe(\.viewState.bindings.alertInfo)) { $0 != nil }
         let deferredAction = deferFulfillment(viewModel.actions) { action in
             action == .dismiss(shouldShowDetails: false)
         }
         context.send(viewAction: .kick)
         try await deferred.fulfill()
-
+        
         context.alertInfo?.textFields?[0].text.wrappedValue = testReason
         context.alertInfo?.secondaryButton?.action?()
         await fulfillment(of: [expectation])
         try await deferredAction.fulfill()
     }
-
+    
     func testBan() async throws {
         let testReason = "Ban Test"
         let roomProxy = JoinedRoomProxyMock(.init(members: [RoomMemberProxyMock.mockAdmin, RoomMemberProxyMock.mockAlice]))
@@ -57,18 +57,18 @@ class ManageRoomMemberSheetViewModelTests: XCTestCase {
             XCTAssertEqual(reason, testReason)
             return .success(())
         }
-
+        
         viewModel = ManageRoomMemberSheetViewModel(memberDetails: .memberDetails(roomMember: .init(withProxy: RoomMemberProxyMock.mockAlice)),
                                                    permissions: .init(canKick: true, canBan: true, ownPowerLevel: RoomMemberProxyMock.mockAdmin.powerLevel),
                                                    roomProxy: roomProxy,
                                                    userIndicatorController: UserIndicatorControllerMock(),
                                                    analyticsService: ServiceLocator.shared.analytics,
                                                    mediaProvider: MediaProviderMock(configuration: .init()))
-
+        
         let deferred = deferFulfillment(context.observe(\.viewState.bindings.alertInfo)) { $0 != nil }
         context.send(viewAction: .ban)
         try await deferred.fulfill()
-
+        
         let deferredAction = deferFulfillment(viewModel.actions) { action in
             action == .dismiss(shouldShowDetails: false)
         }
@@ -77,7 +77,7 @@ class ManageRoomMemberSheetViewModelTests: XCTestCase {
         await fulfillment(of: [expectation])
         try await deferredAction.fulfill()
     }
-
+    
     func testDisplayDetails() async throws {
         let roomProxy = JoinedRoomProxyMock(.init(members: [RoomMemberProxyMock.mockAdmin, RoomMemberProxyMock.mockAlice]))
         viewModel = ManageRoomMemberSheetViewModel(memberDetails: .memberDetails(roomMember: .init(withProxy: RoomMemberProxyMock.mockAlice)),
@@ -86,7 +86,7 @@ class ManageRoomMemberSheetViewModelTests: XCTestCase {
                                                    userIndicatorController: UserIndicatorControllerMock(),
                                                    analyticsService: ServiceLocator.shared.analytics,
                                                    mediaProvider: MediaProviderMock(configuration: .init()))
-
+        
         let deferredAction = deferFulfillment(viewModel.actions) { action in
             action == .dismiss(shouldShowDetails: true)
         }

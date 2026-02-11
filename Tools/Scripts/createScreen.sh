@@ -23,7 +23,7 @@ mkdir -p $SCREENS_DIR
 
 echo "Copying screen files"
 
-cp -R "Templates/SimpleScreenExample/ElementX/" $SCREENS_DIR/
+cp -R "Templates/SimpleScreenExample/ketal/" $SCREENS_DIR/
 
 echo "Copying tests"
 

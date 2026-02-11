@@ -15,7 +15,7 @@ class SettingsScreenViewModelTests: XCTestCase {
     var viewModel: SettingsScreenViewModelProtocol!
     var context: SettingsScreenViewModelType.Context!
     var cancellables = Set<AnyCancellable>()
-
+    
     @MainActor override func setUpWithError() throws {
         cancellables.removeAll()
         let userSession = UserSessionMock(.init(clientProxy: ClientProxyMock(.init(userID: ""))))
@@ -36,7 +36,7 @@ class SettingsScreenViewModelTests: XCTestCase {
         context.send(viewAction: .reportBug)
         try await deferred.fulfill()
     }
-
+    
     func testAnalytics() async throws {
         let deferred = deferFulfillment(viewModel.actions) { $0 == .analytics }
         context.send(viewAction: .analytics)

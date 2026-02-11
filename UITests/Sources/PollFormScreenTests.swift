@@ -28,7 +28,7 @@ class PollFormScreenUITests: XCTestCase {
         let option2TextField = app.textFields[A11yIdentifiers.pollFormScreen.optionID(1)]
         option2TextField.tap(.center)
         option2TextField.typeText("No")
-
+        
         // Dismiss the keyboard
         app.swipeDown()
 
@@ -50,11 +50,11 @@ class PollFormScreenUITests: XCTestCase {
             }
             addOption.tap()
         }
-
+        
         app.swipeDown() // Dismiss the keyboard so the Add button is always visible.
-
+        
         app.swipeUp() // Ensures that the bottom is shown.
-
+        
         XCTAssertFalse(addOption.exists)
         XCTAssertFalse(createButton.isEnabled)
 

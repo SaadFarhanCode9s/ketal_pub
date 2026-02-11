@@ -14,20 +14,20 @@ class ShareExtensionViewController: UIViewController {
     private static var targetConfiguration: Target.ConfigurationResult?
     private let appSettings: CommonSettingsProtocol = AppSettings()
     private var appHooks: AppHooks!
-
+    
     private let keychainController = KeychainController(service: .sessions,
                                                         accessGroup: InfoPlistReader.main.keychainAccessGroupIdentifier)
-
+    
     private var cancellables: Set<AnyCancellable> = []
-
+    
     private let hostingController = UIHostingController(rootView: ShareExtensionView())
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         appHooks = AppHooks()
         appHooks.setUp()
-
+        
         if Self.targetConfiguration == nil {
             Self.targetConfiguration = Target.shareExtension.configure(logLevel: appSettings.logLevel,
                                                                        traceLogPacks: appSettings.traceLogPacks,
@@ -35,15 +35,15 @@ class ShareExtensionViewController: UIViewController {
                                                                        rageshakeURL: appSettings.bugReportRageshakeURL,
                                                                        appHooks: appHooks)
         }
-
+        
         addChild(hostingController)
         view.addMatchedSubview(hostingController.view)
         hostingController.didMove(toParent: self)
     }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        
         if let credentials = keychainController.restorationTokens().first {
             let homeserverURL = credentials.restorationToken.session.homeserverUrl
             appHooks.remoteSettingsHook.loadCache(forHomeserver: homeserverURL, applyingTo: appSettings)
@@ -51,27 +51,27 @@ class ShareExtensionViewController: UIViewController {
             // We should really show a different state when there isn't a logged in user, but for now this is fine.
             MXLog.error("Not logged in, launching app to show the authentication flow.")
         }
-
+        
         Task {
             if let payload = await prepareSharePayload() {
                 await self.openMainApp(payload: payload)
             }
-
+            
             self.dismiss()
         }
     }
-
+    
     // MARK: - Private
-
+    
     private func prepareSharePayload() async -> ShareExtensionPayload? {
         guard let extensionContext,
               let extensionItem = extensionContext.inputItems.first as? NSExtensionItem,
               let itemProviders = extensionItem.attachments else {
             return nil
         }
-
+        
         let roomID = (extensionContext.intent as? INSendMessageIntent)?.conversationIdentifier
-
+        
         var mediaFiles = [ShareExtensionMediaFile]()
         for itemProvider in itemProviders {
             if let fileURL = await itemProvider.storeData(withinAppGroupContainer: true) {
@@ -84,28 +84,28 @@ class ShareExtensionViewController: UIViewController {
                 MXLog.error("Failed loading NSItemProvider data: \(itemProvider)")
             }
         }
-
+        
         if !mediaFiles.isEmpty {
             return .mediaFiles(roomID: roomID, mediaFiles: mediaFiles)
         }
-
+        
         return nil
     }
-
+    
     private func openMainApp(payload: ShareExtensionPayload) async {
         guard let payload = urlEncodeSharePayload(payload) else {
             MXLog.error("Failed preparing share payload")
             return
         }
-
+        
         guard let url = URL(string: "\(InfoPlistReader.main.baseBundleIdentifier):/\(ShareExtensionConstants.urlPath)?\(payload)") else {
             MXLog.error("Failed retrieving main application scheme")
             return
         }
-
+        
         await openURL(url)
     }
-
+    
     private func urlEncodeSharePayload(_ payload: ShareExtensionPayload) -> String? {
         let data: Data
         do {
@@ -114,19 +114,19 @@ class ShareExtensionViewController: UIViewController {
             MXLog.error("Failed encoding share payload with error: \(error)")
             return nil
         }
-
+        
         guard let jsonString = String(data: data, encoding: .utf8) else {
             MXLog.error("Invalid payload data")
             return nil
         }
-
+        
         return jsonString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
     }
-
+    
     private func dismiss() {
         extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
-
+    
     private func openURL(_ url: URL) async {
         var responder: UIResponder? = self
         while responder != nil {
@@ -134,7 +134,7 @@ class ShareExtensionViewController: UIViewController {
                 await application.open(url)
                 return
             }
-
+            
             responder = responder?.next
         }
     }

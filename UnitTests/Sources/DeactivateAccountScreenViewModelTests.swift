@@ -13,30 +13,30 @@ import XCTest
 class DeactivateAccountScreenViewModelTests: XCTestCase {
     var clientProxy: ClientProxyMock!
     var viewModel: DeactivateAccountScreenViewModelProtocol!
-
+    
     var context: DeactivateAccountScreenViewModelType.Context {
         viewModel.context
     }
-
+    
     override func setUpWithError() throws {
         clientProxy = ClientProxyMock(.init())
         viewModel = DeactivateAccountScreenViewModel(clientProxy: clientProxy, userIndicatorController: UserIndicatorControllerMock())
     }
-
+    
     func testDeactivate() async throws {
         try await validateDeactivate(erasingData: false)
     }
-
+    
     func testDeactivateAndErase() async throws {
         try await validateDeactivate(erasingData: true)
     }
-
+    
     func validateDeactivate(erasingData shouldErase: Bool) async throws {
         let enteredPassword = UUID().uuidString
-
+        
         clientProxy.deactivateAccountPasswordEraseDataClosure = { [weak self] password, eraseData in
             guard let self else { return .failure(.sdkError(ClientProxyMockError.generic)) }
-
+            
             if clientProxy.deactivateAccountPasswordEraseDataCallsCount == 1 {
                 if password != nil {
                     XCTFail("The password shouldn't be sent first time round.")
@@ -55,25 +55,25 @@ class DeactivateAccountScreenViewModelTests: XCTestCase {
                 return .success(())
             }
         }
-
+        
         context.eraseData = shouldErase
         context.password = enteredPassword
-
+        
         XCTAssertNil(context.alertInfo)
-
+        
         let deferredState = deferFulfillment(context.observe(\.viewState.bindings.alertInfo)) { $0 != nil }
         context.send(viewAction: .deactivate)
         try await deferredState.fulfill()
-
+        
         guard let confirmationAction = context.alertInfo?.primaryButton.action else {
             XCTFail("Couldn't find the confirmation action.")
             return
         }
-
+        
         let deferredAction = deferFulfillment(viewModel.actionsPublisher) { $0 == .accountDeactivated }
         confirmationAction()
         try await deferredAction.fulfill()
-
+        
         XCTAssertEqual(clientProxy.deactivateAccountPasswordEraseDataCallsCount, 2)
         XCTAssertEqual(clientProxy.deactivateAccountPasswordEraseDataReceivedArguments?.password, enteredPassword)
         XCTAssertEqual(clientProxy.deactivateAccountPasswordEraseDataReceivedArguments?.eraseData, shouldErase)

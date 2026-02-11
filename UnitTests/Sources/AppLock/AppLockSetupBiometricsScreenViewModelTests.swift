@@ -13,21 +13,21 @@ import XCTest
 class AppLockSetupBiometricsScreenViewModelTests: XCTestCase {
     var appLockService: AppLockServiceMock!
     var viewModel: AppLockSetupBiometricsScreenViewModelProtocol!
-
+    
     var context: AppLockSetupBiometricsScreenViewModelType.Context {
         viewModel.context
     }
-
+    
     override func setUp() {
         AppSettings.resetAllSettings()
-
+        
         appLockService = AppLockServiceMock()
         appLockService.underlyingIsEnabled = true
         appLockService.underlyingBiometryType = .touchID
         appLockService.enableBiometricUnlockReturnValue = .success(())
         viewModel = AppLockSetupBiometricsScreenViewModel(appLockService: appLockService)
     }
-
+    
     override func tearDown() {
         AppSettings.resetAllSettings()
     }
@@ -37,7 +37,7 @@ class AppLockSetupBiometricsScreenViewModelTests: XCTestCase {
         let deferred = deferFulfillment(viewModel.actions) { $0 == .continue }
         context.send(viewAction: .allow)
         try await deferred.fulfill()
-
+        
         // Then the service should now have biometric unlock enabled.
         XCTAssertEqual(appLockService.enableBiometricUnlockCallsCount, 1)
     }
@@ -47,7 +47,7 @@ class AppLockSetupBiometricsScreenViewModelTests: XCTestCase {
         let deferred = deferFulfillment(viewModel.actions) { $0 == .continue }
         context.send(viewAction: .skip)
         try await deferred.fulfill()
-
+        
         // Then the service should now have biometric unlock enabled.
         XCTAssertEqual(appLockService.enableBiometricUnlockCallsCount, 0)
     }

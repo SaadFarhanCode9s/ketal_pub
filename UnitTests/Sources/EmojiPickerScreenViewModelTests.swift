@@ -12,16 +12,16 @@ import XCTest
 @MainActor
 final class EmojiPickerScreenViewModelTests: XCTestCase {
     var timelineProxy: TimelineProxyMock!
-
+    
     var viewModel: EmojiPickerScreenViewModel!
     var context: EmojiPickerScreenViewModel.Context {
         viewModel.context
     }
-
+    
     func testToggleReaction() async throws {
         setupViewModel()
         let reaction = "👋"
-
+        
         let expectation = XCTestExpectation(description: "Toggle reaction")
         let deferred = deferFulfillment(viewModel.actions) { $0 == .dismiss }
         timelineProxy.toggleReactionToClosure = { toggledReaction, _ in
@@ -33,12 +33,12 @@ final class EmojiPickerScreenViewModelTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 1)
         try await deferred.fulfill()
     }
-
+    
     // MARK: - Helpers
-
+    
     private func setupViewModel(selectedEmojis: Set<String> = []) {
         timelineProxy = TimelineProxyMock(.init())
-
+        
         viewModel = EmojiPickerScreenViewModel(itemID: .randomEvent,
                                                selectedEmojis: selectedEmojis,
                                                emojiProvider: EmojiProvider(appSettings: ServiceLocator.shared.settings),

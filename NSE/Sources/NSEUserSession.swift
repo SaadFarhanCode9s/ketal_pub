@@ -14,7 +14,7 @@ protocol NSEUserSessionProtocol {
     var inviteAvatarsVisibility: InviteAvatars { get async }
     var mediaPreviewVisibility: MediaPreviews { get async }
     var threadsEnabled: Bool { get }
-
+    
     func notificationItemProxy(roomID: String, eventID: String) async -> NotificationItemProxyProtocol?
     func roomForIdentifier(_ roomID: String) -> Room?
 }
@@ -29,7 +29,7 @@ final class NSEUserSession: NSEUserSessionProtocol {
                                                                                imageCache: .onlyOnDisk,
                                                                                homeserverReachabilityPublisher: nil)
     private let delegateHandle: TaskHandle?
-
+    
     var mediaPreviewVisibility: MediaPreviews {
         get async {
             do {
@@ -40,7 +40,7 @@ final class NSEUserSession: NSEUserSessionProtocol {
             }
         }
     }
-
+    
     var inviteAvatarsVisibility: InviteAvatars {
         get async {
             do {
@@ -51,7 +51,7 @@ final class NSEUserSession: NSEUserSessionProtocol {
             }
         }
     }
-
+    
     var threadsEnabled: Bool {
         appSettings.threadsEnabled
     }
@@ -64,7 +64,7 @@ final class NSEUserSession: NSEUserSessionProtocol {
         sessionDirectories = credentials.restorationToken.sessionDirectories
         userID = credentials.userID
         self.appSettings = appSettings
-
+        
         let homeserverURL = credentials.restorationToken.session.homeserverUrl
         let clientBuilder = ClientBuilder
             .baseBuilder(setupEncryption: false,
@@ -83,20 +83,20 @@ final class NSEUserSession: NSEUserSessionProtocol {
                     .passphrase(passphrase: credentials.restorationToken.passphrase))
             .username(username: credentials.userID)
             .homeserverUrl(url: homeserverURL)
-
+        
         baseClient = try await clientBuilder.build()
         delegateHandle = try baseClient.setDelegate(delegate: ClientDelegateWrapper())
-
+        
         try await baseClient.restoreSessionWith(session: credentials.restorationToken.session,
                                                 roomLoadSettings: .one(roomId: roomID))
-
+        
         notificationClient = try await baseClient.notificationClient(processSetup: .multipleProcesses)
     }
-
+    
     func notificationItemProxy(roomID: String, eventID: String) async -> NotificationItemProxyProtocol? {
         do {
             let notificationStatus = try await notificationClient.getNotification(roomId: roomID, eventId: eventID)
-
+                
             switch notificationStatus {
             case .event(let notification):
                 return NotificationItemProxy(notificationItem: notification,
@@ -115,7 +115,7 @@ final class NSEUserSession: NSEUserSessionProtocol {
             return EmptyNotificationItemProxy(eventID: eventID, roomID: roomID, receiverID: userID)
         }
     }
-
+    
     func roomForIdentifier(_ roomID: String) -> Room? {
         do {
             return try notificationClient.getRoom(roomId: roomID)
@@ -124,7 +124,7 @@ final class NSEUserSession: NSEUserSessionProtocol {
             return nil
         }
     }
-
+    
     deinit {
         delegateHandle?.cancel()
     }
@@ -136,8 +136,19 @@ private final class ClientDelegateWrapper: ClientDelegate {
     func didReceiveAuthError(isSoftLogout: Bool) {
         MXLog.error("Received authentication error, the NSE can't handle this.")
     }
-
+    
     func didRefreshTokens() {
         MXLog.info("Delegating session updates to the ClientSessionDelegate.")
+    }
+    
+    func onBackgroundTaskErrorReport(taskName: String, error: MatrixRustSDK.BackgroundTaskFailureReason) {
+        switch error {
+        case .panic(let message, let backtrace):
+            MXLog.error("Received background task panic: \(message ?? "Missing message")\nBacktrace:\n\(backtrace ?? "Missing backtrace")")
+        case .error(let error):
+            MXLog.error("Received background task error: \(error)")
+        case .earlyTermination:
+            MXLog.error("Received background task early termination")
+        }
     }
 }

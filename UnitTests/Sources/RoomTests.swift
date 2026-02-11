@@ -16,18 +16,18 @@ class RoomTests: XCTestCase {
         let room = RoomSDKMock()
         room.hasActiveRoomCallReturnValue = false
         room.isDirectReturnValue = false
-
+        
         var callIntent = await room.joinCallIntent
         XCTAssertEqual(callIntent, .startCall)
-
+        
         room.isDirectReturnValue = true
         callIntent = await room.joinCallIntent
         XCTAssertEqual(callIntent, .startCallDm)
-
+        
         room.hasActiveRoomCallReturnValue = true
         callIntent = await room.joinCallIntent
         XCTAssertEqual(callIntent, .joinExistingDm)
-
+        
         room.isDirectReturnValue = false
         callIntent = await room.joinCallIntent
         XCTAssertEqual(callIntent, .joinExisting)

@@ -21,4 +21,7 @@ extension AudioSessionProtocol {
     }
 }
 
+// sourcery: AutoMockable
+extension AudioSessionProtocol { }
+
 extension AVAudioSession: AudioSessionProtocol { }

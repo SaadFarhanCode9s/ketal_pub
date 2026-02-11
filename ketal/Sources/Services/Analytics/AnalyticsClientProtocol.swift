@@ -35,3 +35,6 @@ protocol AnalyticsClientProtocol {
     /// - Parameter userProperties: The properties event to capture.
     func updateUserProperties(_ event: AnalyticsEvent.UserProperties)
 }
+
+// sourcery: AutoMockable
+extension AnalyticsClientProtocol { }

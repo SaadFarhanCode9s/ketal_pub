@@ -15,7 +15,7 @@ import SwiftUI
 /// `ShieldStateCode` for more information about the meaning of the cases.
 enum EncryptionAuthenticity: Hashable {
     enum Color { case red, gray }
-
+    
     case notGuaranteed(color: Color)
     case unknownDevice(color: Color)
     case unsignedDevice(color: Color)
@@ -23,26 +23,26 @@ enum EncryptionAuthenticity: Hashable {
     case verificationViolation(color: Color)
     case sentInClear(color: Color)
     case mismatchedSender(color: Color)
-
+    
     var message: String {
         switch self {
         case .notGuaranteed:
-            L10n.eventShieldReasonAuthenticityNotGuaranteed
+            L10n.cryptoEventAuthenticityNotGuaranteed
         case .unknownDevice:
-            L10n.eventShieldReasonUnknownDevice
+            L10n.cryptoEventAuthenticityUnknownDevice
         case .unsignedDevice:
-            L10n.eventShieldReasonUnsignedDevice
+            L10n.cryptoEventAuthenticityUnsignedDevice
         case .unverifiedIdentity:
-            L10n.eventShieldReasonUnverifiedIdentity
+            L10n.cryptoEventAuthenticityUnverifiedIdentity
         case .verificationViolation:
-            L10n.eventShieldReasonPreviouslyVerified
+            L10n.cryptoEventAuthenticityPreviouslyVerified
         case .sentInClear:
-            L10n.eventShieldReasonSentInClear
+            L10n.cryptoEventAuthenticitySentInClear
         case .mismatchedSender:
-            L10n.eventShieldMismatchedSender
+            L10n.cryptoEventAuthenticityMismatchedSender
         }
     }
-
+    
     var color: Color {
         switch self {
         case .notGuaranteed(let color),
@@ -55,7 +55,7 @@ enum EncryptionAuthenticity: Hashable {
             color
         }
     }
-
+    
     var icon: KeyPath<CompoundIcons, Image> {
         switch self {
         case .notGuaranteed: \.info
@@ -76,7 +76,7 @@ extension EncryptionAuthenticity {
             return nil
         }
     }
-
+    
     init(shieldStateCode: TimelineEventShieldStateCode, color: EncryptionAuthenticity.Color) {
         switch shieldStateCode {
         case .authenticityNotGuaranteed:

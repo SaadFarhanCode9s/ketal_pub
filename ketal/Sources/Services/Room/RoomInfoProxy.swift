@@ -135,7 +135,7 @@ struct RoomInfoProxy: RoomInfoProxyProtocol {
     }
 
     var joinRule: JoinRule? {
-        roomInfo.joinRule
+        roomInfo.joinRule.map(JoinRule.init)
     }
 
     var historyVisibility: RoomHistoryVisibility {

@@ -58,7 +58,7 @@ struct RoomStateEventStringBuilder {
             if senderIsYou {
                 return L10n.stateEventRoomInviteByYou(member)
             } else if memberIsYou {
-                return L10n.stateEventRoomInviteYou(senderDisplayName)
+                return buildInvitedYouString(senderDisplayName)
             } else {
                 return L10n.stateEventRoomInvite(senderDisplayName, member)
             }

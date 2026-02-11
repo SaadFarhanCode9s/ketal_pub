@@ -19,3 +19,6 @@ protocol UserNotificationCenterProtocol: AnyObject {
     func authorizationStatus() async -> UNAuthorizationStatus
     func notificationSettings() async -> UNNotificationSettings
 }
+
+// sourcery: AutoMockable
+extension UserNotificationCenterProtocol { }

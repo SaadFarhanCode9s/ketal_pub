@@ -50,3 +50,6 @@ protocol AudioPlayerProtocol: AnyObject {
     func stop()
     func seek(to progress: Double) async
 }
+
+// sourcery: AutoMockable
+extension AudioPlayerProtocol { }

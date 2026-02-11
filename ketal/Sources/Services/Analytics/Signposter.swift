@@ -29,7 +29,7 @@ class Signposter {
         static let homeserver = "homeserver"
     }
 
-    static let subsystem = "ElementX"
+    static let subsystem = "ketal"
     static let category = "PerformanceTests"
 
     // MARK: - App Startup

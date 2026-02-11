@@ -90,5 +90,5 @@ extension ShareToMapsAppActivity.MapsAppType {
 }
 
 private extension UIActivity.ActivityType {
-    static let shareToMapsApp = UIActivity.ActivityType("ElementX.ShareToMapsApp")
+    static let shareToMapsApp = UIActivity.ActivityType("ketal.ShareToMapsApp")
 }

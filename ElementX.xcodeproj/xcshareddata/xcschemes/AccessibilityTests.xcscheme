@@ -18,7 +18,7 @@
                BlueprintIdentifier = "C0C687DE1D270F9895FEE186"
                BuildableName = "AccessibilityTests.xctest"
                BlueprintName = "AccessibilityTests"
-               ReferencedContainer = "container:ElementX.xcodeproj">
+               ReferencedContainer = "container:ketal.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -41,7 +41,7 @@
             BlueprintIdentifier = "C0C687DE1D270F9895FEE186"
             BuildableName = "AccessibilityTests.xctest"
             BlueprintName = "AccessibilityTests"
-            ReferencedContainer = "container:ElementX.xcodeproj">
+            ReferencedContainer = "container:ketal.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -65,7 +65,7 @@
             BlueprintIdentifier = "C0C687DE1D270F9895FEE186"
             BuildableName = "AccessibilityTests.xctest"
             BlueprintName = "AccessibilityTests"
-            ReferencedContainer = "container:ElementX.xcodeproj">
+            ReferencedContainer = "container:ketal.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <CommandLineArguments>
@@ -85,7 +85,7 @@
             BlueprintIdentifier = "C0C687DE1D270F9895FEE186"
             BuildableName = "AccessibilityTests.xctest"
             BlueprintName = "AccessibilityTests"
-            ReferencedContainer = "container:ElementX.xcodeproj">
+            ReferencedContainer = "container:ketal.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

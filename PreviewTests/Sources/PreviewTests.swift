@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import ketal
 @testable import SnapshotTesting
 import SwiftUI
 import XCTest

@@ -35,7 +35,7 @@ struct GenerateSDKMocks: AsyncParsableCommand {
         guard let fileURL = URL(string: fileURLString) else {
             throw GenerateSDKMocksError.invalidFileUrl
         }
-
+        
         let (tempURL, _) = try await URLSession.shared.download(from: fileURL)
         let sdkFilePath = NSTemporaryDirectory().appending("matrix_sdk_ffi.swift")
         try FileManager.default.moveItem(at: tempURL, to: URL(fileURLWithPath: sdkFilePath))

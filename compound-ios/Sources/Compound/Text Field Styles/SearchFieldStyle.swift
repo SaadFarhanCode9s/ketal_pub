@@ -16,16 +16,16 @@ public extension View {
         introspect(.navigationStack, on: .supportedVersions, scope: .ancestor) { navigationController in
             // Uses the navigation stack as .searchField is unreliable when pushing the second search bar, during the create rooms flow.
             guard let searchController = navigationController.navigationBar.topItem?.searchController else { return }
-
+            
             // Ported from Riot iOS as this is the only reliable way to get the exact look we want.
             // However this is fragile and tied to gutwrenching the current UISearchBar internals.
-
+            
             let searchTextField = searchController.searchBar.searchTextField
             searchTextField.tintColor = .compound.iconAccentTertiary
-
+            
             if #unavailable(iOS 26.0) {
                 let placeholderColor = UIColor.compound.textSecondary
-
+                
                 // Magnifying glass icon.
                 let leftImageView = searchTextField.leftView as? UIImageView
                 leftImageView?.tintColor = placeholderColor
@@ -37,11 +37,11 @@ public extension View {
                 let buttonImage = clearButton?.image(for: .normal)?.withRenderingMode(.alwaysTemplate)
                 clearButton?.setImage(buttonImage, for: .normal)
                 clearButton?.tintColor = placeholderColor
-
+                
                 // Text field.
                 searchTextField.textColor = .compound.textPrimary
                 searchTextField.backgroundColor = .compound._bgSubtleSecondaryAlpha
-
+                
                 // Hide the effect views so we can use the rounded rect style without any materials.
                 let effectBackgroundTop = searchTextField.value(forKey: "_effectBackgroundTop") as? UIView
                 effectBackgroundTop?.isHidden = true
@@ -68,7 +68,7 @@ struct SearchStyle_Previews: PreviewProvider, TestablePreview {
         }
         .tint(.compound.textActionPrimary)
         .previewDisplayName("List")
-
+        
         NavigationStack {
             Form {
                 Section {

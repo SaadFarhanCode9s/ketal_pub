@@ -19,7 +19,7 @@ extension UNTextInputNotificationResponse {
         let archiver = MockCoder(requiringSecureCoding: false)
         let notification = try XCTUnwrap(UNNotification(coder: archiver))
         notification.setValue(request, forKey: "request")
-
+        
         let response = try XCTUnwrap(UNTextInputNotificationResponse(coder: archiver))
         response.setValue(notification, forKey: "notification")
         response.setValue(actionIdentifier, forKey: "actionIdentifier")

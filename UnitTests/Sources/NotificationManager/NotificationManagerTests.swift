@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ketal
+@testable import ElementX
 import NotificationCenter
 import XCTest
 
@@ -22,7 +22,7 @@ final class NotificationManagerTests: XCTestCase {
     private var handleInlineReplyDelegateCalled = false
     private var notificationTappedDelegateCalled = false
     private var registerForRemoteNotificationsDelegateCalled: (() -> Void)?
-
+    
     private var appSettings: AppSettings {
         ServiceLocator.shared.settings
     }
@@ -33,23 +33,23 @@ final class NotificationManagerTests: XCTestCase {
         notificationCenter.requestAuthorizationOptionsReturnValue = true
         notificationCenter.authorizationStatusReturnValue = .authorized
         notificationCenter.notificationSettingsClosure = { await UNUserNotificationCenter.current().notificationSettings() }
-
+        
         notificationManager = NotificationManager(notificationCenter: notificationCenter, appSettings: appSettings)
         notificationManager.start()
         notificationManager.setUserSession(mockUserSession)
     }
-
+    
     override func tearDown() {
         notificationCenter = nil
         notificationManager = nil
     }
-
+    
     func test_whenRegistered_pusherIsCalled() async {
         _ = await notificationManager.register(with: Data())
-
+        
         XCTAssertTrue(clientProxy.setPusherWithCalled)
     }
-
+    
     func test_whenRegisteredSuccess_completionSuccessIsCalled() async {
         let success = await notificationManager.register(with: Data())
         XCTAssertTrue(success)
@@ -59,7 +59,7 @@ final class NotificationManagerTests: XCTestCase {
         enum TestError: Error {
             case someError
         }
-
+        
         clientProxy.setPusherWithThrowableError = TestError.someError
         let success = await notificationManager.register(with: Data())
         XCTAssertFalse(success)
@@ -68,12 +68,12 @@ final class NotificationManagerTests: XCTestCase {
     func test_whenRegistered_pusherIsCalledWithCorrectValues() async throws {
         let pushkeyData = Data("1234".utf8)
         _ = await notificationManager.register(with: pushkeyData)
-
+        
         guard let configuration = clientProxy.setPusherWithReceivedInvocations.first else {
             XCTFail("Invalid pusher configuration sent")
             return
         }
-
+        
         XCTAssertEqual(configuration.identifiers.pushkey, pushkeyData.base64EncodedString())
         XCTAssertEqual(configuration.identifiers.appId, appSettings.pusherAppID)
         XCTAssertEqual(configuration.appDisplayName, "\(InfoPlistReader.main.bundleDisplayName) (iOS)")
@@ -111,7 +111,7 @@ final class NotificationManagerTests: XCTestCase {
         XCTAssertEqual(request.content.title, "Title")
         XCTAssertEqual(request.content.subtitle, "Subtitle")
     }
-
+    
     func test_whenStart_notificationCategoriesAreSet() {
         let replyAction = UNTextInputNotificationAction(identifier: NotificationConstants.Action.inlineReply,
                                                         title: L10n.actionQuickReply,
@@ -120,7 +120,7 @@ final class NotificationManagerTests: XCTestCase {
                                                      actions: [replyAction],
                                                      intentIdentifiers: [],
                                                      options: [])
-
+        
         let inviteCategory = UNNotificationCategory(identifier: NotificationConstants.Category.invite,
                                                     actions: [],
                                                     intentIdentifiers: [],
@@ -156,32 +156,32 @@ final class NotificationManagerTests: XCTestCase {
         await fulfillment(of: [expectation])
         XCTAssertTrue(authorizationStatusWasGranted)
     }
-
+    
     func test_whenStartAndAuthorizedAndNotificationDisabled_registerForRemoteNotificationsNotCalled() async throws {
         appSettings.enableNotifications = false
         notificationCenter.authorizationStatusReturnValue = .authorized
         notificationManager.delegate = self
-
+        
         notificationManager.setUserSession(UserSessionMock(.init()))
         try await Task.sleep(for: .seconds(1))
-
+        
         XCTAssertFalse(authorizationStatusWasGranted)
     }
-
+    
     func test_whenStartAndAuthorized_registerForRemoteNotificationsCalled() async {
         appSettings.enableNotifications = true
         notificationCenter.authorizationStatusReturnValue = .authorized
         notificationManager.delegate = self
-
+        
         let expectation: XCTestExpectation = expectation(description: "registerForRemoteNotifications delegate function should be called")
         expectation.assertForOverFulfill = false
         registerForRemoteNotificationsDelegateCalled = {
             expectation.fulfill()
         }
-
+        
         notificationManager.setUserSession(UserSessionMock(.init()))
         await fulfillment(of: [expectation])
-
+        
         XCTAssertTrue(authorizationStatusWasGranted)
     }
 
@@ -227,25 +227,25 @@ final class NotificationManagerTests: XCTestCase {
     }
 }
 
-extension NotificationManagerTests: NotificationManagerDelegate {
+extension NotificationManagerTests: @MainActor NotificationManagerDelegate {
     func registerForRemoteNotifications() {
         authorizationStatusWasGranted = true
         registerForRemoteNotificationsDelegateCalled?()
     }
-
+    
     func unregisterForRemoteNotifications() {
         authorizationStatusWasGranted = false
     }
-
+    
     func shouldDisplayInAppNotification(content: UNNotificationContent) -> Bool {
         shouldDisplayInAppNotificationReturnValue
     }
-
+    
     func notificationTapped(content: UNNotificationContent) async {
         notificationTappedDelegateCalled = true
     }
-
-    func handleInlineReply(_ service: ketal.NotificationManagerProtocol, content: UNNotificationContent, replyText: String) async {
+    
+    func handleInlineReply(_ service: ElementX.NotificationManagerProtocol, content: UNNotificationContent, replyText: String) async {
         handleInlineReplyDelegateCalled = true
     }
 }

@@ -22,7 +22,7 @@ public struct ListRowButtonStyle: PrimitiveButtonStyle {
         }
         .buttonStyle(Style())
     }
-
+    
     /// Inner style used to set the pressed background colour.
     struct Style: ButtonStyle {
         func makeBody(configuration: Configuration) -> some View {
@@ -46,7 +46,7 @@ public struct ListRowButtonStyle_Previews: PreviewProvider, TestablePreview {
                     .buttonStyle(ListRowButtonStyle.Style())
             }
             .listRowInsets(EdgeInsets())
-
+            
             Section {
                 Button("Title") { }
                 Button("Title") { }
@@ -54,7 +54,7 @@ public struct ListRowButtonStyle_Previews: PreviewProvider, TestablePreview {
             }
             .buttonStyle(ListRowButtonStyle())
             .listRowInsets(EdgeInsets())
-
+            
             Section {
                 ShareLink(item: "test")
                     .buttonStyle(ListRowButtonStyle())

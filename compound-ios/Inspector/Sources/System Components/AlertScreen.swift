@@ -15,17 +15,17 @@ struct AlertScreen: View {
     @State private var isPresentingDestructiveAlert = false
     @State private var isPresentingTextFieldAlert = false
     @State private var textFieldValue = ""
-
+    
     private let title = "A Short Title is Best"
     private let message = "A message should be a short, complete sentence."
-
+    
     var body: some View {
         ScreenContent(navigationTitle: "Alerts") {
             Text("This component will be rendered differently when running on macOS.")
                 .font(.footnote)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-
+            
             Button("Action") { isPresentingActionAlert = true }
                 .padding(.top)
                 .alert(title, isPresented: $isPresentingActionAlert) {
@@ -33,7 +33,7 @@ struct AlertScreen: View {
                 } message: {
                     Text(message)
                 }
-
+            
             Button("Action and Cancel") { isPresentingActionAndCancelAlert = true }
                 .padding(.top)
                 .alert(title, isPresented: $isPresentingActionAndCancelAlert) {
@@ -42,7 +42,7 @@ struct AlertScreen: View {
                 } message: {
                     Text(message)
                 }
-
+            
             Button("Destructive") { isPresentingDestructiveAlert = true }
                 .padding(.top)
                 .alert(title, isPresented: $isPresentingDestructiveAlert) {
@@ -52,7 +52,7 @@ struct AlertScreen: View {
                 } message: {
                     Text(message)
                 }
-
+            
             Button("TextField") { isPresentingTextFieldAlert = true }
                 .padding(.top)
                 .alert(title, isPresented: $isPresentingTextFieldAlert) {

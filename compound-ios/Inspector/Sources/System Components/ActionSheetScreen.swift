@@ -11,7 +11,7 @@ import SwiftUI
 
 struct ActionSheetScreen: View {
     @State private var isPresentingConfirmationDialog = true
-
+    
     var body: some View {
         ScreenContent(navigationTitle: "Action Sheets") {
             Text("This component will be rendered differently when running on macOS.")

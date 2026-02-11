@@ -7,20 +7,20 @@
 //
 
 import Combine
-@testable import ketal
+@testable import ElementX
 import XCTest
 
 @MainActor
 class StaticLocationScreenViewModelTests: XCTestCase {
     let timelineProxy = TimelineProxyMock(.init())
-
+    
     var viewModel: StaticLocationScreenViewModelProtocol!
     var context: StaticLocationScreenViewModel.Context {
         viewModel.context
     }
-
+    
     private var cancellables = Set<AnyCancellable>()
-
+    
     override func setUpWithError() throws {
         cancellables.removeAll()
         let viewModel = StaticLocationScreenViewModel(interactionMode: .picker,
@@ -31,7 +31,7 @@ class StaticLocationScreenViewModelTests: XCTestCase {
         viewModel.state.bindings.isLocationAuthorized = true
         self.viewModel = viewModel
     }
-
+    
     func testUserDidPan() {
         XCTAssertTrue(context.viewState.isSharingUserLocation)
         XCTAssertEqual(context.showsUserLocationMode, .showAndFollow)
@@ -39,7 +39,7 @@ class StaticLocationScreenViewModelTests: XCTestCase {
         XCTAssertFalse(context.viewState.isSharingUserLocation)
         XCTAssertEqual(context.showsUserLocationMode, .show)
     }
-
+    
     func testCenterOnUser() {
         XCTAssertTrue(context.viewState.isSharingUserLocation)
         context.showsUserLocationMode = .show
@@ -48,14 +48,14 @@ class StaticLocationScreenViewModelTests: XCTestCase {
         XCTAssertTrue(context.viewState.isSharingUserLocation)
         XCTAssertEqual(context.showsUserLocationMode, .showAndFollow)
     }
-
+    
     func testCenterOnUserWithoutAuth() {
         context.showsUserLocationMode = .hide
         context.isLocationAuthorized = nil
         context.send(viewAction: .centerToUser)
         XCTAssertEqual(context.showsUserLocationMode, .showAndFollow)
     }
-
+    
     func testCenterOnUserWithDeniedAuth() {
         context.isLocationAuthorized = false
         context.showsUserLocationMode = .hide
@@ -63,7 +63,7 @@ class StaticLocationScreenViewModelTests: XCTestCase {
         XCTAssertNotEqual(context.showsUserLocationMode, .showAndFollow)
         XCTAssertNotNil(context.alertInfo)
     }
-
+    
     func testErrorMapping() {
         let mapError = AlertInfo(locationSharingViewError: .mapError(.failedLoadingMap))
         XCTAssertEqual(mapError.message, L10n.errorFailedLoadingMap(InfoPlistReader.main.bundleDisplayName))
@@ -76,7 +76,7 @@ class StaticLocationScreenViewModelTests: XCTestCase {
     func testSendUserLocation() async throws {
         context.mapCenterLocation = .init(latitude: 0, longitude: 0)
         context.geolocationUncertainty = 10
-
+        
         let deferred = deferFulfillment(viewModel.actions) { $0 == .close }
         let expectation = XCTestExpectation(description: "sendLocation")
         timelineProxy.sendLocationBodyGeoURIDescriptionZoomLevelAssetTypeClosure = { _, geoURI, _, _, assetType in
@@ -85,7 +85,7 @@ class StaticLocationScreenViewModelTests: XCTestCase {
             expectation.fulfill()
             return .success(())
         }
-
+        
         context.send(viewAction: .selectLocation)
         await fulfillment(of: [expectation], timeout: 1)
         try await deferred.fulfill()
@@ -104,7 +104,7 @@ class StaticLocationScreenViewModelTests: XCTestCase {
             expectation.fulfill()
             return .success(())
         }
-
+        
         context.send(viewAction: .selectLocation)
         await fulfillment(of: [expectation], timeout: 1)
         try await deferred.fulfill()

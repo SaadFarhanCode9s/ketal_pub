@@ -36,12 +36,12 @@ public struct ListRowTrailingSection<Icon: View>: View {
     private var counter: Int?
     private var isWaiting = false
     private var accessory: ListRowAccessory?
-
+    
     @ScaledMetric private var iconSize = 24
     private var hideAccessory: Bool {
         isWaiting && accessory?.kind == .unselected
     }
-
+    
     init(_ details: ListRowDetails<Icon>?, accessory: ListRowAccessory? = nil) {
         title = details?.title
         icon = details?.icon
@@ -49,13 +49,13 @@ public struct ListRowTrailingSection<Icon: View>: View {
         counter = details?.counter
         self.accessory = accessory
     }
-
+    
     public var body: some View {
         HStack(spacing: ListRowTrailingSectionSpacing.horizontal) {
             if isWaiting {
                 ProgressView()
             }
-
+            
             if title != nil || icon != nil {
                 Label {
                     title.map(Text.init)
@@ -64,7 +64,7 @@ public struct ListRowTrailingSection<Icon: View>: View {
                 }
                 .labelStyle(ListRowDetailsLabelStyle())
             }
-
+            
             if let counter {
                 Text("\(counter)")
                     .font(.compound.bodyLG)
@@ -73,7 +73,7 @@ public struct ListRowTrailingSection<Icon: View>: View {
                     .padding(.vertical, 2)
                     .background { Capsule().fill(isEnabled ? .compound.iconSuccessPrimary : .compound.iconDisabled) }
             }
-
+            
             if let accessory, !hideAccessory {
                 accessory
             }
@@ -88,14 +88,14 @@ public struct ListRowTrailingSection<Icon: View>: View {
 struct ListRowTrailingSection_Previews: PreviewProvider, TestablePreview {
     static let someCondition = true
     static let otherCondition = true
-
+    
     static var previews: some View {
         VStack(spacing: 40) {
             details
             withAccessory
         }
     }
-
+    
     static var details: some View {
         VStack(spacing: 20) {
             ListRowTrailingSection(.label(title: "Content", icon: Image(systemName: "square.dashed")))
@@ -104,31 +104,31 @@ struct ListRowTrailingSection_Previews: PreviewProvider, TestablePreview {
             ListRowTrailingSection(.icon(Image(systemName: "square.dashed")))
             ListRowTrailingSection(.systemIcon(.squareDashed))
             ListRowTrailingSection(.isWaiting(true))
-
+            
             ListRowTrailingSection(.systemIcon(.checkmark))
             ListRowTrailingSection(.title("Hello"))
-
+            
             ListRowTrailingSection(someCondition ? .isWaiting(true) : otherCondition ? .systemIcon(.checkmark) : .title("Hello"))
-
+            
             ListRowTrailingSection(.title("Hello", counter: 1))
             ListRowTrailingSection(.title("Hello", counter: 1))
                 .disabled(true)
         }
     }
-
+    
     static var withAccessory: some View {
         VStack(spacing: 20) {
             ListRowTrailingSection(.isWaiting(true), accessory: .selection(true))
                 .border(.purple)
-
+            
             // The checkmark should be hidden.
             ListRowTrailingSection(.isWaiting(true), accessory: .selection(false))
                 .border(.purple)
-
+            
             // The checkmark's space should be reserved.
             ListRowTrailingSection(.isWaiting(false), accessory: .selection(false))
                 .border(.purple)
-
+            
             ListRowTrailingSection(.counter(1), accessory: .navigationLink)
                 .border(.purple)
         }

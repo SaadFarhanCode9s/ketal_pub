@@ -4,7 +4,7 @@ import SwiftUI
 enum FontSize {
     case custom(CGFloat, Font.TextStyle?)
     case style(Font.TextStyle)
-
+    
     /// The raw value in points.
     var value: CGFloat {
         switch self {
@@ -39,7 +39,7 @@ enum FontSize {
             }
         }
     }
-
+    
     /// The text style of the font.
     var style: Font.TextStyle {
         switch self {
@@ -49,22 +49,22 @@ enum FontSize {
             return textStyle
         }
     }
-
+    
     static func reflecting(_ font: Font) -> FontSize? {
         let mirror = Mirror(reflecting: font)
         guard let provider = mirror.descendant("provider", "base") else { return nil }
         return resolveFontSize(provider)
     }
-
+    
     private static func resolveFontSize(_ provider: Any) -> FontSize? {
         let mirror = Mirror(reflecting: provider)
-
+        
         if let size = mirror.descendant("size") as? CGFloat {
             return .custom(size, mirror.descendant("textStyle") as? Font.TextStyle)
         } else if let textStyle = mirror.descendant("style") as? Font.TextStyle {
             return .style(textStyle)
         }
-
+        
         // recurse to handle modifiers.
         guard let provider = mirror.descendant("base", "provider", "base") else { return nil }
         return resolveFontSize(provider)

@@ -1,6 +1,6 @@
 sources:
   include:
-    - ../../ketal
+    - ../../ElementX
 templates:
   - AccessibilityTests.stencil
 output:

@@ -12,7 +12,7 @@ final class MockCoder: NSKeyedArchiver {
     deinit {
         finishEncoding()
     }
-
+    
     override func decodeObject(forKey _: String) -> Any {
         ""
     }

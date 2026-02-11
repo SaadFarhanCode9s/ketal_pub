@@ -16,11 +16,11 @@ public struct ListRowDetails<Icon: View> {
     var title: String?
     var icon: Icon?
     var counter: Int?
-
+    
     var isWaiting = false
-
+    
     // MARK: - Initialisers
-
+    
     public static func label(title: String,
                              icon: Icon,
                              counter: Int? = nil,
@@ -30,7 +30,7 @@ public struct ListRowDetails<Icon: View> {
                        counter: counter,
                        isWaiting: isWaiting)
     }
-
+    
     public static func label(title: String,
                              icon: KeyPath<CompoundIcons, Image>,
                              counter: Int? = nil,
@@ -40,7 +40,7 @@ public struct ListRowDetails<Icon: View> {
                        counter: counter,
                        isWaiting: isWaiting)
     }
-
+    
     public static func label(title: String,
                              systemIcon: SFSymbol,
                              counter: Int? = nil,
@@ -50,7 +50,7 @@ public struct ListRowDetails<Icon: View> {
                        counter: counter,
                        isWaiting: isWaiting)
     }
-
+    
     public static func icon(_ icon: Icon,
                             counter: Int? = nil,
                             isWaiting: Bool = false) -> Self {
@@ -58,7 +58,7 @@ public struct ListRowDetails<Icon: View> {
                        counter: counter,
                        isWaiting: isWaiting)
     }
-
+    
     public static func icon(_ icon: KeyPath<CompoundIcons, Image>,
                             counter: Int? = nil,
                             isWaiting: Bool = false) -> Self where Icon == CompoundIcon {
@@ -66,7 +66,7 @@ public struct ListRowDetails<Icon: View> {
                        counter: counter,
                        isWaiting: isWaiting)
     }
-
+    
     public static func systemIcon(_ systemIcon: SFSymbol,
                                   counter: Int? = nil,
                                   isWaiting: Bool = false) -> Self where Icon == Image {
@@ -84,11 +84,11 @@ public extension ListRowDetails where Icon == Image {
                        counter: counter,
                        isWaiting: isWaiting)
     }
-
+    
     static func counter(_ counter: Int, isWaiting: Bool = false) -> Self {
         ListRowDetails(counter: counter, isWaiting: isWaiting)
     }
-
+    
     static func isWaiting(_ isWaiting: Bool) -> Self {
         ListRowDetails(isWaiting: isWaiting)
     }

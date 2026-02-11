@@ -11,24 +11,24 @@ import SwiftUI
 public struct SendButton: View {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.colorScheme) private var colorScheme
-
+    
     /// The action to perform when the user triggers the button.
     private let action: () -> Void
-
+    
     private var iconColor: Color {
         guard isEnabled else { return .compound.iconQuaternary }
         return colorScheme == .light ? .compound.iconOnSolidPrimary : .compound.iconPrimary
     }
-
+    
     private var gradient: Gradient {
         isEnabled ? .compound.action : .init(colors: [.clear])
     }
-
+    
     /// Creates a send button that performs the provided action.
     public init(action: @escaping () -> Void) {
         self.action = action
     }
-
+    
     public var body: some View {
         Button(action: action) {
             CompoundIcon(\.sendSolid, size: .medium, relativeTo: .compound.headingLG)
@@ -38,7 +38,7 @@ public struct SendButton: View {
                 .compositingGroup()
         }
     }
-
+    
     var buttonShape: some View {
         Circle()
             .fill(LinearGradient(gradient: gradient, startPoint: .top, endPoint: .bottom))
@@ -60,7 +60,7 @@ public struct SendButton_Previews: PreviewProvider, TestablePreview {
         }
         .cornerRadius(20)
     }
-
+    
     public static var states: some View {
         HStack(spacing: 30) {
             SendButton { }

@@ -1,12 +1,12 @@
-project: ketal.xcodeproj
+project: ElementX.xcodeproj
 schemes:
-- ketal
+- ElementX
 - UnitTests
 - PreviewTests
 - UITests
 - IntegrationTests
 targets:
-- ketal
+- ElementX
 - NSE
 - ShareExtension
 - UnitTests
@@ -14,6 +14,6 @@ targets:
 - UITests
 - IntegrationTests
 report_exclude:
-  - ketal/Sources/Mocks/Generated/GeneratedMocks.swift
-  - ketal/Sources/Mocks/Generated/SDKGeneratedMocks.swift
+  - ElementX/Sources/Mocks/Generated/GeneratedMocks.swift
+  - ElementX/Sources/Mocks/Generated/SDKGeneratedMocks.swift
 retain_swift_ui_previews: true

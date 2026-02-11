@@ -1,5 +1,5 @@
-input_dir: ../../ketal/
-output_dir: ../../ketal/Sources/Generated/
+input_dir: ../../ElementX/
+output_dir: ../../ElementX/Sources/Generated/
 xcassets:
   inputs:
     - Resources/Assets.xcassets

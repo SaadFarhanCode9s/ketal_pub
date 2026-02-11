@@ -16,7 +16,7 @@ struct ContextMenuScreen: View {
                 .font(.footnote)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-
+            
             Text("Actions")
                 .padding()
                 .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 12))
@@ -45,7 +45,7 @@ struct ContextMenuScreen: View {
                         }
                     }
                 }
-
+            
             Text("Toggles")
                 .padding()
                 .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 12))

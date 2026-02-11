@@ -20,7 +20,7 @@ enum Screen: Hashable, View {
     case icons
     /// Size tokens
     case sizes
-
+    
     /// List styles and components
     case list
     /// Label styles
@@ -33,7 +33,7 @@ enum Screen: Hashable, View {
     case bigIcon
     /// The `TitleAndIcon` component.
     case titleAndIcon
-
+    
     /// The system's confirmation dialog component
     case actionSheet
     /// The system's alert component
@@ -44,14 +44,14 @@ enum Screen: Hashable, View {
     case navigationBar
     /// The system's share sheet component
     case shareSheet
-
+    
     var body: some View {
         switch self {
         case .colors: ColorsScreen()
         case .gradients: GradientsScreen()
         case .fonts: FontsScreen()
         case .icons: IconsScreen()
-
+        
         case .list: ListScreen()
         case .sizes: EmptyView()
         case .labels: EmptyView()
@@ -59,7 +59,7 @@ enum Screen: Hashable, View {
         case .textFields: EmptyView()
         case .bigIcon: BigIconScreen()
         case .titleAndIcon: TitleAndIconScreen()
-
+        
         case .actionSheet: ActionSheetScreen()
         case .alert: AlertScreen()
         case .contextMenu: ContextMenuScreen()

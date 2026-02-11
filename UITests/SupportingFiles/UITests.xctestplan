@@ -16,9 +16,9 @@
     "codeCoverage" : {
       "targets" : [
         {
-          "containerPath" : "container:ketal.xcodeproj",
+          "containerPath" : "container:ElementX.xcodeproj",
           "identifier" : "C0FAEB81CFD9776CD78CE489",
-          "name" : "ketal"
+          "name" : "ElementX"
         }
       ]
     },
@@ -39,7 +39,7 @@
       "referenceType" : "built-in"
     },
     "targetForVariableExpansion" : {
-      "containerPath" : "container:ketal.xcodeproj",
+      "containerPath" : "container:ElementX.xcodeproj",
       "identifier" : "0E28CD62691FDBC63147D5E3",
       "name" : "UITests"
     },
@@ -49,7 +49,7 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:ketal.xcodeproj",
+        "containerPath" : "container:ElementX.xcodeproj",
         "identifier" : "0E28CD62691FDBC63147D5E3",
         "name" : "UITests"
       }

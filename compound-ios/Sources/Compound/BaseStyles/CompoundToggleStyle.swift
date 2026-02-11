@@ -34,26 +34,26 @@ public struct CompoundToggleStyle_Previews: PreviewProvider, TestablePreview {
         }
         .padding(32)
     }
-
+    
     @ViewBuilder
     public static var states: some View {
         VStack(spacing: 16) {
             Toggle("Title", isOn: .constant(false))
                 .toggleStyle(.compound)
                 .labelsHidden()
-
+            
             Toggle("Title", isOn: .constant(true))
                 .toggleStyle(.compound)
                 .labelsHidden()
         }
         .padding(.bottom, 32)
-
+        
         VStack(spacing: 16) {
             Toggle("Title", isOn: .constant(true))
                 .toggleStyle(.compound)
             Toggle("Title", isOn: .constant(false))
                 .toggleStyle(.compound)
-
+            
             Toggle(isOn: .constant(true)) {
                 Label("Title", systemImage: "square.dashed")
             }

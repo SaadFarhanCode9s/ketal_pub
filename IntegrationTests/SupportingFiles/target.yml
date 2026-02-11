@@ -19,7 +19,7 @@ schemes:
       disableMainThreadChecker: false
       gatherCoverageData: true
       coverageTargets:
-        - ketal
+        - ElementX
       testPlans:
         - path: IntegrationTests.xctestplan
           defaultPlan: true
@@ -30,7 +30,7 @@ targets:
     platform: iOS
 
     dependencies:
-    - target: ketal
+    - target: ElementX
     - package: MatrixRustSDK
     - package: DeviceKit
     - package: KeychainAccess
@@ -53,7 +53,7 @@ targets:
     sources:
     - path: ../Sources
     - path: ../SupportingFiles
-    - path: ../../ketal/Sources/Other/AccessibilityIdentifiers.swift
-    - path: ../../ketal/Sources/Other/Extensions/NSRegularExpresion.swift
-    - path: ../../ketal/Sources/Other/Extensions/XCUIElement.swift
-    - path: ../../ketal/Sources/Services/Analytics/Signposter.swift
+    - path: ../../ElementX/Sources/Other/AccessibilityIdentifiers.swift
+    - path: ../../ElementX/Sources/Other/Extensions/NSRegularExpresion.swift
+    - path: ../../ElementX/Sources/Other/Extensions/XCUIElement.swift
+    - path: ../../ElementX/Sources/Services/Analytics/Signposter.swift

@@ -14,7 +14,7 @@ import SwiftUI
 struct CompoundInspectorApp: App {
     @State private var colorScheme: ColorScheme = .light
     @State private var dynamicTypeSize: DynamicTypeSize = .large
-
+    
     private var isDark: Bool {
         colorScheme == .dark
     }
@@ -22,7 +22,7 @@ struct CompoundInspectorApp: App {
     private var preferredColorScheme: ColorScheme? {
         ProcessInfo.processInfo.isMacCatalystApp ? colorScheme : nil
     }
-
+    
     var body: some Scene {
         WindowGroup {
             NavigationSplitView {
@@ -50,19 +50,19 @@ struct CompoundInspectorApp: App {
             CommandMenu("Options") {
                 Button("Hyperion", action: HyperionManager.sharedInstance().togglePluginDrawer)
                     .keyboardShortcut("i", modifiers: [.command, .option])
-
+                
                 Divider()
-
+                
                 Button("Toggle Appearance", action: toggleDarkMode)
                     .keyboardShortcut("a", modifiers: [.command, .shift])
-
+                
                 #if targetEnvironment(macCatalyst)
                 textSizePicker
                 #endif
             }
         }
     }
-
+    
     var textSizePicker: some View {
         Picker("Text Size", selection: $dynamicTypeSize) {
             ForEach(DynamicTypeSize.allCases, id: \.self) { size in
@@ -70,7 +70,7 @@ struct CompoundInspectorApp: App {
             }
         }
     }
-
+    
     @ViewBuilder
     var screenToolbar: some View {
         #if targetEnvironment(macCatalyst)
@@ -86,7 +86,7 @@ struct CompoundInspectorApp: App {
             Image(systemName: "ruler")
         }
     }
-
+    
     func toggleDarkMode() {
         colorScheme = isDark ? .light : .dark
     }

@@ -22,11 +22,11 @@ struct GradientsScreen: View {
 struct GradientItem: View {
     let gradient: Gradient
     let name: String
-
+    
     var body: some View {
         HStack {
             swatch
-
+            
             VStack(alignment: .leading) {
                 Text(name)
                     .font(.compound.bodyLG)
@@ -34,7 +34,7 @@ struct GradientItem: View {
             }
         }
     }
-
+    
     var swatch: some View {
         swatchShape
             .foregroundStyle(gradient)
@@ -46,7 +46,7 @@ struct GradientItem: View {
                     .opacity(0.2)
             }
     }
-
+    
     var swatchShape: some InsettableShape {
         RoundedRectangle(cornerRadius: 12, style: .continuous)
     }

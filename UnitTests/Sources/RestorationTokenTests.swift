@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ketal
+@testable import ElementX
 import MatrixRustSDK
 import XCTest
 
@@ -24,7 +24,7 @@ class RestorationTokenTests: XCTestCase {
                                                passphrase: "passphrase",
                                                pusherNotificationClientIdentifier: "pusher-identifier")
         let data = try JSONEncoder().encode(originalToken)
-
+        
         // When decoding the data to the current restoration token format.
         XCTAssertThrowsError(try JSONDecoder().decode(RestorationToken.self, from: data)) { error in
             // Then an error should be thrown as it is no longer supported.
@@ -36,7 +36,7 @@ class RestorationTokenTests: XCTestCase {
             }
         }
     }
-
+    
     func testDecodeFromTokenV4() throws {
         // Given an encoded restoration token in the 4th format that contains a stored session directory.
         let sessionDirectoryName = UUID().uuidString
@@ -51,10 +51,10 @@ class RestorationTokenTests: XCTestCase {
                                                passphrase: "passphrase",
                                                pusherNotificationClientIdentifier: "pusher-identifier")
         let data = try JSONEncoder().encode(originalToken)
-
+        
         // When decoding the data to the current restoration token format.
         let decodedToken = try JSONDecoder().decode(RestorationToken.self, from: data)
-
+        
         // Then the output should be a valid token with the expected store directories.
         assertEqual(session: decodedToken.session, originalSession: originalToken.session)
         XCTAssertEqual(decodedToken.passphrase, originalToken.passphrase, "The passphrase should not be changed.")
@@ -65,7 +65,7 @@ class RestorationTokenTests: XCTestCase {
         XCTAssertEqual(decodedToken.sessionDirectories.cacheDirectory, .sessionCachesBaseDirectory.appending(component: sessionDirectoryName),
                        "The cache directory should be derived from the session directory but in the caches directory.")
     }
-
+    
     func testDecodeFromTokenV5() throws {
         // Given an encoded restoration token in the 5th format that contains separate directories for session data and caches.
         let sessionDirectoryName = UUID().uuidString
@@ -81,10 +81,10 @@ class RestorationTokenTests: XCTestCase {
                                                passphrase: "passphrase",
                                                pusherNotificationClientIdentifier: "pusher-identifier")
         let data = try JSONEncoder().encode(originalToken)
-
+        
         // When decoding the data.
         let decodedToken = try JSONDecoder().decode(RestorationToken.self, from: data)
-
+        
         // Then the output should be a valid token.
         assertEqual(session: decodedToken.session, originalSession: originalToken.session)
         XCTAssertEqual(decodedToken.passphrase, originalToken.passphrase, "The passphrase should not be changed.")
@@ -95,7 +95,7 @@ class RestorationTokenTests: XCTestCase {
         XCTAssertEqual(decodedToken.sessionDirectories.cacheDirectory, originalToken.cacheDirectory,
                        "The cache directory should not be changed.")
     }
-
+    
     func testDecodeFromCurrentToken() throws {
         // Given an encoded restoration token in the current format.
         let originalToken = RestorationToken(session: Session(accessToken: "1234",
@@ -109,14 +109,14 @@ class RestorationTokenTests: XCTestCase {
                                              passphrase: "passphrase",
                                              pusherNotificationClientIdentifier: "pusher-identifier")
         let data = try JSONEncoder().encode(originalToken)
-
+        
         // When decoding the data.
         let decodedToken = try JSONDecoder().decode(RestorationToken.self, from: data)
-
+        
         // Then the output should be a valid token.
         XCTAssertEqual(decodedToken, originalToken, "The token should remain identical.")
     }
-
+    
     func assertEqual(session: Session, originalSession: SessionV1) {
         XCTAssertEqual(session.accessToken, originalSession.accessToken, "The access token should not be changed.")
         XCTAssertEqual(session.refreshToken, originalSession.refreshToken, "The refresh token should not be changed.")
@@ -160,7 +160,7 @@ enum SlidingSyncVersionV1: Equatable {
     case none
     case proxy(url: String)
     case native
-
+    
     var proxyURL: String? {
         guard case let .proxy(url) = self else { return nil }
         return url
@@ -179,7 +179,7 @@ extension SessionV1: Codable {
                          oidcData: container.decodeIfPresent(String.self, forKey: .oidcData),
                          slidingSyncVersion: slidingSyncProxy.map { .proxy(url: $0) } ?? .native)
     }
-
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(accessToken, forKey: .accessToken)
@@ -190,7 +190,7 @@ extension SessionV1: Codable {
         try container.encode(oidcData, forKey: .oidcData)
         try container.encode(slidingSyncVersion.proxyURL, forKey: .slidingSyncProxy)
     }
-
+    
     enum CodingKeys: String, CodingKey {
         case accessToken, refreshToken, userId, deviceId, homeserverUrl, oidcData, slidingSyncProxy
     }

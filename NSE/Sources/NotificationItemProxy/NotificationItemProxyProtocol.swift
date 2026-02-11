@@ -13,7 +13,7 @@ import UserNotifications
 // sourcery: AutoMockable
 protocol NotificationItemProxyProtocol {
     var event: NotificationEvent? { get }
-
+    
     var senderID: String { get }
 
     var roomID: String { get }
@@ -29,17 +29,17 @@ protocol NotificationItemProxyProtocol {
     var roomAvatarMediaSource: MediaSourceProxy? { get }
 
     var roomJoinedMembers: Int { get }
-
+    
     var isRoomSpace: Bool { get }
 
     var isRoomDirect: Bool { get }
-
+    
     var isRoomPrivate: Bool { get }
 
     var isNoisy: Bool { get }
 
     var hasMention: Bool { get }
-
+    
     var threadRootEventID: String? { get }
 }
 

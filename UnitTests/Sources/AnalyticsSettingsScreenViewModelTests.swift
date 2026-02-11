@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ketal
+@testable import ElementX
 import XCTest
 
 @MainActor
@@ -14,15 +14,15 @@ class AnalyticsSettingsScreenViewModelTests: XCTestCase {
     private var appSettings: AppSettings!
     private var viewModel: AnalyticsSettingsScreenViewModelProtocol!
     private var context: AnalyticsSettingsScreenViewModelType.Context!
-
+    
     override func setUp() {
         AppSettings.resetAllSettings()
     }
-
+    
     override func tearDown() {
         AppSettings.resetAllSettings()
     }
-
+    
     @MainActor override func setUpWithError() throws {
         AppSettings.resetAllSettings()
         appSettings = AppSettings()
@@ -30,7 +30,7 @@ class AnalyticsSettingsScreenViewModelTests: XCTestCase {
         analyticsClient.isRunning = false
         ServiceLocator.shared.register(analytics: AnalyticsService(client: analyticsClient,
                                                                    appSettings: appSettings))
-
+        
         viewModel = AnalyticsSettingsScreenViewModel(appSettings: appSettings,
                                                      analytics: ServiceLocator.shared.analytics)
         context = viewModel.context
@@ -45,7 +45,7 @@ class AnalyticsSettingsScreenViewModelTests: XCTestCase {
         context.send(viewAction: .toggleAnalytics)
         XCTAssertTrue(context.enableAnalytics)
     }
-
+    
     func testOptOut() {
         appSettings.analyticsConsentState = .optedIn
         context.send(viewAction: .toggleAnalytics)

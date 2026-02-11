@@ -12,7 +12,7 @@ import Foundation
 enum UserIndicatorType: Equatable {
     case toast(progress: UserIndicator.Progress?)
     case modal(progress: UserIndicator.Progress?, interactiveDismissDisabled: Bool, allowsInteraction: Bool)
-
+    
     static var toast: Self {
         .toast(progress: .none)
     }
@@ -31,27 +31,27 @@ struct UserIndicator: Equatable, Identifiable {
             default: return false
             }
         }
-
+        
         case indeterminate
         case published(CurrentValuePublisher<Double, Never>)
     }
-
+    
     var id: String = UUID().uuidString
     var type: UserIndicatorType = .toast
     var title: String
     var message: String?
     var iconName: String?
     var persistent = false
-
+    
     // MARK: - Associated values from the type
-
+    
     var progress: Progress? {
         switch type {
         case .toast(let progress): return progress
         case .modal(let progress, _, _): return progress
         }
     }
-
+    
     var progressPublisher: CurrentValuePublisher<Double, Never> {
         switch type {
         case .toast(let progress), .modal(let progress, _, _):
@@ -63,7 +63,7 @@ struct UserIndicator: Equatable, Identifiable {
             }
         }
     }
-
+    
     var interactiveDismissDisabled: Bool {
         switch type {
         case .toast:
@@ -72,7 +72,7 @@ struct UserIndicator: Equatable, Identifiable {
             return interactiveDismissDisabled
         }
     }
-
+    
     var allowsInteraction: Bool {
         switch type {
         case .toast:

@@ -11,7 +11,7 @@ import SwiftUI
 
 struct BadgeView: View {
     let size: Double
-
+    
     var body: some View {
         Circle()
             .fill(.compound.iconCriticalPrimary)
@@ -21,7 +21,7 @@ struct BadgeView: View {
 
 struct BadgeViewModifier: ViewModifier {
     let size: Double
-
+    
     func body(content: Content) -> some View {
         content.mask {
             Rectangle()
@@ -39,11 +39,11 @@ struct BadgeViewModifier: ViewModifier {
             BadgeView(size: size)
         }
     }
-
+    
     private var maskSize: Double {
         size * 1.25
     }
-
+    
     private var maskOffset: CGSize {
         .init(width: (maskSize - size) / 2, height: -(maskSize - size) / 2)
     }

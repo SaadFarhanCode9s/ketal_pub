@@ -13,7 +13,7 @@ final class MessageTextView: UITextView, PillAttachmentViewProviderDelegate, UIG
     var timelineContext: TimelineViewModel.Context?
     var updateClosure: (() -> Void)?
     private var pillViews = NSHashTable<UIView>.weakObjects()
-
+        
     override func addGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
         // We don't need to change the behaviour on MacOS
         if !ProcessInfo.processInfo.isiOSAppOnMac {
@@ -21,7 +21,7 @@ final class MessageTextView: UITextView, PillAttachmentViewProviderDelegate, UIG
         }
         super.addGestureRecognizer(gestureRecognizer)
     }
-
+    
     /// This prevents the magnifying glass from showing up
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         if otherGestureRecognizer is UILongPressGestureRecognizer {
@@ -29,7 +29,7 @@ final class MessageTextView: UITextView, PillAttachmentViewProviderDelegate, UIG
         }
         return true
     }
-
+    
     func invalidateTextAttachmentsDisplay() {
         attributedText.enumerateAttribute(.attachment,
                                           in: NSRange(location: 0, length: attributedText.length),
@@ -59,7 +59,7 @@ struct MessageText: UIViewRepresentable {
     @Environment(\.openURL) private var openURLAction
     @Environment(\.timelineContext) private var viewModel
     @State private var computedSizes = [Double: CGSize]()
-
+    
     @State var attributedString: AttributedString {
         didSet {
             computedSizes.removeAll()
@@ -87,7 +87,7 @@ struct MessageText: UIViewRepresentable {
         // We disable selection at delegate level
         textView.isSelectable = true
         textView.isUserInteractionEnabled = true
-
+        
         // Otherwise links can be dragged and dropped when long pressed
         textView.textDragInteraction?.isEnabled = false
 
@@ -115,11 +115,11 @@ struct MessageText: UIViewRepresentable {
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: MessageTextView, context: Context) -> CGSize? {
         let proposalWidth = proposal.width ?? UIView.layoutFittingExpandedSize.width
-
+        
         if let size = computedSizes[proposalWidth] {
             return size
         }
-
+        
         let size = uiView.sizeThatFits(CGSize(width: proposalWidth, height: UIView.layoutFittingCompressedSize.height))
         DispatchQueue.main.async {
             computedSizes[proposalWidth] = size
@@ -137,14 +137,14 @@ struct MessageText: UIViewRepresentable {
         init(openURLAction: OpenURLAction) {
             self.openURLAction = openURLAction
         }
-
+        
         func textViewDidChangeSelection(_ textView: UITextView) {
             guard !ProcessInfo.processInfo.isiOSAppOnMac else {
                 return
             }
             textView.selectedTextRange = nil
         }
-
+        
         func textView(_ textView: UITextView, primaryActionFor textItem: UITextItem, defaultAction: UIAction) -> UIAction? {
             if case .link(let url) = textItem.content {
                 return .init(title: defaultAction.title,
@@ -157,7 +157,7 @@ struct MessageText: UIViewRepresentable {
             }
             return defaultAction
         }
-
+                        
         func textView(_ textView: UITextView, menuConfigurationFor textItem: UITextItem, defaultMenu: UIMenu) -> UITextItem.MenuConfiguration? {
             switch textItem.content {
             case let .link(url):
@@ -182,15 +182,15 @@ struct MessageText_Previews: PreviewProvider, TestablePreview {
         container.font = UIFont.preferredFont(forTextStyle: .body)
         return container
     }()
-
+    
     private static let attributedString = AttributedString("Hello World! Hello world! Hello world! Hello world! Hello World! Hellooooooooooooooooooooooo Woooooooooooooooooooooorld", attributes: defaultFontContainer)
-
+    
     private static let attributedStringWithAttachment: AttributedString = {
         let testData = PillTextAttachmentData(type: .user(userID: "@alice:example.com"), font: .preferredFont(forTextStyle: .body))
         guard let attachment = PillTextAttachment(attachmentData: testData) else {
             return AttributedString()
         }
-
+        
         var attributedString = "Hello test test test " + AttributedString(NSAttributedString(attachment: attachment)) + " World!"
         attributedString
             .mergeAttributes(defaultFontContainer)
@@ -199,14 +199,13 @@ struct MessageText_Previews: PreviewProvider, TestablePreview {
 
     private static let htmlStringWithQuote =
         """
-        <blockquote>A blockquote that is long and goes onto multiple lines as the first item in the message</blockquote>
-        <p>Then another line of text here to reply to the blockquote, which is also a multiline component.</p>
+        <blockquote>A blockquote that is long and goes onto multiple lines as the first item in the message</blockquote><p>Then another line of text here to reply to the blockquote, which is also a multiline component.</p>
         """
-
-    private static let htmlStringWithList = "<p>This is a list</p>\n<ul>\n<li>One</li>\n<li>Two</li>\n<li>And number 3</li>\n</ul>\n"
+    
+    private static let htmlStringWithList = "<p>This is a list</p>\n<ul><li>One</li>\n<li>Two</li>\n<li>And number 3</li>\n</ul>\n"
 
     private static let attributedStringBuilder = AttributedStringBuilder(mentionBuilder: MentionBuilder())
-
+    
     static var attachmentPreview: some View {
         MessageText(attributedString: attributedStringWithAttachment)
             .border(Color.purple)

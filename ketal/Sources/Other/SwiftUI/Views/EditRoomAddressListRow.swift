@@ -13,11 +13,11 @@ struct EditRoomAddressListRow: View {
     @Binding var aliasLocalPart: String
     var serverName: String
     var shouldDisplayError: Bool
-
+    
     private var fullAddress: String {
         "#\(aliasLocalPart):\(serverName)"
     }
-
+    
     var body: some View {
         ListRow(kind: .custom {
             HStack(spacing: 0) {
@@ -61,7 +61,7 @@ private extension View {
                 .stroke(Color.compound.borderCriticalPrimary)
         }
     }
-
+    
     func errorBackground(_ shouldDisplay: Bool) -> some View {
         listRowBackground(shouldDisplay ? AnyView(shape) : AnyView(Color.compound.bgCanvasDefaultLevel1))
     }

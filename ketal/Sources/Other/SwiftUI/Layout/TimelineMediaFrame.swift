@@ -15,7 +15,7 @@ extension View {
         let defaultMediaSize = 100.0
         let minMediaHeight = 100.0
         let maxMediaHeight = 300.0
-
+        
         if let contentHeight = imageInfo?.size?.height, contentHeight < minMediaHeight { // Special case very small images
             aspectRatio(imageInfo?.aspectRatio, contentMode: .fit)
                 .frame(minHeight: minMediaHeight, maxHeight: minMediaHeight)
@@ -30,7 +30,7 @@ extension View {
             }
         }
     }
-
+    
     func mediaGalleryTimelineAspectRatio(imageInfo: ImageInfoProxy?) -> some View {
         aspectRatio(imageInfo?.aspectRatio, contentMode: .fill)
     }

@@ -28,12 +28,12 @@ struct UserIndicatorModalView: View {
                             .font(titleFont)
                             .foregroundColor(.compound.iconPrimary)
                     }
-
+                    
                     Text(indicator.title)
                         .font(titleFont)
                         .foregroundColor(.compound.textPrimary)
                 }
-
+                
                 if let message = indicator.message {
                     Text(message)
                         .font(.compound.bodyMD)
@@ -61,7 +61,7 @@ struct UserIndicatorModalView: View {
         .ignoresSafeArea()
         .interactiveDismissDisabled(indicator.interactiveDismissDisabled)
     }
-
+    
     private var titleFont: Font {
         if indicator.message != nil {
             .compound.headingMDBold
@@ -77,19 +77,19 @@ struct UserIndicatorModalView_Previews: PreviewProvider, TestablePreview {
             UserIndicatorModalView(indicator: UserIndicator(type: .modal,
                                                             title: "Successfully logged in",
                                                             iconName: "checkmark"))
-
+            
             UserIndicatorModalView(indicator: UserIndicator(type: .modal(progress: .published(CurrentValueSubject<Double, Never>(0.5).asCurrentValuePublisher()),
                                                                          interactiveDismissDisabled: false,
                                                                          allowsInteraction: false),
                                                             title: "Successfully logged in",
                                                             iconName: "checkmark"))
-
+            
             UserIndicatorModalView(indicator: UserIndicator(type: .modal(progress: .none,
                                                                          interactiveDismissDisabled: false,
                                                                          allowsInteraction: false),
                                                             title: "Successfully logged in",
                                                             iconName: "checkmark"))
-
+            
             UserIndicatorModalView(indicator: UserIndicator(type: .modal,
                                                             title: "Successfully logged in",
                                                             message: "You can now be happy.",

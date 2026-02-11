@@ -32,14 +32,15 @@ extension NSAttributedString.Key {
     static let MatrixEventOnRoomAlias: NSAttributedString.Key = .init(rawValue: EventOnRoomAliasAttribute.name)
     static let MatrixAllUsersMention: NSAttributedString.Key = .init(rawValue: AllUsersMentionAttribute.name)
     static let CodeBlock: NSAttributedString.Key = .init(rawValue: CodeBlockAttribute.name)
+    static let InlineCode: NSAttributedString.Key = .init(rawValue: InlineCodeAttribute.name)
 }
 
 struct AttributedStringBuilder: AttributedStringBuilderProtocol {
     private static let defaultKey = "default"
-
+    
     private let cacheKey: String
     private let mentionBuilder: MentionBuilderProtocol
-
+    
     private static let attributeMSC4286 = "msc4286-external-payment-details"
     private static let cacheDispatchQueue = DispatchQueue(label: "io.element.elementx.attributed_string_builder_v2_cache")
     private static var caches: [String: LRUCache<String, AttributedString>] = [:]
@@ -47,17 +48,17 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
     static func invalidateCaches() {
         caches.removeAll()
     }
-
+    
     init(cacheKey: String = defaultKey, mentionBuilder: MentionBuilderProtocol) {
         self.cacheKey = cacheKey
         self.mentionBuilder = mentionBuilder
     }
-
+        
     func fromPlain(_ string: String?) -> AttributedString? {
         guard let string else {
             return nil
         }
-
+        
         if let cached = Self.cachedValue(forKey: string, cacheKey: cacheKey) {
             return cached
         }
@@ -65,13 +66,13 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
         let mutableAttributedString = NSMutableAttributedString(string: string)
         addLinksAndMentions(mutableAttributedString)
         addMatrixEntityPermalinkAttributesTo(mutableAttributedString)
-
+        
         let result = try? AttributedString(mutableAttributedString, including: \.elementX)
         Self.cacheValue(result, forKey: string, cacheKey: cacheKey)
-
+        
         return result
     }
-
+        
     /// Do not use the default HTML renderer of NSAttributedString because this method
     /// runs on the UI thread which we want to avoid because renderHTMLString is called
     /// most of the time from a background thread.
@@ -83,34 +84,34 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
         guard let originalHTMLString = htmlString else {
             return nil
         }
-
+        
         if let cached = Self.cachedValue(forKey: originalHTMLString, cacheKey: cacheKey) {
             return cached
         }
-
+                
         let htmlString = originalHTMLString.replacingHtmlBreaksOccurrences()
-
+        
         let doc = try? SwiftSoup.parseBodyFragment(htmlString)
-
+        
         guard let body = doc?.body() else {
             return nil
         }
-
+        
         var listIndex = 1
         let mutableAttributedString = attributedString(element: body, documentBody: body, preserveFormatting: false, listTag: nil, listIndex: &listIndex, indentLevel: 0)
         detectPhishingAttempts(mutableAttributedString)
         addLinksAndMentions(mutableAttributedString)
         addMatrixEntityPermalinkAttributesTo(mutableAttributedString)
         removeParsingArtefacts(mutableAttributedString)
-
+        
         let result = try? AttributedString(mutableAttributedString, including: \.elementX)
         Self.cacheValue(result, forKey: originalHTMLString, cacheKey: cacheKey)
-
+        
         return result
     }
-
+        
     // MARK: - Private
-
+    
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     func attributedString(element: Element,
                           documentBody: Element,
@@ -119,38 +120,38 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
                           listIndex: inout Int,
                           indentLevel: Int) -> NSMutableAttributedString {
         let result = NSMutableAttributedString()
-
+        
         for node in element.getChildNodes() {
             if let textNode = node as? TextNode {
-                // If this node is plain text just append its preformatted contents
+                // If this node is plain text append the whitespace normalised version
                 if node.parent() == documentBody {
-                    result.append(NSAttributedString(string: textNode.getWholeText()))
+                    result.append(NSAttributedString(string: textNode.text()))
                     continue
                 }
-
+                
                 var text = preserveFormatting ? textNode.getWholeText() : textNode.text()
-
+                
                 // There seem to be sibling TextNodes following every </br> tag that
                 // contain one single space character which we don't want as it
                 // breaks line head indents.
                 if (node.previousSibling() as? Element)?.tagName() == "br" {
                     text.trimPrefix(" ")
                 }
-
+                 
                 result.append(NSAttributedString(string: text))
                 continue
             }
-
+            
             guard let childElement = node as? Element else {
                 continue
             }
-
+            
             let tag = childElement.tagName().lowercased()
             var content = NSMutableAttributedString()
             var childIndex = 1
-
+            
             let fontPointSize = UIFont.preferredFont(forTextStyle: .body).pointSize
-
+            
             switch tag {
             case "h1", "h2", "h3", "h4", "h5", "h6":
                 let level = max(3, Int(String(tag.dropFirst())) ?? 1)
@@ -162,51 +163,59 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
             case "p", "div":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 content.append(NSAttributedString(string: "\n"))
-
+                
             case "br":
                 content = NSMutableAttributedString(string: "\n")
-
+                
             case "b", "strong":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 content.setFontPreservingSymbolicTraits(UIFont.boldSystemFont(ofSize: fontPointSize))
-
+                
             case "i", "em":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 content.setFontPreservingSymbolicTraits(UIFont.italicSystemFont(ofSize: fontPointSize))
-
+                
             case "u":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 content.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: NSRange(location: 0, length: content.length))
-
+                
             case "s", "del":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 content.addAttribute(.strikethroughStyle, value: NSUnderlineStyle.single.rawValue, range: NSRange(location: 0, length: content.length))
-
+                
             case "sup":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 content.addAttribute(.baselineOffset, value: 6, range: NSRange(location: 0, length: content.length))
                 content.setFontPreservingSymbolicTraits(UIFont.systemFont(ofSize: fontPointSize * 0.7))
-
+                
             case "sub":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 content.addAttribute(.baselineOffset, value: -4, range: NSRange(location: 0, length: content.length))
                 content.setFontPreservingSymbolicTraits(UIFont.systemFont(ofSize: fontPointSize * 0.7))
-
+                
             case "blockquote":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 content.addAttribute(.MatrixBlockquote, value: true, range: NSRange(location: 0, length: content.length))
-
+                
             case "code", "pre":
-                let preserveFormatting = preserveFormatting || tag == "pre"
+                let isCodeBlock = tag == "pre"
+                
+                let preserveFormatting = preserveFormatting || isCodeBlock
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
-
+                
                 let fontPointSize = fontPointSize * 0.9 // Intentionally shrink code blocks by 10%
                 content.setFontPreservingSymbolicTraits(UIFont.monospacedSystemFont(ofSize: fontPointSize, weight: .regular))
-
-                content.addAttribute(.CodeBlock, value: true, range: NSRange(location: 0, length: content.length))
-                content.addAttribute(.backgroundColor, value: UIColor.compound._bgCodeBlock as Any, range: NSRange(location: 0, length: content.length))
-
-                // Don't allow identifiers or links in code blocks
+                
+                if isCodeBlock {
+                    content.addAttribute(.CodeBlock, value: true, range: NSRange(location: 0, length: content.length))
+                    // The scroll view provides the background colour for code blocks.
+                } else {
+                    content.addAttribute(.InlineCode, value: true, range: NSRange(location: 0, length: content.length))
+                    // But inline code is (obviously) inline so it's much easier to set the background colour here.
+                    content.addAttribute(.backgroundColor, value: UIColor.compound._bgCodeBlock as Any, range: NSRange(location: 0, length: content.length))
+                }
+                
+                // Don't allow identifiers or links in code.
                 content.removeAttribute(.MatrixRoomID, range: NSRange(location: 0, length: content.length))
                 content.removeAttribute(.MatrixRoomAlias, range: NSRange(location: 0, length: content.length))
                 content.removeAttribute(.MatrixUserID, range: NSRange(location: 0, length: content.length))
@@ -214,30 +223,30 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
                 content.removeAttribute(.MatrixEventOnRoomAlias, range: NSRange(location: 0, length: content.length))
                 content.removeAttribute(.MatrixAllUsersMention, range: NSRange(location: 0, length: content.length))
                 content.removeAttribute(.link, range: NSRange(location: 0, length: content.length))
-
+                
             case "hr":
                 content = NSMutableAttributedString(string: "\n")
-
+                
             case "a":
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 if let href = try? childElement.attr("href"), let url = URL(string: href) {
                     content.addAttribute(.link, value: url, range: NSRange(location: 0, length: content.length))
                 }
-
+                
             case "span":
                 if childElement.dataset()[Self.attributeMSC4286] == nil {
                     content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
                 }
-
+                
             case "ul", "ol":
                 var listIndex = 1
                 if let startAttribute = try? childElement.attr("start"), let startIndex = Int(startAttribute) {
                     listIndex = startIndex
                 }
-
+                
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: tag, listIndex: &listIndex, indentLevel: indentLevel + 1)
-
-                if indentLevel > 0 {
+                
+                if indentLevel > 0 || !element.ownText().isEmpty {
                     content.insert(NSAttributedString("\n"), at: 0)
                 }
 
@@ -249,91 +258,91 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
                 } else {
                     bullet += "• "
                 }
-
+                
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel + 1)
                 content.insert(NSAttributedString(string: bullet), at: 0)
                 if !(content.string.last?.isNewline ?? false) {
                     content.append(NSAttributedString(string: "\n"))
                 }
-
+                
             case "img":
                 if let alt = try? childElement.attr("alt"), !alt.isEmpty {
                     content = NSMutableAttributedString(string: "[img: \(alt)]")
                 } else {
                     content = NSMutableAttributedString(string: "[img]")
                 }
-
+                
             default:
                 content = attributedString(element: childElement, documentBody: documentBody, preserveFormatting: preserveFormatting, listTag: listTag, listIndex: &childIndex, indentLevel: indentLevel)
             }
-
+            
             result.append(content)
         }
-
+        
         return result
     }
-
+    
     private static func cacheValue(_ value: AttributedString?, forKey key: String, cacheKey: String) {
         cacheDispatchQueue.sync {
             if caches[cacheKey] == nil {
                 caches[cacheKey] = LRUCache<String, AttributedString>(countLimit: 1000)
             }
-
+            
             caches[cacheKey]?.setValue(value, forKey: key)
         }
     }
-
+    
     private static func cachedValue(forKey key: String, cacheKey: String) -> AttributedString? {
         var result: AttributedString?
         cacheDispatchQueue.sync {
             result = caches[cacheKey]?.value(forKey: key)
         }
-
+        
         return result
     }
-
+    
     // swiftlint:disable:next cyclomatic_complexity
     private func addLinksAndMentions(_ attributedString: NSMutableAttributedString) {
         let string = attributedString.string
-
+        
         // Event identifiers and room aliases and identifiers detected in plain text are techincally incomplete
         // without via parameters and we won't bother detecting them
-
+        
         var matches: [TextParsingMatch] = MatrixEntityRegex.userIdentifierRegex.matches(in: string).compactMap { match in
             guard let matchRange = Range(match.range, in: string) else {
                 return nil
             }
-
+            
             let identifier = String(string[matchRange])
 
             return TextParsingMatch(type: .userID(identifier: identifier), range: match.range)
         }
-
+        
         matches.append(contentsOf: MatrixEntityRegex.roomAliasRegex.matches(in: string).compactMap { match in
             guard let matchRange = Range(match.range, in: string) else {
                 return nil
             }
-
+            
             let alias = String(string[matchRange])
-
+            
             return TextParsingMatch(type: .roomAlias(alias: alias), range: match.range)
         })
-
+        
         matches.append(contentsOf: MatrixEntityRegex.uriRegex.matches(in: string).compactMap { match in
             guard let matchRange = Range(match.range, in: string) else {
                 return nil
             }
-
+            
             let uri = String(string[matchRange])
-
+            
             return TextParsingMatch(type: .matrixURI(uri: uri), range: match.range)
         })
-
+        
         matches.append(contentsOf: MatrixEntityRegex.linkRegex.matches(in: string).compactMap { match in
             guard let matchRange = Range(match.range, in: string), let url = match.url else {
                 return nil
             }
-
+            
             // If the NSDataDetector found a hyperlink then sanitise it
             if url.scheme?.contains("http") ?? false {
                 // Use the underlying string so it gets an `https` scheme if it didn't have any
@@ -342,35 +351,36 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
                 return TextParsingMatch(type: .link(urlString: url.absoluteString), range: match.range)
             }
         })
-
+        
         matches.append(contentsOf: MatrixEntityRegex.allUsersRegex.matches(in: attributedString.string).map { match in
             TextParsingMatch(type: .atRoom, range: match.range)
         })
-
+        
         guard matches.count > 0 else {
             return
         }
-
+        
         // Sort the links by length so the longest one always takes priority
         matches.sorted { $0.range.length > $1.range.length }.forEach { [attributedString] match in
             // Don't highlight links within codeblocks
-            let isInCodeBlock = attributedString.attribute(.CodeBlock, at: match.range.location, effectiveRange: nil) != nil
-            if isInCodeBlock {
+            let isCode = attributedString.attribute(.CodeBlock, at: match.range.location, effectiveRange: nil) != nil
+                || attributedString.attribute(.InlineCode, at: match.range.location, effectiveRange: nil) != nil
+            if isCode {
                 return
             }
-
+            
             var hasLink = false
             attributedString.enumerateAttribute(.link, in: match.range, options: []) { value, _, stop in
-                if value != nil, !isInCodeBlock {
+                if value != nil, !isCode {
                     hasLink = true
                     stop.pointee = true
                 }
             }
-
+            
             if hasLink {
                 return
             }
-
+                        
             switch match.type {
             case .atRoom:
                 attributedString.addAttribute(.MatrixAllUsersMention, value: true, range: match.range)
@@ -390,7 +400,7 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
             }
         }
     }
-
+    
     func addMatrixEntityPermalinkAttributesTo(_ attributedString: NSMutableAttributedString) {
         attributedString.enumerateAttribute(.link, in: .init(location: 0, length: attributedString.length), options: []) { value, range, _ in
             if value != nil {
@@ -411,7 +421,7 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
                 }
             }
         }
-
+        
         attributedString.enumerateAttribute(.MatrixAllUsersMention, in: .init(location: 0, length: attributedString.length), options: []) { value, range, _ in
             if let value = value as? Bool,
                value {
@@ -419,46 +429,46 @@ struct AttributedStringBuilder: AttributedStringBuilderProtocol {
             }
         }
     }
-
+        
     private func detectPhishingAttempts(_ attributedString: NSMutableAttributedString) {
         attributedString.enumerateAttribute(.link, in: .init(location: 0, length: attributedString.length), options: []) { value, range, _ in
             guard value != nil, let internalURL = value as? URL else {
                 return
             }
             let displayString = attributedString.attributedSubstring(from: range).string
-
+            
             guard PhishingDetector.isPhishingAttempt(displayString: displayString, internalURL: internalURL) else {
                 return
             }
             handlePhishingAttempt(for: attributedString, in: range, internalURL: internalURL, displayString: displayString)
         }
     }
-
+    
     private func handlePhishingAttempt(for attributedString: NSMutableAttributedString,
                                        in range: NSRange,
                                        internalURL: URL,
                                        displayString: String) {
         // Let's remove the existing link attribute
         attributedString.removeAttribute(.link, range: range)
-
+        
         var urlComponents = URLComponents()
         urlComponents.scheme = URL.confirmationScheme
         urlComponents.host = ""
         let parameters = ConfirmURLParameters(internalURL: internalURL, displayString: displayString)
         urlComponents.queryItems = parameters.urlQueryItems
-
+        
         guard let finalURL = urlComponents.url else {
             return
         }
-
+        
         attributedString.addAttribute(.link, value: finalURL, range: range)
     }
-
+    
     private func removeParsingArtefacts(_ attributedString: NSMutableAttributedString) {
         guard attributedString.length > 0 else {
             return
         }
-
+        
         // Ruma's markdown parsing sometimes inserts extra trailing new lines
         // https://github.com/ruma/ruma/blob/c3dc6de3e03b2ca131eab889a9d310ef160b95ac/crates/ruma-events/src/room/message.rs#L962
         while (attributedString.string as NSString).hasSuffixCharacter(from: .whitespacesAndNewlines) {
@@ -475,10 +485,10 @@ private struct TextParsingMatch {
         case link(urlString: String)
         case atRoom
     }
-
+    
     let type: MatchType
     let range: NSRange
-
+    
     var link: URL? {
         switch type {
         case .userID(let identifier):
@@ -516,9 +526,9 @@ private extension NSString {
         if length == 0 {
             return false
         }
-
+        
         let lastChar = character(at: length - 1)
-
+        
         return (characterSet as NSCharacterSet).characterIsMember(lastChar)
     }
 }

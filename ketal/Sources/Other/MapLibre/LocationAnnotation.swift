@@ -14,9 +14,9 @@ final class LocationAnnotation: NSObject, MLNAnnotation {
     let coordinate: CLLocationCoordinate2D
     let anchorPoint: CGPoint
     let view: AnyView
-
+    
     // MARK: - Setup
-
+    
     init(coordinate: CLLocationCoordinate2D,
          anchorPoint: CGPoint = .init(x: 0.5, y: 0.5),
          @ViewBuilder label: () -> some View) {
@@ -29,12 +29,12 @@ final class LocationAnnotation: NSObject, MLNAnnotation {
 
 final class LocationAnnotationView: MLNUserLocationAnnotationView {
     // MARK: - Setup
-
+    
     override init(annotation: MLNAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier:
             reuseIdentifier)
     }
-
+    
     convenience init(annotation: LocationAnnotation) {
         self.init(annotation: annotation, reuseIdentifier: "\(Self.self)")
         let view: UIView = UIHostingController(rootView: annotation.view).view
@@ -43,7 +43,7 @@ final class LocationAnnotationView: MLNUserLocationAnnotationView {
         addSubview(view)
         view.bounds.size = view.intrinsicContentSize
     }
-
+    
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError()

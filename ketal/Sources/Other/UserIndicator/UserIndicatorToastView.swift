@@ -10,7 +10,7 @@ import SwiftUI
 
 struct UserIndicatorToastView: View {
     let indicator: UserIndicator
-
+    
     var body: some View {
         HStack(spacing: 4) {
             if case .indeterminate = indicator.progress {
@@ -35,7 +35,7 @@ struct UserIndicatorToastView: View {
         .shadow(color: .black.opacity(0.1), radius: 6.0, y: 4.0)
         .transition(toastTransition)
     }
-
+    
     private var toastTransition: AnyTransition {
         AnyTransition
             .asymmetric(insertion: .move(edge: .top),
@@ -49,9 +49,9 @@ struct UserIndicatorToastView_Previews: PreviewProvider, TestablePreview {
         VStack(spacing: 30) {
             UserIndicatorToastView(indicator: UserIndicator(title: "Successfully logged in",
                                                             iconName: "checkmark"))
-
+            
             UserIndicatorToastView(indicator: UserIndicator(title: "Toast without icon"))
-
+            
             UserIndicatorToastView(indicator: UserIndicator(type: .toast(progress: .indeterminate),
                                                             title: "Syncing"))
         }

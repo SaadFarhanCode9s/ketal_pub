@@ -12,7 +12,7 @@ import SwiftUI
 struct LocationMarkerView: View {
     private let pinColor: Color = .compound.iconOnSolidPrimary
     private let pinInsets = EdgeInsets(top: 13, leading: 12, bottom: 15, trailing: 12)
-
+    
     var body: some View {
         CompoundIcon(\.locationPinSolid)
             .dynamicTypeSize(.large)
@@ -26,7 +26,7 @@ struct LocationMarkerView: View {
                 dimensions[.bottom]
             }
     }
-
+    
     var backgroundShape: some View {
         Image(asset: Asset.Images.locationMarkerShape)
             .resizable()

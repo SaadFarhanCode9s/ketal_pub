@@ -14,7 +14,7 @@ enum PillType: Codable, Equatable {
         case roomAlias(String)
         case roomID(String)
     }
-
+    
     case event(room: EventRoom)
     case roomAlias(String)
     case roomID(String)
@@ -29,10 +29,10 @@ struct PillTextAttachmentData: Codable, Equatable {
         let descender: CGFloat
         let lineHeight: CGFloat
     }
-
+    
     /// Pill type
     let type: PillType
-
+    
     /// Font for the display name
     let fontData: Font
 }

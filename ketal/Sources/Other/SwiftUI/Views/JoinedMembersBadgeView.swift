@@ -12,9 +12,9 @@ import SwiftUI
 struct JoinedMembersBadgeView: View {
     let heroes: [UserProfileProxy]
     let joinedCount: Int
-
+    
     let mediaProvider: MediaProviderProtocol?
-
+    
     var body: some View {
         if heroes.isEmpty {
             Label(title: title) {
@@ -35,11 +35,11 @@ struct JoinedMembersBadgeView: View {
             .labelStyle(.custom(spacing: 6))
         }
     }
-
+    
     func title() -> Text {
         Text("\(joinedCount)")
     }
-
+    
     var heroesFacePile: some View {
         HStack(spacing: -8) {
             ForEach(heroes.prefix(3).reversed()) { hero in
@@ -71,13 +71,13 @@ struct JoinedMembersBadgeView: View {
 
 struct JoinedMembersBadgeView_Previews: PreviewProvider, TestablePreview {
     static let mediaProvider = MediaProviderMock(configuration: .init())
-
+    
     static var previews: some View {
         VStack(spacing: 16) {
             JoinedMembersBadgeView(heroes: [],
                                    joinedCount: 123,
                                    mediaProvider: mediaProvider)
-
+            
             JoinedMembersBadgeView(heroes: [.mockAlice, .mockBob, .mockCharlie, .mockDan],
                                    joinedCount: 123,
                                    mediaProvider: mediaProvider)

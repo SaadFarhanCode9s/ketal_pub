@@ -13,17 +13,17 @@ import Network
 class NetworkMonitor: NetworkMonitorProtocol {
     private let pathMonitor: NWPathMonitor
     private let queue: DispatchQueue
-
+    
     private let reachabilitySubject: CurrentValueSubject<NetworkMonitorReachability, Never>
     var reachabilityPublisher: CurrentValuePublisher<NetworkMonitorReachability, Never> {
         reachabilitySubject.asCurrentValuePublisher()
     }
-
+    
     init() {
         queue = DispatchQueue(label: "io.element.elementx.network_monitor", qos: .background)
         pathMonitor = NWPathMonitor()
         reachabilitySubject = CurrentValueSubject<NetworkMonitorReachability, Never>(.reachable)
-
+        
         pathMonitor.pathUpdateHandler = { [weak self] path in
             DispatchQueue.main.async {
                 if path.status == .satisfied {

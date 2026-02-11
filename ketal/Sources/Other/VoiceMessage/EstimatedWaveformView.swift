@@ -50,9 +50,9 @@ struct EstimatedWaveformView: View {
     var linePadding: CGFloat = 2
     var waveform: EstimatedWaveform
     var progress: CGFloat = 0.0
-
+    
     @State private var normalizedWaveformData: [Float] = []
-
+    
     var body: some View {
         GeometryReader { geometry in
             WaveformShape(lineWidth: lineWidth,
@@ -66,7 +66,7 @@ struct EstimatedWaveformView: View {
             buildNormalizedWaveformData(size: size)
         }
     }
-
+    
     private func buildNormalizedWaveformData(size: CGSize) {
         let count = Int(size.width / (lineWidth + linePadding))
         // Rebuild the normalized waveform data only if the count has changed
@@ -89,25 +89,25 @@ private struct WaveformShape: Shape {
     let linePadding: CGFloat
     let waveformData: [Float]
     var minimumGraphAmplitude: CGFloat = 1.0
-
+    
     func path(in rect: CGRect) -> Path {
         let width = rect.size.width
         let height = rect.size.height
         let centerY = rect.size.height / 2
         var xOffset: CGFloat = lineWidth / 2
         var index = 0
-
+        
         var path = Path()
         while xOffset <= width {
             let sample = CGFloat(index >= waveformData.count ? 0 : waveformData[index])
             let drawingAmplitude = max(minimumGraphAmplitude, sample * (height - 2))
-
+            
             path.move(to: CGPoint(x: xOffset, y: centerY - drawingAmplitude / 2))
             path.addLine(to: CGPoint(x: xOffset, y: centerY + drawingAmplitude / 2))
             xOffset += lineWidth + linePadding
             index += 1
         }
-
+        
         return path
     }
 }

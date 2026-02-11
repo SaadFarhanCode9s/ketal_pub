@@ -32,29 +32,29 @@ enum Avatars {
         var scaledValue: CGFloat {
             value * UIScreen.main.scale
         }
-
+        
         var scaledSize: CGSize {
             CGSize(width: scaledValue, height: scaledValue)
         }
     }
-
+    
     @MainActor
     static func generatePlaceholderAvatarImageData(name: String, id: String, size: CGSize) -> Data? {
         let image = PlaceholderAvatarImage(name: name, contentID: id)
             .clipShape(Circle())
             .frame(width: size.width, height: size.height)
-
+        
         let renderer = ImageRenderer(content: image)
-
+        
         // Specify the scale so the image is rendered correctly. We don't have access to the screen
         // here so a hardcoded 3.0 will have to do
         renderer.scale = 3.0
-
+        
         guard let image = renderer.uiImage else {
             MXLog.info("Generating notification icon placeholder failed")
             return nil
         }
-
+        
         return image.pngData()
     }
 }
@@ -66,6 +66,7 @@ enum UserAvatarSizeOnScreen {
     case settings
     case roomDetails
     case roomMembersList
+    case roomChangeRoles
     case dmDetails
     case startChat
     case memberDetails
@@ -87,11 +88,7 @@ enum UserAvatarSizeOnScreen {
     var value: CGFloat {
         switch self {
         case .chats, .spaces:
-            if #available(iOS 26, *) {
-                return 40
-            } else {
-                return 32
-            }
+            return 32
         case .timeline:
             return 32
         case .readReceipt:
@@ -110,12 +107,14 @@ enum UserAvatarSizeOnScreen {
             return 44
         case .roomMembersList:
             return 32
+        case .roomChangeRoles:
+            return 56
         case .startChat:
             return 36
         case .memberDetails:
             return 96
         case .inviteUsers:
-            return 56
+            return 52
         case .editUserDetails:
             return 96
         case .dmDetails:
@@ -142,6 +141,7 @@ enum RoomAvatarSizeOnScreen {
     case chats
     case spaces
     case spaceSettings
+    case spaceFilters
     case authorizedSpaces
     case timeline
     case leaveSpace
@@ -153,23 +153,25 @@ enum RoomAvatarSizeOnScreen {
     case roomDirectorySearch
     case joinRoom
     case spaceHeader
+    case spaceAddRooms
+    case spaceAddRoomsSelected
     case completionSuggestions
+    case createRoomSelectSpace
 
     var value: CGFloat {
         switch self {
         case .chats, .spaces, .spaceSettings:
             return 52
         case .timeline, .leaveSpace, .roomDirectorySearch,
-             .completionSuggestions, .authorizedSpaces:
+             .completionSuggestions, .authorizedSpaces, .createRoomSelectSpace,
+             .spaceFilters:
             return 32
         case .notificationSettings:
             return 30
-        case .messageForwarding:
+        case .messageForwarding, .globalSearch, .roomSelection, .spaceAddRooms:
             return 36
-        case .globalSearch:
-            return 36
-        case .roomSelection:
-            return 36
+        case .spaceAddRoomsSelected:
+            return 52
         case .details:
             return 96
         case .joinRoom:

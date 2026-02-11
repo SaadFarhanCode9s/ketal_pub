@@ -19,7 +19,7 @@ extension ButtonStyle where Self == MenuSheetButtonStyle {
 /// a sheet such as `TimelineItemMenu`.
 struct MenuSheetButtonStyle: ButtonStyle {
     @Environment(\.accessibilityShowButtonShapes) private var accessibilityShowButtonShapes
-
+    
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(MenuSheetLabelStyle())
@@ -39,7 +39,7 @@ struct MenuSheetButtonStyle: ButtonStyle {
 
 private struct MenuSheetLabelStyle: LabelStyle {
     var spacing: CGFloat = 16
-
+    
     func makeBody(configuration: Configuration) -> some View {
         HStack(spacing: spacing) {
             configuration.icon

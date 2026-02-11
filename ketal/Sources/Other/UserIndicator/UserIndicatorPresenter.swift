@@ -10,13 +10,13 @@ import SwiftUI
 
 struct UserIndicatorPresenter: View {
     @ObservedObject var userIndicatorController: UserIndicatorController
-
+    
     var body: some View {
         indicatorViewFor(indicator: userIndicatorController.activeIndicator)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .animation(.elementDefault, value: userIndicatorController.activeIndicator)
     }
-
+    
     private func indicatorViewFor(indicator: UserIndicator?) -> some View {
         ZStack { // Need a container to properly animate transitions
             if let indicator {
@@ -28,6 +28,5 @@ struct UserIndicatorPresenter: View {
                 }
             }
         }
-        .alert(item: $userIndicatorController.alertInfo)
     }
 }

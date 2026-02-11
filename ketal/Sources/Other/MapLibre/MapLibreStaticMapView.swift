@@ -19,7 +19,7 @@ struct MapLibreStaticMapView<PinAnnotation: View>: View {
 
     @Environment(\.colorScheme) private var colorScheme
     @State private var fetchAttempt = 0
-
+    
     init(coordinates: CLLocationCoordinate2D,
          zoomLevel: Double,
          attributionPlacement: MapTilerAttributionPlacement,
@@ -33,7 +33,7 @@ struct MapLibreStaticMapView<PinAnnotation: View>: View {
         self.mapSize = mapSize
         self.pinAnnotationView = pinAnnotationView()
     }
-
+    
     var body: some View {
         GeometryReader { geometry in
             if let url = mapURLBuilder.staticMapTileImageURL(for: colorScheme.mapStyle,
@@ -117,7 +117,7 @@ private struct MapTilerURLBuilderMock: MapTilerURLBuilderProtocol {
     func interactiveMapURL(for style: MapTilerStyle) -> URL? {
         nil
     }
-
+    
     func staticMapTileImageURL(for style: MapTilerStyle,
                                coordinates: CLLocationCoordinate2D,
                                zoomLevel: Double,

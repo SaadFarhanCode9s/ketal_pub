@@ -22,12 +22,12 @@ struct CollapsibleReactionLayout: Layout {
     var collapsed = true
     /// The number of rows before the collapse/expand button is shown
     var rowsBeforeCollapsible: Int?
-
+    
     func sizeThatFits(proposal: ProposedViewSize, subviews: some FlowLayoutSubviews, cache: inout ()) -> CGSize {
         guard let subviewsByType = getSubviewsByItemType(subviews: Array(subviews)), subviewsByType.reactions.count > 0 else {
             return .zero
         }
-
+        
         // Calculate the layout of the rows with the reactions button and add more button
         let reactionsAndAddMore = calculateRows(proposal: proposal, subviews: Array(subviewsByType.reactions + [subviewsByType.addMoreButton]))
         // If we have extended beyond the defined number of rows we are showing the expand/collapse ui
@@ -51,7 +51,7 @@ struct CollapsibleReactionLayout: Layout {
             return sizeThatFits(rows: reactionsAndAddMore)
         }
     }
-
+    
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: some FlowLayoutSubviews, cache: inout ()) {
         guard let subviewsByType = getSubviewsByItemType(subviews: Array(subviews)), subviewsByType.reactions.count > 0 else {
             subviews.forEach { subview in
@@ -71,7 +71,7 @@ struct CollapsibleReactionLayout: Layout {
                                                                                                  rows: collapsedRows,
                                                                                                  collapseButton: subviewsByType.collapseButton,
                                                                                                  addMoreButton: subviewsByType.addMoreButton)
-
+                
                 var remainingSubviews = subviewsToHide + Array(reactionsAndAddMore.suffix(reactionsAndAddMore.count - rowsBeforeCollapsible)).joined()
                 // remove the add button which was in initial rows calculation
                 remainingSubviews.removeLast()
@@ -80,7 +80,7 @@ struct CollapsibleReactionLayout: Layout {
                 remainingSubviews.forEach { subview in
                     subview.place(at: Self.pointOffscreen, anchor: .leading, proposal: .zero)
                 }
-
+                
             } else {
                 // Show all subviews with the buttons at the end
                 var rowsWithButtons = calculateRows(proposal: ProposedViewSize(bounds.size), subviews: Array(subviews))
@@ -94,7 +94,7 @@ struct CollapsibleReactionLayout: Layout {
             subviewsByType.collapseButton.place(at: Self.pointOffscreen, anchor: .leading, proposal: .zero)
         }
     }
-
+    
     /// Given a proposed size and a flat list of subviews, calculates and returns a structure representing
     /// how the subviews should wrap on to multiple rows given the size's width.
     /// - Parameters:
@@ -104,7 +104,7 @@ struct CollapsibleReactionLayout: Layout {
     private func calculateRows(proposal: ProposedViewSize, subviews: [FlowLayoutSubview]) -> [[FlowLayoutSubview]] {
         var rows = [[FlowLayoutSubview]]()
         var currentRow = [FlowLayoutSubview]()
-
+        
         var rowX: CGFloat = 0
         for subview in subviews {
             let size = subview.sizeThatFits(.unspecified)
@@ -124,7 +124,7 @@ struct CollapsibleReactionLayout: Layout {
         }
         return rows
     }
-
+    
     /// Given a list of rows calculate the size needed to display them
     /// - Parameters:
     ///   - proposal: The proposed size
@@ -139,7 +139,7 @@ struct CollapsibleReactionLayout: Layout {
         let maxHeight = sizes.joined().reduce(0) { partialResult, size in
             max(partialResult, size.height)
         }
-
+        
         return sizes.enumerated().reduce(CGSize.zero) { partialResult, rowItem in
             let (rowIndex, row) = rowItem
             let rowSize = row.enumerated().reduce(CGSize.zero) { partialResult, subviewItem in
@@ -151,7 +151,7 @@ struct CollapsibleReactionLayout: Layout {
             return CGSize(width: max(partialResult.width, rowSize.width), height: partialResult.height + rowSize.height + verticalSpacing)
         }
     }
-
+    
     /// Used to render the collapsed state, this takes the rows inputted and adds the button to the last row,
     /// removing only as many trailing subviews as needed to make space for it. It also returns the items removed.
     /// - Parameters:
@@ -181,7 +181,7 @@ struct CollapsibleReactionLayout: Layout {
         rows[rows.count - 1] = lastRowWithButton
         return (rows, [])
     }
-
+    
     private func ensureCollapseAndAddMoreButtonsAreOnTheSameRow(_ rows: inout [[FlowLayoutSubview]]) {
         guard var lastRow = rows.last, lastRow.count == 1 else {
             return
@@ -192,7 +192,7 @@ struct CollapsibleReactionLayout: Layout {
         rows[rows.count - 2] = secondLastRow
         rows[rows.count - 1] = lastRow
     }
-
+    
     /// Given a list of rows place them in the layout.
     /// - Parameters:
     ///   - bounds: The bounds of the parent
@@ -200,17 +200,17 @@ struct CollapsibleReactionLayout: Layout {
     private func placeSubviews(in bounds: CGRect, rows: [[FlowLayoutSubview]]) {
         var rowY: CGFloat = bounds.minY
         var rowHeight: CGFloat = 0
-
+        
         let sizes = rows.map { row in
             row.map { subview in
                 subview.sizeThatFits(.unspecified)
             }
         }
-
+        
         let maxHeight = sizes.joined().reduce(0) { partialResult, size in
             max(partialResult, size.height)
         }
-
+        
         for (i, row) in sizes.enumerated() {
             var rowX: CGFloat = bounds.minX
             let verticalSpacing = i == 0 ? 0 : rowSpacing
@@ -225,7 +225,7 @@ struct CollapsibleReactionLayout: Layout {
             rowY += rowHeight + verticalSpacing
         }
     }
-
+    
     /// Group the subviews by type using `ReactionLayoutItemType`
     /// - Parameter subviews: A flat list of all the subviews
     /// - Returns: The subviews organised by type

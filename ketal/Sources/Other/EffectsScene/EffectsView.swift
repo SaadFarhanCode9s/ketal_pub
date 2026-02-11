@@ -18,21 +18,21 @@ struct EffectsView: UIViewRepresentable {
         /// No effect will be shown.
         case none
     }
-
+    
     /// The type of effects to be shown in the view.
     var effect: Effect
-
+    
     func makeUIView(context: Context) -> SCNView {
         SCNView(frame: .zero)
     }
-
+    
     func updateUIView(_ sceneView: SCNView, context: Context) {
         sceneView.scene = makeScene()
         sceneView.backgroundColor = .clear
     }
-
+    
     // MARK: - Private
-
+    
     private func makeScene() -> EffectsScene? {
         switch effect {
         case .confetti:

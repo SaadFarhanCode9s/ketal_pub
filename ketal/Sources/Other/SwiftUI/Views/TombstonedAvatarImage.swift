@@ -11,16 +11,16 @@ import SwiftUI
 
 struct TombstonedAvatarImage: View {
     @ScaledMetric private var frameSize: CGFloat
-
+    
     init(avatarSize: Avatars.Size) {
         _frameSize = ScaledMetric(wrappedValue: avatarSize.value)
     }
-
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .center) {
                 Color.compound.bgSubtlePrimary
-
+                
                 Text(verbatim: "!")
                     .foregroundColor(.compound.iconTertiary)
                     .font(.system(size: geometry.size.width * 0.5625, weight: .semibold))

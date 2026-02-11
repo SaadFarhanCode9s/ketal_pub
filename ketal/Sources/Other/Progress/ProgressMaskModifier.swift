@@ -35,7 +35,7 @@ private struct ProgressMaskModifier: ViewModifier {
                 Rectangle()
                     .fill(backgroundTrackColor)
                     .frame(width: geometry.size.width, height: geometry.size.height)
-
+                
                 Rectangle()
                     .fill(trackColor)
                     .frame(width: max(0.0, geometry.size.width * progress), height: geometry.size.height)

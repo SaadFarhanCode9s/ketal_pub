@@ -21,7 +21,7 @@ extension View {
             frame.wrappedValue = newValue
         }
     }
-
+    
     /// Reads the height of the view and stores it in the `height` binding.
     /// - Parameters:
     ///   - height: a `CGFloat` binding
@@ -32,7 +32,7 @@ extension View {
             height.wrappedValue = newValue
         }
     }
-
+    
     /// Reads the width of the view and stores it in the `width` binding.
     /// - Parameters:
     ///   - width: a `CGFloat` binding

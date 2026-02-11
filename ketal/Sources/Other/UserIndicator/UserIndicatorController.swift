@@ -13,15 +13,15 @@ class UserIndicatorController: ObservableObject, UserIndicatorControllerProtocol
     private var timerCancellable: AnyCancellable?
     private var displayTimes = [String: Date]()
     private var delayedIndicators = Set<String>()
-
+    
     var nonPersistentDisplayDuration = 2.5
     var minimumDisplayDuration = 0.5
-
+    
     @Published private(set) var activeIndicator: UserIndicator?
     private(set) var indicatorQueue = [UserIndicator]() {
         didSet {
             activeIndicator = indicatorQueue.last
-
+            
             if let activeIndicator, !activeIndicator.persistent {
                 timerCancellable?.cancel()
                 timerCancellable = Task { [weak self, nonPersistentDisplayDuration] in
@@ -31,9 +31,7 @@ class UserIndicatorController: ObservableObject, UserIndicatorControllerProtocol
             }
         }
     }
-
-    @Published var alertInfo: AlertInfo<UUID>?
-
+    
     var window: UIWindow? {
         didSet {
             let hostingController = UIHostingController(rootView: UserIndicatorPresenter(userIndicatorController: self).statusBarHidden(ProcessInfo.isRunningUITests))
@@ -41,7 +39,7 @@ class UserIndicatorController: ObservableObject, UserIndicatorControllerProtocol
             window?.rootViewController = hostingController
         }
     }
-
+    
     func submitIndicator(_ indicator: UserIndicator, delay: Duration?) {
         if let index = indicatorQueue.firstIndex(where: { $0.id == indicator.id }) {
             indicatorQueue[index] = indicator
@@ -49,10 +47,10 @@ class UserIndicatorController: ObservableObject, UserIndicatorControllerProtocol
         } else {
             if let delay {
                 delayedIndicators.insert(indicator.id)
-
+                
                 Task {
                     try await Task.sleep(for: .seconds(delay.seconds))
-
+                    
                     guard delayedIndicators.contains(indicator.id) else {
                         return
                     }
@@ -64,28 +62,28 @@ class UserIndicatorController: ObservableObject, UserIndicatorControllerProtocol
             }
         }
     }
-
+    
     func retractAllIndicators() {
         for indicator in indicatorQueue {
             retractIndicatorWithId(indicator.id)
         }
     }
-
+    
     func retractIndicatorWithId(_ id: String) {
         delayedIndicators.remove(id)
-
+        
         guard let displayTime = displayTimes[id], abs(displayTime.timeIntervalSinceNow) <= minimumDisplayDuration else {
             indicatorQueue.removeAll { $0.id == id }
             return
         }
-
+        
         Task {
             try? await Task.sleep(for: .seconds(minimumDisplayDuration))
             indicatorQueue.removeAll { $0.id == id }
             displayTimes[id] = nil
         }
     }
-
+    
     // MARK: - Private
 
     private func enqueue(indicator: UserIndicator) {

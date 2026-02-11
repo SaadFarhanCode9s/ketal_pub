@@ -29,7 +29,7 @@ struct LoadableImage<TransformerView: View, PlaceholderView: View>: View {
     private let mediaProvider: MediaProviderProtocol?
     private let transformer: (AnyView) -> TransformerView
     private let placeholder: () -> PlaceholderView
-
+    
     /// A SwiftUI view that automatically fetches images
     /// It will try fetching the image from in-memory cache and if that's not available
     /// it will fire a task to load it through the image provider
@@ -53,7 +53,7 @@ struct LoadableImage<TransformerView: View, PlaceholderView: View>: View {
         self.transformer = transformer
         self.placeholder = placeholder
     }
-
+    
     init(url: URL,
          mediaType: LoadableImageMediaType = .generic,
          blurhash: String? = nil,
@@ -69,7 +69,7 @@ struct LoadableImage<TransformerView: View, PlaceholderView: View>: View {
         self.transformer = transformer
         self.placeholder = placeholder
     }
-
+    
     var body: some View {
         if let mediaSource {
             LoadableImageContent(mediaSource: mediaSource,
@@ -84,7 +84,7 @@ struct LoadableImage<TransformerView: View, PlaceholderView: View>: View {
             placeholder()
         }
     }
-
+    
     private var stableMediaIdentifier: String? {
         switch mediaType {
         case .timelineItem(let uniqueID):
@@ -100,16 +100,16 @@ struct LoadableImage<TransformerView: View, PlaceholderView: View>: View {
 
 private struct LoadableImageContent<TransformerView: View, PlaceholderView: View>: View, ImageDataProvider {
     @Environment(\.shouldAutomaticallyLoadImages) private var loadAutomatically
-
+    
     private let mediaSource: MediaSourceProxy
     private let mediaType: LoadableImageMediaType
     private let blurhash: String?
     private let transformer: (AnyView) -> TransformerView
     private let placeholder: () -> PlaceholderView
-
+    
     @StateObject private var contentLoader: ContentLoader
     @State private var loadManually = false
-
+    
     init(mediaSource: MediaSourceProxy,
          mediaType: LoadableImageMediaType,
          blurhash: String? = nil,
@@ -118,7 +118,7 @@ private struct LoadableImageContent<TransformerView: View, PlaceholderView: View
          transformer: @escaping (AnyView) -> TransformerView,
          placeholder: @escaping () -> PlaceholderView) {
         assert(mediaProvider != nil, "Missing image provider, make sure one has been supplied to the view model.")
-
+        
         self.mediaSource = mediaSource
         self.mediaType = mediaType
         self.blurhash = blurhash
@@ -126,11 +126,11 @@ private struct LoadableImageContent<TransformerView: View, PlaceholderView: View
         self.placeholder = placeholder
         _contentLoader = StateObject(wrappedValue: ContentLoader(mediaSource: mediaSource, size: size, mediaProvider: mediaProvider))
     }
-
+    
     var shouldRender: Bool {
         loadAutomatically || loadManually
     }
-
+    
     var body: some View {
         ZStack {
             switch (contentLoader.content, shouldRender) {
@@ -156,18 +156,18 @@ private struct LoadableImageContent<TransformerView: View, PlaceholderView: View
             guard shouldRender, contentLoader.content == nil else {
                 return
             }
-
+            
             await contentLoader.load()
         }
         .onDisappear {
             guard contentLoader.content == nil else {
                 return
             }
-
+            
             contentLoader.cancel()
         }
     }
-
+    
     /// Note: Returns `AnyView` as this is what `transformer` expects.
     var blurHashView: AnyView? {
         if let blurhash,
@@ -178,9 +178,9 @@ private struct LoadableImageContent<TransformerView: View, PlaceholderView: View
             return nil
         }
     }
-
+    
     // MARK: - Overlays
-
+    
     @ViewBuilder
     var placeholderOverlay: some View {
         switch mediaType {
@@ -195,20 +195,20 @@ private struct LoadableImageContent<TransformerView: View, PlaceholderView: View
             }
         }
     }
-
+    
     @ViewBuilder
     var blurHashOverlay: some View {
         if !shouldRender {
             loadManuallyButton
         }
     }
-
+    
     var loadManuallyButton: some View {
         ZStack {
             Color.black.opacity(0.6)
                 .contentShape(.rect)
                 .onTapGesture { /* Empty gesture to block the `mediaTapped` action */ }
-
+            
             // Don't use a real Button as it sometimes triggers simultaneously with the long press gesture.
             Text(L10n.actionShow)
                 .font(.compound.bodyLGSemibold)
@@ -227,18 +227,18 @@ private struct LoadableImageContent<TransformerView: View, PlaceholderView: View
                 .environment(\.colorScheme, .light)
         }
     }
-
+    
     // MARK: - ImageDataProvider
-
+    
     var cacheKey: String {
         mediaSource.url.absoluteString
     }
-
+    
     func data(handler: @escaping (Result<Data, Error>) -> Void) {
         guard case let .gifData(data) = contentLoader.content else {
             fatalError("Shouldn't reach this point without any gif data")
         }
-
+        
         handler(.success(data))
     }
 }
@@ -248,19 +248,19 @@ private class ContentLoader: ObservableObject {
         case image(UIImage)
         case gifData(Data)
     }
-
+    
     private let mediaProvider: MediaProviderProtocol?
     private let mediaSource: MediaSourceProxy
     private let size: CGSize?
     private var imageLoadingCancellable: AnyCancellable?
-
+    
     @Published private var cachedContent: Content?
-
+    
     var content: Content? {
         if cachedContent != nil {
             return cachedContent
         }
-
+        
         if isGIF {
             if let image = mediaProvider?.imageFromSource(mediaSource),
                let data = image.kf.data(format: .GIF) {
@@ -269,16 +269,16 @@ private class ContentLoader: ObservableObject {
         } else if let image = mediaProvider?.imageFromSource(mediaSource, size: size) {
             return .image(image)
         }
-
+        
         return cachedContent
     }
-
+    
     init(mediaSource: MediaSourceProxy, size: CGSize?, mediaProvider: MediaProviderProtocol?) {
         self.mediaSource = mediaSource
         self.size = size
         self.mediaProvider = mediaProvider
     }
-
+    
     @MainActor
     func load() async {
         if isGIF {
@@ -290,19 +290,19 @@ private class ContentLoader: ObservableObject {
                 MXLog.error("Failed loading image, invalid reconnection retry task.")
                 return
             }
-
+            
             imageLoadingCancellable = task.asCancellable()
-
+            
             if let image = try? await task.value {
                 cachedContent = .image(image)
             }
         }
     }
-
+    
     func cancel() {
         imageLoadingCancellable?.cancel()
     }
-
+    
     private var isGIF: Bool {
         mediaSource.mimeType == "image/gif"
     }
@@ -318,7 +318,7 @@ extension EnvironmentValues {
 struct LoadableImage_Previews: PreviewProvider, TestablePreview {
     static let mediaProvider = makeMediaProvider()
     static let loadingMediaProvider = makeMediaProvider(isLoading: true)
-
+    
     static var previews: some View {
         LazyVGrid(columns: [.init(.adaptive(minimum: 110, maximum: 110))], spacing: 24) {
             LoadableImage(url: "mxc://wherever/1234",
@@ -326,33 +326,33 @@ struct LoadableImage_Previews: PreviewProvider, TestablePreview {
                           mediaProvider: mediaProvider,
                           placeholder: placeholder)
                 .layout(title: "Loaded")
-
+            
             LoadableImage(url: "mxc://wherever/2345",
                           mediaType: .timelineItem(uniqueID: .init("id")),
                           blurhash: "KpE4oyayR5|GbHb];3j@of",
                           mediaProvider: mediaProvider,
                           placeholder: placeholder)
                 .layout(title: "Hidden (blurhash)", hideTimelineMedia: true)
-
+            
             LoadableImage(url: "mxc://wherever/3456",
                           mediaType: .timelineItem(uniqueID: .init("id")),
                           mediaProvider: mediaProvider,
                           placeholder: placeholder)
                 .layout(title: "Hidden (placeholder)", hideTimelineMedia: true)
-
+            
             LoadableImage(url: "mxc://wherever/4567",
                           mediaType: .timelineItem(uniqueID: .init("id")),
                           blurhash: "KbLM^j]q$jT|EfR-3rtjXk",
                           mediaProvider: loadingMediaProvider,
                           placeholder: placeholder)
                 .layout(title: "Loading (blurhash)")
-
+            
             LoadableImage(url: "mxc://wherever/5678",
                           mediaType: .timelineItem(uniqueID: .init("id")),
                           mediaProvider: loadingMediaProvider,
                           placeholder: placeholder)
                 .layout(title: "Loading (placeholder)")
-
+            
             LoadableImage(url: "mxc://wherever/6789",
                           mediaType: .avatar,
                           mediaProvider: loadingMediaProvider,
@@ -366,7 +366,7 @@ struct LoadableImage_Previews: PreviewProvider, TestablePreview {
                           transformer: transformer,
                           placeholder: placeholder)
                 .layout(title: "Loaded (transformer)")
-
+            
             LoadableImage(url: "mxc://wherever/345",
                           mediaType: .timelineItem(uniqueID: .init("id")),
                           blurhash: "KbLM^j]q$jT|EfR-3rtjXk",
@@ -374,7 +374,7 @@ struct LoadableImage_Previews: PreviewProvider, TestablePreview {
                           transformer: transformer,
                           placeholder: placeholder)
                 .layout(title: "Loading (transformer)")
-
+            
             LoadableImage(url: "mxc://wherever/234",
                           mediaType: .timelineItem(uniqueID: .init("id")),
                           blurhash: "KbLM^j]q$jT|EfR-3rtjXk",
@@ -384,7 +384,7 @@ struct LoadableImage_Previews: PreviewProvider, TestablePreview {
                 .layout(title: "Hidden (transformer)", hideTimelineMedia: true)
         }
     }
-
+    
     static func placeholder() -> some View {
         Color.compound._bgBubbleIncoming
     }
@@ -396,10 +396,10 @@ struct LoadableImage_Previews: PreviewProvider, TestablePreview {
                 .foregroundStyle(.compound.iconAccentPrimary)
         }
     }
-
+    
     static func makeMediaProvider(isLoading: Bool = false) -> MediaProviderProtocol {
         let mediaProvider = MediaProviderMock(configuration: .init())
-
+        
         if isLoading {
             mediaProvider.imageFromSourceSizeClosure = { _, _ in nil }
             mediaProvider.loadFileFromSourceFilenameClosure = { _, _ in .failure(.failedRetrievingFile) }

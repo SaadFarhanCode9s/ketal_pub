@@ -21,7 +21,7 @@ enum Tracing {
             logsDirectoryOverride ?? .appGroupLogsDirectory
         }
     }
-
+    
     /// Set this to temporarily override the directory from which logs will be collected.
     /// This basically only affects ``logFiles``, and doesn't inform the SDK to write
     /// the logs to a different directory, which should be done before setting this.
@@ -29,9 +29,9 @@ enum Tracing {
     static var legacyLogsDirectory: URL {
         .appGroupContainerDirectory
     }
-
+    
     static let fileExtension = "log"
-
+    
     static func buildConfiguration(logLevel: LogLevel, traceLogPacks: Set<TraceLogPack>,
                                    currentTarget: String,
                                    filePrefix: String?,
@@ -41,15 +41,15 @@ enum Tracing {
         } else {
             Tracing.filePrefix
         }
-
+        
         // Keep a minimum of 1 week of log files. In reality it will be longer
         // as the app is unlikely to be running continuously.
         let maxFiles: UInt64 = 24 * 7
-
+        
         // Log everything on integration tests to check whether
         // the logs contain any sensitive data. See `integration-tests.yml`
         let level: LogLevel = ProcessInfo.isRunningIntegrationTests ? .trace : logLevel
-
+        
         return .init(logLevel: level.rustLogLevel,
                      traceLogPacks: traceLogPacks.map(\.rustLogPack),
                      extraTargets: [currentTarget],
@@ -60,44 +60,44 @@ enum Tracing {
                                          maxFiles: maxFiles),
                      sentryDsn: sentryURL?.absoluteString)
     }
-
+    
     /// A list of all log file URLs, sorted chronologically.
     static var logFiles: [URL] {
         logFiles(in: logsDirectory)
     }
-
+    
     /// Collect all of the logs in the given directory, sorting them chronologically.
     private static func logFiles(in directory: URL) -> [URL] {
         var logFiles = [(url: URL, modificationDate: Date)]()
-
+        
         let fileManager = FileManager.default
         let enumerator = fileManager.enumerator(at: directory,
                                                 includingPropertiesForKeys: [.contentModificationDateKey],
                                                 options: .skipsSubdirectoryDescendants)
-
+        
         // Find all *.log files and their modification dates.
         while let logURL = enumerator?.nextObject() as? URL {
             guard let resourceValues = try? logURL.resourceValues(forKeys: [.contentModificationDateKey]),
                   let modificationDate = resourceValues.contentModificationDate
             else { continue }
-
+            
             if logURL.lastPathComponent.hasPrefix(filePrefix) {
                 logFiles.append((logURL, modificationDate))
             }
         }
-
+        
         let sortedFiles = logFiles.sorted { $0.modificationDate > $1.modificationDate }.map(\.url)
-
+        
         MXLog.info("logFiles: \(sortedFiles.map(\.lastPathComponent))")
-
+        
         return sortedFiles
     }
-
+    
     static func migrateLogFiles() {
         MXLog.info("Moving log files to \(logsDirectory)")
         let fileManager = FileManager.default
         let oldLogFiles = logFiles(in: legacyLogsDirectory)
-
+        
         for oldFileURL in oldLogFiles {
             do {
                 let newFileURL = logsDirectory.appending(component: oldFileURL.lastPathComponent)
@@ -105,7 +105,7 @@ enum Tracing {
                 MXLog.info("Moved \(newFileURL.lastPathComponent)")
             } catch {
                 MXLog.error("Failed to move \(oldFileURL.lastPathComponent): \(error.localizedDescription)")
-
+                
                 let nsError = error as NSError
                 if nsError.domain == NSCocoaErrorDomain, nsError.code == NSFileWriteFileExistsError {
                     // By now there will already be some logs in the new directory, so there is likely to be
@@ -116,11 +116,11 @@ enum Tracing {
             }
         }
     }
-
+    
     /// Delete all log files.
     static func deleteLogFiles(in directory: URL) {
         let fileManager = FileManager.default
-
+        
         // We don't simply delete logsDirectory as once upon a time the logs
         // we written to the very top-level of the app group container and
         // there's a migration in place for old users of the app.

@@ -19,7 +19,7 @@ struct HorizontalHighlightGradient: ViewModifier {
     let gradient: Gradient
     let borderColor: Color
     let backgroundColor: Color
-
+    
     func body(content: Content) -> some View {
         ZStack(alignment: .top) {
             VStack(spacing: 0) {

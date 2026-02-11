@@ -65,8 +65,7 @@ include:
 packages:
   MatrixRustSDK:
     url: https://github.com/element-hq/matrix-rust-components-swift
-    exactVersion: 26.01.27
-    # path: ../matrix-rust-sdk
+    exactVersion: 26.02.10
   Compound:
     path: compound-ios
   AnalyticsEvents:

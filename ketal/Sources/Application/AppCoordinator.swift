@@ -696,6 +696,14 @@ class AppCoordinator: AppCoordinatorProtocol, AuthenticationFlowCoordinatorDeleg
         guard let userSession else {
             fatalError("User session not setup")
         }
+        
+        if let serverName = userSession.clientProxy.userIDServerName {
+            ServiceLocator.shared.analytics.signpost.addGlobalTag(.homeserver, value: serverName)
+        }
+        
+        if !isNewLogin {
+            ServiceLocator.shared.analytics.signpost.startTransaction(.cachedRoomList)
+        }
 
         let flowParameters = CommonFlowParameters(userSession: userSession,
                                                   bugReportService: bugReportService,
@@ -953,8 +961,14 @@ class AppCoordinator: AppCoordinatorProtocol, AuthenticationFlowCoordinatorDeleg
 
         options.dsn = bugReportSentryURL.absoluteString
 
-        if AppSettings.isDevelopmentBuild {
-            options.environment = "development"
+        // Matches android, at least for now.
+        switch AppSettings.appBuildType {
+        case .debug:
+            options.environment = "DEBUG"
+        case .nightly:
+            options.environment = "NIGHTLY"
+        case .release:
+            options.environment = "RELEASE"
         }
 
         // Sentry swizzling shows up quite often as the heaviest stack trace when profiling
@@ -1070,6 +1084,7 @@ class AppCoordinator: AppCoordinatorProtocol, AuthenticationFlowCoordinatorDeleg
 
         clientProxyObserver = userSession.clientProxy
             .loadingStatePublisher
+            .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
@@ -1082,7 +1097,7 @@ class AppCoordinator: AppCoordinatorProtocol, AuthenticationFlowCoordinatorDeleg
                         ServiceLocator.shared.userIndicatorController.submitIndicator(.init(id: toastIdentifier, type: .toast(progress: .indeterminate), title: L10n.commonSyncing, persistent: true))
                     }
                 case .notLoading:
-                    ServiceLocator.shared.analytics.signpost.endFirstSync()
+                    ServiceLocator.shared.analytics.signpost.finishTransaction(.upToDateRoomList)
                     ServiceLocator.shared.userIndicatorController.retractIndicatorWithId(toastIdentifier)
                 }
             }

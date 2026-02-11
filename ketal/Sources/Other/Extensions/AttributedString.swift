@@ -13,23 +13,38 @@ extension AttributedString {
     var string: String {
         String(characters[...])
     }
-
+    
     var formattedComponents: [AttributedStringBuilderComponent] {
-        runs[\.blockquote].map { value, range in
-            var attributedString = AttributedString(self[range])
-
+        var components = [AttributedStringBuilderComponent]()
+        
+        for run in runs[\.blockquote, \.codeBlock] {
+            let isBlockquote = run.0 != nil
+            let isCodeBlock = run.1 != nil
+            var attributedString = AttributedString(self[run.2])
+            
             // Remove trailing new lines if any
             if attributedString.characters.last?.isNewline ?? false,
                let range = attributedString.range(of: "\n", options: .backwards, locale: nil) {
                 attributedString.removeSubrange(range)
             }
-
-            let isBlockquote = value != nil
-
-            return AttributedStringBuilderComponent(id: String(attributedString.characters), attributedString: attributedString, isBlockquote: isBlockquote)
+            
+            let componentType: AttributedStringBuilderComponent.ComponentType = switch (isBlockquote, isCodeBlock) {
+            case (true, _):
+                .blockquote
+            case (false, true):
+                .codeBlock
+            case (false, false):
+                .plainText
+            }
+                    
+            components.append(AttributedStringBuilderComponent(id: String(attributedString.characters),
+                                                               attributedString: attributedString,
+                                                               type: componentType))
         }
+        
+        return components
     }
-
+    
     /// Replaces the specified placeholder with a string that links to the specified URL.
     /// - Parameters:
     ///   - linkPlaceholder: The text in the string that will be replaced. Make sure this is unique within the string.
@@ -41,7 +56,7 @@ extension AttributedString {
         replacement.link = url
         replace(linkPlaceholder, with: replacement)
     }
-
+    
     /// Replaces the specified placeholder with the supplied attributed string.
     /// - Parameters:
     ///   - placeholder: The text in the string that will be replaced. Make sure this is unique within the string.
@@ -51,11 +66,11 @@ extension AttributedString {
             MXLog.failure("Failed to find the placeholder to be replaced.")
             return
         }
-
+        
         // Replace the placeholder.
         replaceSubrange(range, with: replacement)
     }
-
+    
     /// Returns a new attributed string, created by replacing any hard coded `UIFont` with
     /// a simple presentation intent. This allows simple formatting to respond to Dynamic Type.
     ///
@@ -69,7 +84,7 @@ extension AttributedString {
         }
         return newValue
     }
-
+    
     /// Makes the entire string bold by setting the presentation intent to strongly emphasized.
     ///
     /// In practice, this is rendered as semibold for smaller font sizes and just so happens to nicely

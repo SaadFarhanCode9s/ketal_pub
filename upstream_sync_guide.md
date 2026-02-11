@@ -10,6 +10,19 @@ The synchronization is handled by the `upstream_sync.sh` script located in the r
 - **Automatic Backups:** Creates a backup branch before doing anything. Use this to roll back if needed.
 - **Smart Merging:** Automatically resolves conflicts in configuration files (like `project.yml`, `app.yml`), ensuring your Ketal branding is **always** preserved.
 - **Validation:** Runs checks after merging to ensure the project name and bundle IDs are still correct.
+4. **Conflict Resolution**:
+   - The script will **automatically resolve** configuration conflicts by keeping Ketal's branding.
+   - If other conflicts occur (e.g., in Swift code), the script will pause and ask you to resolve them manually.
+
+5. **Validation**: The script checks if branding (e.g., `APP_DISPLAY_NAME`) is preserved.
+
+6. **Finalization (Merge to Main)**:
+   - If validation passes, the script will ask: `Do you want to merge these changes to 'main' and push to origin? (y/N)`
+   - Enter `y` to automatically:
+     - Switch to `main`.
+     - Merge the sync branch.
+     - Push to GitHub.
+     - Delete the temporary sync branch.
 
 ## How to Run the Sync
 

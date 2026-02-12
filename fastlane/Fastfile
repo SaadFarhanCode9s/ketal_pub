@@ -350,16 +350,21 @@ lane :deploy_testflight do
     in_house: false
   )
 
-  # 2. Sync Code Signing (ReadOnly)
-  # Ensure you used the 'match' action to generate these repo url and password
-  match(type: "appstore", readonly: true, git_url: ENV["MATCH_GIT_URL"])
+  # 2. Import Certificates and Provisioning Profiles
+  import_code_signing_assets()
 
   # 3. Build App
   build_app(
     project: "ketal.xcodeproj",
     scheme: "ketal",
     clean: true,
-    xcargs: "-allowProvisioningUpdates"
+    export_method: "app-store",
+    export_options: {
+      provisioningProfiles: {
+        "io.ketal.app" => "Ketal App Store Profile",
+        "io.ketal.app.nse" => "Ketal NSE App Store Profile"
+      }
+    }
   )
 
   # 4. Upload to TestFlight
@@ -367,4 +372,79 @@ lane :deploy_testflight do
     api_key: api_key,
     skip_waiting_for_build_processing: true
   )
+  
+  # 5. Cleanup
+  cleanup_keychain()
+end
+
+# Private lane to import certificates and provisioning profiles from environment variables
+private_lane :import_code_signing_assets do
+  # Validate required environment variables
+  certificate_base64 = ENV["CERTIFICATE_P12_BASE64"]
+  p12_password = ENV["P12_PASSWORD"]
+  main_profile_base64 = ENV["PROVISIONING_PROFILE_BASE64"]
+  nse_profile_base64 = ENV["NSE_PROVISIONING_PROFILE_BASE64"]
+  
+  UI.user_error!("CERTIFICATE_P12_BASE64 is missing") if certificate_base64.to_s.empty?
+  UI.user_error!("P12_PASSWORD is missing") if p12_password.to_s.empty?
+  UI.user_error!("PROVISIONING_PROFILE_BASE64 is missing") if main_profile_base64.to_s.empty?
+  UI.user_error!("NSE_PROVISIONING_PROFILE_BASE64 is missing") if nse_profile_base64.to_s.empty?
+
+  # Create temporary directory for certificates
+  cert_dir = File.expand_path("~/fastlane_tmp")
+  FileUtils.mkdir_p(cert_dir)
+  
+  # Decode and save certificate
+  cert_path = "#{cert_dir}/certificate.p12"
+  File.write(cert_path, Base64.decode64(certificate_base64))
+  
+  # Decode and save provisioning profiles
+  main_profile_path = "#{cert_dir}/main.mobileprovision"
+  nse_profile_path = "#{cert_dir}/nse.mobileprovision"
+  File.write(main_profile_path, Base64.decode64(main_profile_base64))
+  File.write(nse_profile_path, Base64.decode64(nse_profile_base64))
+  
+  # Create temporary keychain
+  keychain_name = "fastlane_keychain"
+  keychain_password = SecureRandom.hex(16)
+  
+  ENV["FASTLANE_KEYCHAIN_NAME"] = keychain_name
+  ENV["FASTLANE_KEYCHAIN_PASSWORD"] = keychain_password
+  
+  create_keychain(
+    name: keychain_name,
+    password: keychain_password,
+    default_keychain: false,
+    unlock: true,
+    timeout: 3600,
+    lock_when_sleeps: false
+  )
+  
+  # Import certificate into keychain
+  import_certificate(
+    certificate_path: cert_path,
+    certificate_password: p12_password,
+    keychain_name: keychain_name,
+    keychain_password: keychain_password,
+    log_output: true
+  )
+  
+  # Install provisioning profiles
+  install_provisioning_profile(path: main_profile_path)
+  install_provisioning_profile(path: nse_profile_path)
+  
+  UI.success("Successfully imported certificates and provisioning profiles")
+end
+
+private_lane :cleanup_keychain do
+  keychain_name = ENV["FASTLANE_KEYCHAIN_NAME"]
+  
+  if keychain_name && !keychain_name.empty?
+    delete_keychain(name: keychain_name)
+    UI.success("Cleaned up keychain: #{keychain_name}")
+  end
+  
+  # Clean up temporary directory
+  cert_dir = File.expand_path("~/fastlane_tmp")
+  FileUtils.rm_rf(cert_dir) if File.exist?(cert_dir)
 end
